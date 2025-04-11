@@ -1,126 +1,135 @@
-import React from 'react';
-import { View, ScrollView, Text, StyleSheet, Image, TouchableOpacity, StatusBar, SafeAreaView, Animated } from 'react-native';
-import { COLORS, SIZES, FONTS, commonStyles } from '../../styles/theme';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, StatusBar, Animated } from 'react-native';
+import { COLORS } from '../../styles/theme';
+import { Bell } from 'lucide-react-native';
 
-class HomeHeader extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      animation: new Animated.Value(0),
-    };
-  }
-
-  componentDidMount() {
-    Animated.timing(this.state.animation, {
+const HomeHeader = () => {
+  // Crear referencias para animaciones
+  const animation = useRef(new Animated.Value(0)).current;
+  
+  useEffect(() => {
+    // Iniciar animación al montar el componente
+    Animated.timing(animation, {
       toValue: 1,
-      duration: 1500,
+      duration: 1000,
       useNativeDriver: true,
     }).start();
-  }
+  }, []);
+  
+  // Interpolaciones para animaciones
+  const logoScale = animation.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [0.92, 1.03, 1]
+  });
 
-  render() {
-    const logoScale = this.state.animation.interpolate({
-      inputRange: [0, 0.5, 1],
-      outputRange: [0.85, 1.05, 1]
-    });
+  const fadeIn = animation.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 1]
+  });
 
-    const titleTranslateY = this.state.animation.interpolate({
-      inputRange: [0, 1],
-      outputRange: [20, 0]
-    });
-
-    const titleOpacity = this.state.animation.interpolate({
-      inputRange: [0, 0.7, 1],
-      outputRange: [0, 0, 1]
-    });
-
-    return (
-      <SafeAreaView style={styles.safeArea}>
-        <StatusBar backgroundColor={COLORS.background} barStyle="light-content" />
-        <View style={styles.container}>
-          <View style={styles.headerTop}>
-            <Animated.Image
-              source={require('../../../assets/images/logos/agronea-logo.jpg')}
-              style={[styles.logo, { transform: [{ scale: logoScale }] }]}
+  return (
+    <View style={styles.container}>
+      <View style={styles.headerContent}>
+        {/* Logo y título en una fila */}
+        <View style={styles.brandContainer}>
+          <Animated.View
+            style={{
+              transform: [{ scale: logoScale }]
+            }}
+          >
+            <Image
+              source={require('../../../assets/images/logos/agronea-logo.png')}
+              style={styles.logo}
               resizeMode="contain"
             />
-            <TouchableOpacity style={styles.notificationButton}>
-              <Ionicons name="notifications-outline" size={24} color={COLORS.text} />
-              <View style={styles.notificationBadge}>
-                <Text style={styles.notificationBadgeText}>3</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
+          </Animated.View>
           
           <Animated.View 
             style={[
-              styles.titleContainer, 
-              { 
-                opacity: titleOpacity, 
-                transform: [{ translateY: titleTranslateY }] 
-              }
+              styles.titleContainer,
+              { opacity: fadeIn }
             ]}
           >
-            <Text style={styles.title}>AGRONEA 2025</Text>
-            <Text style={styles.subtitle}>La exposición agrícola más importante</Text>
+            <Text style={styles.title}>Agronea </Text>
+            <Text style={styles.title}>2025</Text>
           </Animated.View>
-          
-          <View style={styles.sponsorsContainer}>
-            <Text style={styles.sponsorsTitle}>Patrocinadores Premium</Text>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              style={styles.sponsorsScroll}
-            >
-              {/* Logos de los patrocinadores */}
-              <Image source={require('../../../assets/images/sponsors/deere.png')} style={styles.sponsorLogo} />
-              <Image source={require('../../../assets/images/sponsors/case.png')} style={styles.sponsorLogo} />
-              <Image source={require('../../../assets/images/sponsors/massey.png')} style={styles.sponsorLogo} />
-              <Image source={require('../../../assets/images/sponsors/claas.png')} style={styles.sponsorLogo} />
-            </ScrollView>
-          </View>
         </View>
-      </SafeAreaView>
-    );
-  }
-}
+        
+        {/* Botón de notificaciones */}
+        <TouchableOpacity style={styles.notificationButton}>
+          <Bell size={22} color={COLORS.text} />
+          <View style={styles.notificationBadge}>
+            <Text style={styles.notificationBadgeText}>3</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+      
+      
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-  safeArea: {
-    backgroundColor: COLORS.background,
-  },
   container: {
-    backgroundColor: COLORS.card,
-    paddingVertical: 16,
+    paddingTop: 12,
     paddingHorizontal: 16,
+    paddingBottom: 12,
+    backgroundColor: COLORS.background,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
+    height: '100%', // Altura fija para evitar fluctuaciones
   },
-  headerTop: {
+  headerContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+  },
+  brandContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   logo: {
-    width: 150,
-    height: 50,
+    width: 60,
+    height: 40,
+    borderRadius: 15,
   },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    marginLeft: 8,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#17823B', // Verde de Agronea
+  },
+  year: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#17823B',
+    marginBottom: 4,
+    marginLeft: 2,
+  },
+  
   notificationButton: {
     position: 'relative',
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: COLORS.border,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: COLORS.card,
     alignItems: 'center',
     justifyContent: 'center',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.5,
   },
   notificationBadge: {
     position: 'absolute',
     top: 0,
     right: 0,
-    backgroundColor: COLORS.primary,
+    backgroundColor: '#FFD700', // Color dorado similar al de la web
     borderRadius: 10,
     width: 18,
     height: 18,
@@ -128,39 +137,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   notificationBadgeText: {
-    color: COLORS.text,
+    color: '#17823B', // Verde sobre fondo dorado
     fontSize: 10,
     fontWeight: 'bold',
-  },
-  titleContainer: {
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: COLORS.text,
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-  },
-  sponsorsContainer: {
-    marginTop: 10,
-  },
-  sponsorsTitle: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-    marginBottom: 8,
-  },
-  sponsorsScroll: {
-    flexDirection: 'row',
-  },
-  sponsorLogo: {
-    width: 70,
-    height: 30,
-    marginRight: 15,
-    resizeMode: 'contain',
   },
 });
 

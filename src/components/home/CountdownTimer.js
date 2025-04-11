@@ -55,16 +55,19 @@ const CountdownTimer = ({ targetDate, eventTitle, eventLocation }) => {
       
       // Animar cambios
       Object.keys(newTimeLeft).forEach(key => {
-        if (newTimeLeft[key] !== timeLeft[key]) {
-          animateValue(key, newTimeLeft[key]);
-        }
+        // Usamos una función para comparar con el estado anterior
+        setTimeLeft(prevTimeLeft => {
+          if (newTimeLeft[key] !== prevTimeLeft[key]) {
+            animateValue(key, newTimeLeft[key]);
+          }
+          return newTimeLeft;
+        });
       });
       
-      setTimeLeft(newTimeLeft);
     }, 1000);
     
     return () => clearInterval(timer);
-  }, [targetDate, timeLeft]);
+  }, [targetDate]);
   
   // Crear animaciones de rotación para cada dígito
   const createRotateAnimation = (value) => {
@@ -154,18 +157,18 @@ const CountdownTimer = ({ targetDate, eventTitle, eventLocation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: COLORS.card,
-    borderRadius: 10,
-    padding: 16,
-    marginHorizontal: 16,
-    marginTop: -20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 5,
-    borderWidth: 1,
-    borderColor: COLORS.border,
+    // backgroundColor: COLORS.card,
+    // borderRadius: 10,
+     padding: 16,
+    // marginHorizontal: 16,
+    // marginTop: -20,
+    // shadowColor: '#000',
+    // shadowOffset: { width: 0, height: 4 },
+    // shadowOpacity: 0.2,
+    // shadowRadius: 8,
+    // elevation: 5,
+    // borderWidth: 1,
+    // borderColor: COLORS.border,
   },
   eventInfo: {
     alignItems: 'center',

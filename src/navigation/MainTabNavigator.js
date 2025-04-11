@@ -1,19 +1,86 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { createStackNavigator } from "@react-navigation/stack";
+import { StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 // Importamos las pantallas necesarias
 import HomeScreen from "../screens/HomeScreen";
 import EventInfoScreen from "../screens/EventInfoScreen";
-import ExhibitorsScreen from "../screens/ExhibitorsScreen";
+import ExhibitorsStackNavigator from "./ExhibitorsStackNavigator";
 import ShopScreen from "../screens/ShopScreen";
 import PlannerScreen from "../screens/PlannerScreen";
+import LoginScreen from "../screens/LoginScreen";
+import MyTicketsScreen from "../screens/more/MyTicketsScreen";
+import MyProductsScreen from "../screens/more/MyProductsScreen";
+import VisitorGuideScreen from "../screens/more/VisitorGuideScreen";
+import ImportantInfoScreen from "../screens/more/ImportantInfoScreen";
+import MoreMenuScreen from "../screens/more/MoreMenuScreen";
 
 // Importamos el tema y colores
 import { COLORS } from "../constants/colors";
 
 const Tab = createBottomTabNavigator();
+const MoreStack = createStackNavigator();
+
+// Stack Navigator para la sección "Más"
+const MoreStackNavigator = () => {
+  return (
+    <MoreStack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: COLORS.card,
+          shadowColor: 'black',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.2,
+          shadowRadius: 5,
+          elevation: 5,
+        },
+        headerTintColor: COLORS.text,
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+        cardStyle: { backgroundColor: COLORS.background }
+      }}
+    >
+      <MoreStack.Screen 
+        name="MoreMenu" 
+        component={MoreMenuScreen}
+        options={{ title: "Más Opciones" }}
+      />
+      <MoreStack.Screen 
+        name="MyAgenda" 
+        component={PlannerScreen}
+        options={{ title: "Mi Agenda" }}
+      />
+      <MoreStack.Screen 
+        name="Login" 
+        component={LoginScreen}
+        options={{ title: "Iniciar Sesión" }}
+      />
+      <MoreStack.Screen 
+        name="MyTickets" 
+        component={MyTicketsScreen}
+        options={{ title: "Mis Entradas" }}
+      />
+      <MoreStack.Screen 
+        name="MyProducts" 
+        component={MyProductsScreen}
+        options={{ title: "Mis Productos" }}
+      />
+      <MoreStack.Screen 
+        name="VisitorGuide" 
+        component={VisitorGuideScreen}
+        options={{ title: "Guía del Visitante" }}
+      />
+      <MoreStack.Screen 
+        name="ImportantInfo" 
+        component={ImportantInfoScreen}
+        options={{ title: "Información Importante" }}
+      />
+    </MoreStack.Navigator>
+  );
+};
 
 const MainTabNavigator = () => {
   return (
@@ -51,7 +118,7 @@ const MainTabNavigator = () => {
 
       <Tab.Screen
         name="Exhibitors"
-        component={ExhibitorsScreen}
+        component={ExhibitorsStackNavigator}
         options={{
           tabBarLabel: "Expositores",
           tabBarIcon: ({ color, size }) => (
@@ -72,12 +139,12 @@ const MainTabNavigator = () => {
       />
 
       <Tab.Screen
-        name="Planner"
-        component={PlannerScreen}
+        name="More"
+        component={MoreStackNavigator}
         options={{
-          tabBarLabel: "Mi Agenda",
+          tabBarLabel: "Más",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="clipboard-outline" size={size} color={color} />
+            <Ionicons name="menu-outline" size={size} color={color} />
           ),
         }}
       />
@@ -89,7 +156,7 @@ const styles = StyleSheet.create({
   tabBar: {
     backgroundColor: COLORS.background,
     borderTopWidth: 1,
-    borderTopColor: "#f0f0f0",
+    borderTopColor: "#2A2A2A",
     height: 60,
     paddingBottom: 5,
     paddingTop: 5,

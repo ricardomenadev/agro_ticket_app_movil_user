@@ -136,7 +136,7 @@ const UpcomingEvents = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Próximos Eventos</Text>
+        <Text style={styles.title}>Eventos en Agronea 2025</Text>
         <TouchableOpacity>
           <Text style={styles.viewAllText}>Ver todos</Text>
         </TouchableOpacity>

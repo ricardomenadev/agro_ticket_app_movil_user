@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
-import { MapPin, Navigation } from 'lucide-react-native';
+import { 
+  View, 
+  Text, 
+  ScrollView, 
+  TouchableOpacity, 
+  StyleSheet,
+  ImageBackground, 
+} from 'react-native';
 import { scheduleData, venueData } from '../constants/dummyData';
 import { COLORS } from '../styles/theme';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,9 +20,14 @@ const EventInfoScreen = () => {
       <View style={styles.sectionContainer}>
         {scheduleData.map((day, index) => (
           <View key={day.date} style={styles.dayContainer}>
-            <View style={styles.dayHeader}>
+            <LinearGradient
+              colors={[COLORS.primary, COLORS.secondary]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.dayHeader}
+            >
               <Text style={styles.dayHeaderText}>{day.date}</Text>
-            </View>
+            </LinearGradient>
             <View style={styles.eventsContainer}>
               {day.events.map(event => (
                 <View key={event.id} style={styles.eventItem}>
@@ -56,12 +67,12 @@ const EventInfoScreen = () => {
           <View style={styles.venueContent}>
             <Text style={styles.venueTitle}>Ubicación</Text>
             <View style={styles.addressContainer}>
-              <MapPin size={16} color={COLORS.primary} style={styles.addressIcon} />
+              <Ionicons name="location" size={16} color={COLORS.primary} style={styles.addressIcon} />
               <Text style={styles.addressText}>{venueData.address}</Text>
             </View>
             
             <TouchableOpacity style={styles.directionsButton}>
-              <Navigation size={16} color="white" style={styles.directionsIcon} />
+              <Ionicons name="navigate" size={16} color="white" style={styles.directionsIcon} />
               <Text style={styles.directionsText}>Cómo llegar</Text>
             </TouchableOpacity>
             
@@ -79,14 +90,24 @@ const EventInfoScreen = () => {
             
             <Text style={styles.sectionSubtitle}>Servicios disponibles</Text>
             <View style={styles.servicesContainer}>
-              {venueData.services.map(service => (
-                <View key={service.id} style={styles.serviceTag}>
-                  <View style={styles.serviceIconContainer}>
-                    {service.icon}
-                  </View>
-                  <Text style={styles.serviceName}>{service.name}</Text>
+              <View style={styles.serviceTag}>
+                <View style={styles.serviceIconContainer}>
+                  <Ionicons name="wifi" size={16} color={COLORS.primary} />
                 </View>
-              ))}
+                <Text style={styles.serviceName}>WiFi Gratis</Text>
+              </View>
+              <View style={styles.serviceTag}>
+                <View style={styles.serviceIconContainer}>
+                  <Ionicons name="restaurant" size={16} color={COLORS.primary} />
+                </View>
+                <Text style={styles.serviceName}>Gastronomía</Text>
+              </View>
+              <View style={styles.serviceTag}>
+                <View style={styles.serviceIconContainer}>
+                  <Ionicons name="car" size={16} color={COLORS.primary} />
+                </View>
+                <Text style={styles.serviceName}>Estacionamiento</Text>
+              </View>
             </View>
           </View>
         </View>
@@ -144,15 +165,16 @@ const EventInfoScreen = () => {
     <View style={styles.container}>
       {/* Encabezado */}
       <View style={styles.header}>
-        <LinearGradient
-          colors={[COLORS.primary, COLORS.secondary]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={styles.headerGradient}
-        >
-          <Text style={styles.headerTitle}>AGRONEA 2025</Text>
-          <Text style={styles.headerSubtitle}>4-6 de Julio • Charata, Chaco</Text>
-        </LinearGradient>
+      <ImageBackground
+    source={require('../../assets/images/agronea-publi1.jpg')}
+    style={styles.headerGradient}
+    resizeMode="cover"
+  >
+    <View style={styles.headerOverlay}>
+      <Text style={styles.headerTitle}>AGRONEA 2025</Text>
+      <Text style={styles.headerSubtitle}>4-6 de Julio • Charata, Chaco</Text>
+    </View>
+  </ImageBackground>
         
         {/* Pestañas */}
         <View style={styles.tabsContainer}>
@@ -196,10 +218,10 @@ const EventInfoScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9F9F9',
+    backgroundColor: '#121212', // Fondo oscuro como el Home
   },
   header: {
-    backgroundColor: 'white',
+    backgroundColor: '#1A1A1A', // Un poco más claro que el fondo principal
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -212,6 +234,14 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     paddingBottom: 16,
   },
+  headerOverlay: {
+    backgroundColor: 'rgba(0,0,0,0.4)', // Overlay negro semitransparente
+    width: '100%',
+    height: '100%',
+    justifyContent: 'flex-end',
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+  },
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -219,11 +249,11 @@ const styles = StyleSheet.create({
   },
   headerSubtitle: {
     fontSize: 16,
-    color: 'white',
+    color: 'rgba(255,255,255,0.8)',
   },
   tabsContainer: {
     flexDirection: 'row',
-    backgroundColor: 'white',
+    backgroundColor: '#1A1A1A',
   },
   tab: {
     flex: 1,
@@ -232,14 +262,18 @@ const styles = StyleSheet.create({
   },
   activeTab: {
     borderBottomWidth: 2,
-    borderBottomColor: COLORS.primary,
+    borderBottomColor: '#17823B',
   },
   tabText: {
-    color: '#888888',
+    color: 'rgba(255,255,255,0.6)',
   },
   activeTabText: {
-    color: COLORS.primary,
+    color: '#FFD700', // Color dorado para el texto activo
     fontWeight: '600',
+  },
+  contentScroll: {
+    flex: 1,
+    backgroundColor: '#121212',
   },
   sectionContainer: {
     padding: 16,
@@ -247,33 +281,31 @@ const styles = StyleSheet.create({
   // Estilos para el Schedule
   dayContainer: {
     marginBottom: 24,
+    borderRadius: 12,
+    overflow: 'hidden',
+    backgroundColor: '#1A1A1A',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
   },
   dayHeader: {
-    backgroundColor: COLORS.primary,
     paddingVertical: 8,
     paddingHorizontal: 16,
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
   },
   dayHeaderText: {
     color: 'white',
     fontWeight: 'bold',
   },
   eventsContainer: {
-    backgroundColor: 'white',
-    borderBottomLeftRadius: 8,
-    borderBottomRightRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1,
+    backgroundColor: '#1A1A1A',
   },
   eventItem: {
     flexDirection: 'row',
     padding: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#EEEEEE',
+    borderBottomColor: 'rgba(255,255,255,0.1)',
   },
   timeContainer: {
     width: 80,
@@ -281,7 +313,7 @@ const styles = StyleSheet.create({
   },
   timeText: {
     fontWeight: 'bold',
-    color: COLORS.primary,
+    color: '#FFD700', // Dorado
     fontSize: 14,
   },
   timeLineContainer: {
@@ -292,7 +324,7 @@ const styles = StyleSheet.create({
   timeLine: {
     width: 2,
     flex: 1,
-    backgroundColor: '#EEEEEE',
+    backgroundColor: 'rgba(255,255,255,0.1)',
   },
   eventContent: {
     flex: 1,
@@ -301,17 +333,17 @@ const styles = StyleSheet.create({
   eventTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#222222',
+    color: 'white',
     marginBottom: 4,
   },
   eventLocation: {
     fontSize: 14,
-    color: '#888888',
+    color: 'rgba(255,255,255,0.7)',
     marginBottom: 2,
   },
   eventSpeaker: {
     fontSize: 14,
-    color: '#666666',
+    color: 'rgba(255,255,255,0.7)',
     fontStyle: 'italic',
     marginBottom: 8,
   },
@@ -320,10 +352,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'flex-start',
     marginTop: 4,
+    backgroundColor: 'rgba(23, 130, 59, 0.15)', // Verde semitransparente
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 12,
   },
   addButtonText: {
     fontSize: 12,
-    color: COLORS.primary,
+    color: '#FFD700', // Dorado
     marginRight: 4,
   },
   addButtonIcon: {
@@ -332,7 +368,7 @@ const styles = StyleSheet.create({
   
   // Estilos para la sección Venue
   mapContainer: {
-    backgroundColor: 'white',
+    backgroundColor: '#1A1A1A',
     borderRadius: 8,
     overflow: 'hidden',
     shadowColor: '#000',
@@ -343,13 +379,14 @@ const styles = StyleSheet.create({
   },
   mapPlaceholder: {
     height: 200,
-    backgroundColor: '#EEEEEE',
+    backgroundColor: '#222222',
     alignItems: 'center',
     justifyContent: 'center',
   },
   mapPlaceholderText: {
-    color: '#888888',
+    color: 'rgba(255,255,255,0.6)',
     fontSize: 16,
+    marginBottom: 12,
   },
   venueContent: {
     padding: 16,
@@ -357,7 +394,7 @@ const styles = StyleSheet.create({
   venueTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#222222',
+    color: 'white',
     marginBottom: 8,
   },
   addressContainer: {
@@ -370,12 +407,12 @@ const styles = StyleSheet.create({
   },
   addressText: {
     fontSize: 14,
-    color: '#666666',
+    color: 'rgba(255,255,255,0.7)',
   },
   directionsButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.primary,
+    backgroundColor: '#17823B',
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 8,
@@ -392,7 +429,7 @@ const styles = StyleSheet.create({
   sectionSubtitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#222222',
+    color: 'white',
     marginBottom: 12,
   },
   sectionsContainer: {
@@ -402,7 +439,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sectionNameContainer: {
-    backgroundColor: COLORS.secondary,
+    backgroundColor: '#FFD700',
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 4,
@@ -410,13 +447,13 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   sectionName: {
-    color: 'white',
+    color: '#222222',
     fontWeight: 'bold',
     fontSize: 12,
   },
   sectionDescription: {
     fontSize: 14,
-    color: '#666666',
+    color: 'rgba(255,255,255,0.7)',
   },
   servicesContainer: {
     flexDirection: 'row',
@@ -425,7 +462,7 @@ const styles = StyleSheet.create({
   serviceTag: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F3F4F6',
+    backgroundColor: 'rgba(255,215,0,0.15)', // Dorado semitransparente
     borderRadius: 20,
     paddingVertical: 6,
     paddingHorizontal: 12,
@@ -437,12 +474,12 @@ const styles = StyleSheet.create({
   },
   serviceName: {
     fontSize: 12,
-    color: '#666666',
+    color: 'rgba(255,255,255,0.8)',
   },
   
   // Estilos para la sección FAQ
   faqContainer: {
-    backgroundColor: 'white',
+    backgroundColor: '#1A1A1A',
     borderRadius: 8,
     padding: 16,
     shadowColor: '#000',
@@ -454,19 +491,26 @@ const styles = StyleSheet.create({
   faqItem: {
     marginBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#EEEEEE',
+    borderBottomColor: 'rgba(255,255,255,0.1)',
     paddingBottom: 16,
+  },
+  faqQuestionContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   faqQuestion: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#222222',
+    color: 'white',
+    flex: 1,
     marginBottom: 8,
   },
   faqAnswer: {
     fontSize: 14,
-    color: '#666666',
+    color: 'rgba(255,255,255,0.7)',
     lineHeight: 20,
+    paddingTop: 8,
   },
 });
 
