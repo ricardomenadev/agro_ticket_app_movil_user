@@ -8,7 +8,9 @@ import { Ionicons } from "@expo/vector-icons";
 import HomeScreen from "../screens/HomeScreen";
 import EventInfoScreen from "../screens/EventInfoScreen";
 import ExhibitorsStackNavigator from "./ExhibitorsStackNavigator";
-import ShopScreen from "../screens/ShopScreen";
+import ShopScreen from "../screens/shop/ShopScreen";
+import CheckoutScreen from "../screens/shop/CheckoutScreen";
+import PaymentConfirmationScreen from "../screens/shop/PaymentConfirmationScreen";
 import PlannerScreen from "../screens/PlannerScreen";
 import LoginScreen from "../screens/LoginScreen";
 import MyTicketsScreen from "../screens/more/MyTicketsScreen";
@@ -22,6 +24,27 @@ import { COLORS } from "../constants/colors";
 
 const Tab = createBottomTabNavigator();
 const MoreStack = createStackNavigator();
+const ShopStack = createStackNavigator(); // Nuevo Stack para la tienda
+
+// Stack Navigator para la tienda
+const ShopStackNavigator = () => {
+  return (
+    <ShopStack.Navigator
+      screenOptions={{
+        headerShown: false,
+        cardStyle: { backgroundColor: COLORS.background }
+      }}
+    >
+      <ShopStack.Screen name="ShopMain" component={ShopScreen} />
+      <ShopStack.Screen name="Checkout" component={CheckoutScreen} />
+      <ShopStack.Screen 
+        name="PaymentConfirmation"
+        component={PaymentConfirmationScreen}
+        options={{ gestureEnabled: false }}
+      />
+    </ShopStack.Navigator>
+  );
+};
 
 // Stack Navigator para la sección "Más"
 const MoreStackNavigator = () => {
@@ -129,7 +152,7 @@ const MainTabNavigator = () => {
 
       <Tab.Screen
         name="Shop"
-        component={ShopScreen}
+        component={ShopStackNavigator} // Cambiado de ShopScreen a ShopStackNavigator
         options={{
           tabBarLabel: "Tienda",
           tabBarIcon: ({ color, size }) => (
