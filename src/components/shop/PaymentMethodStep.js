@@ -9,21 +9,20 @@ import {
   Alert,
   Linking,
 } from "react-native";
-import {
-  CreditCard,
-  Smartphone,
-  BanknoteIcon,
-  ArrowLeft,
+import { 
+  CreditCard, 
+  BanknoteIcon, 
+  ArrowLeft, 
+  Copy, 
+  CheckCircle2,
+  Clock,
+  Mail,
+  MessageCircle,
+  AlertTriangle,
+  Info
 } from "lucide-react-native";
 import { COLORS } from "../../constants/colors";
-import * as MercadoPagoCheckout from "@blackbox-vision/react-native-mercadopago-px";
-import MercadoPagoCardForm from "./CardForm";
 import * as apiMobile from "../../api/apiMobile";
-
-// Configuración del SDK de MercadoPago
-const MP_PUBLIC_KEY =
-  process.env.MERCADOPAGO_PUBLIC_KEY ||
-  "TEST-bdc6d785-66fc-47e7-b731-da94d0fb0efd";
 
 const PaymentMethodStep = ({
   paymentMethod,
@@ -37,323 +36,180 @@ const PaymentMethodStep = ({
   navigation,
 }) => {
   const [paymentError, setPaymentError] = useState(null);
-  const [paymentId, setPaymentId] = useState(null);
   const [preferenceId, setPreferenceId] = useState(null);
-  const [mercadoPagoSdk, setMercadoPagoSdk] = useState(null);
-  const [sdkInitialized, setSdkInitialized] = useState(false);
+  const [isCreatingPreference, setIsCreatingPreference] = useState(false);
+  const [copiedItem, setCopiedItem] = useState('');
 
-  // Inicializar MercadoPago SDK
-  const initializeMercadoPagoSDK = async () => {
+  // Estados para copiar datos bancarios
+  const copyToClipboard = async (text, type) => {
     try {
-      console.log("Inicializando SDK de MercadoPago...");
-      // No es necesario inicializar el SDK como tal, solo marcar como inicializado
-      setSdkInitialized(true);
-      console.log("SDK de MercadoPago listo para usar");
-    } catch (error) {
-      console.error("Error inicializando SDK de MercadoPago:", error);
-      setPaymentError(
-        "Error al inicializar el sistema de pagos: " + error.message
+      setCopiedItem(type);
+      Alert.alert(
+        "Copiado",
+        `${type.toUpperCase()} copiado: ${text}`,
+        [{ text: "OK" }]
       );
+      setTimeout(() => setCopiedItem(''), 2000);
+    } catch (err) {
+      console.error('Error al copiar:', err);
+      Alert.alert('Error', 'No se pudo copiar. Por favor, copia manualmente.');
     }
   };
 
-  // Efecto para crear una preferencia de MercadoPago si se selecciona ese método
+  // Crear preferencia de MercadoPago cuando se selecciona tarjeta
   useEffect(() => {
     const createPreference = async () => {
       if (
-        paymentMethod === "MERCADOPAGO" &&
+        paymentMethod === "CARD" &&
         !preferenceId &&
         cartItems &&
         cartItems.length > 0
       ) {
         try {
-          // Limpiar cualquier error anterior
           setPaymentError(null);
+          setIsCreatingPreference(true);
 
-          // Crear objeto para la preferencia
+          console.log("🔶 MOBILE: Creando preferencia MercadoPago...");
+
+          // Preparar datos para la preferencia
           const preferenceData = {
             items: cartItems.map((item) => ({
               id: item.id,
+              sku: item.sku,
               nombre: item.nombre || item.name,
               descripcion: item.descripcion || item.description || "",
-              precio: item.precio || item.price,
-              cantidad: item.cantidad || item.quantity || 1,
+              precio: parseFloat(item.precio || item.price || 0),
+              cantidad: parseInt(item.cantidad || item.quantity || 1),
               tipo: item.tipo || "producto",
             })),
             buyerInfo: buyerInfo,
-            total: total,
           };
 
-          console.log("Creando preferencia de MercadoPago...");
+          // 🔍 DEBUG: Verificar tipos de datos antes de enviar
+          console.log("🔍 PREFERENCIA: Verificando tipos de datos:");
+          preferenceData.items.forEach((item, index) => {
+            console.log(`Item ${index + 1}:`, {
+              precio: item.precio,
+              tipoPrecio: typeof item.precio,
+              cantidad: item.cantidad,
+              tipoCantidad: typeof item.cantidad,
+            });
+          });
+
           const result = await apiMobile.createMercadoPagoPreference(
             preferenceData
           );
 
           if (result && result.preferenceId) {
-            console.log("Preferencia creada:", result.preferenceId);
+            console.log("🔶 MOBILE: Preferencia creada:", result.preferenceId);
             setPreferenceId(result.preferenceId);
           } else {
-            console.error("Error creando preferencia:", result);
+            console.error("🔴 MOBILE: Error creando preferencia:", result);
             setPaymentError("No se pudo crear la preferencia de pago");
           }
         } catch (error) {
-          console.error("Error creando preferencia:", error);
+          console.error("🔴 MOBILE: Error creando preferencia:", error);
           setPaymentError(
             "Error al conectar con el servicio de pago: " + error.message
           );
+        } finally {
+          setIsCreatingPreference(false);
         }
       }
     };
 
     createPreference();
-  }, [paymentMethod, cartItems, buyerInfo, total, preferenceId]);
+  }, [paymentMethod, cartItems, buyerInfo, preferenceId]);
 
-  // Manejar el envío de datos de tarjeta
-  const handleCardSubmit = async (data) => {
-  try {
-    setPaymentError(null);
-    console.log("🔶 MOBILE: Procesando pago con tarjeta...");
-
-    // Verificar token
-    if (!data.token) {
-      throw new Error("No se pudo generar el token de la tarjeta");
-    }
-
-    // Generar payment_id temporal
-    const paymentTimestamp = Date.now();
-    const payment_id = `CARD-${paymentTimestamp}`;
-    console.log(`🔶 MOBILE: Generando payment_id temporal: ${payment_id}`);
-
-    // Log de los items antes de procesarlos
-    console.log("🔶 MOBILE: Items originales:", JSON.stringify(cartItems));
-
-    // Preparar los items preservando toda la información necesaria y CORRIGIENDO TIPOS
-    const preparedItems = cartItems.map((item) => {
-      // Detectar tipo basado en ID si no está explícito
-      let tipo = item.tipo || item.type;
-      
-      // Si no tiene tipo definido pero tiene ID que comienza con ticket_ o parking_
-      if (!tipo && item.id && typeof item.id === 'string') {
-        if (item.id.startsWith('ticket_')) {
-          tipo = 'ticket';
-          console.log(`🔶 MOBILE: Corrigiendo item ${item.id} a tipo 'ticket'`);
-        } else if (item.id.startsWith('parking_')) {
-          tipo = 'parking';
-          console.log(`🔶 MOBILE: Corrigiendo item ${item.id} a tipo 'parking'`);
-        }
-      }
-      
-      // Si tiene eventId pero no tipo, podría ser un ticket o parking
-      if (!tipo && item.eventId) {
-        // Podríamos inferir tipo por otras características si es necesario
-        console.log(`🔶 MOBILE: Item con eventId pero sin tipo definido: ${item.id}`);
-      }
-      
-      return {
-        id: item.id,
-        nombre: item.nombre || item.name,
-        descripcion: item.descripcion || item.description || item.nombre || item.name,
-        precio: item.precio || item.price,
-        cantidad: item.cantidad || item.quantity || 1,
-        tipo: tipo || "producto", // Usar el tipo detectado o "producto" como fallback
-        // Preservar información del evento
-        eventId: item.eventId || (tipo === 'ticket' || tipo === 'parking' ? item.id.split('_')[1] : null),
-        eventTitle: item.eventTitle || null,
-        fecha: item.fecha || item.date,
-        ubicacion: item.ubicacion || item.location,
-        imagen: item.imagen || item.image,
-      };
-    });
-
-    // Log de los items después de procesarlos
-    console.log("🔶 MOBILE: Items procesados con tipos verificados:");
-    preparedItems.forEach((item, index) => {
-      console.log(`Item ${index+1}: id=${item.id}, tipo=${item.tipo}, eventId=${item.eventId || 'N/A'}`);
-    });
-
-    // Preparar datos para el backend
-    const paymentData = {
-      // Datos específicos de tarjeta
-      token: data.token,
-      issuerId: data.issuerId || "1",
-      paymentMethodId: data.paymentMethodId || "credit_card",
-      installments: data.installments || "1",
-      identificationType: data.identificationType || "DNI",
-      identificationNumber: data.identificationNumber || buyerInfo.dni,
-
-      // Datos generales del pago
-      items: preparedItems,
-      buyerInfo: buyerInfo,
-      deliveryMethod: "email", // O usar una variable si tienes selección de método de entrega
-      paymentMethod: "CARD",
-      total: parseFloat(total),
-      payment_id: payment_id,
-      email: data.cardholderEmail || buyerInfo.email,
-      amount: parseFloat(total),
-    };
-
-    console.log("🔶 MOBILE: Enviando datos finales para procesamiento:", 
-      JSON.stringify({
-        ...paymentData,
-        token: "[TOKEN REDACTADO]", // No mostrar el token completo en logs
-        items: paymentData.items.length
-      })
-    );
-
-    // Enviar al método de procesamiento
-    onSubmit(paymentData);
-    
-  } catch (error) {
-    console.error("🔴 MOBILE: Error en envío de tarjeta:", error);
-    setPaymentError(error.message || "Error procesando el pago con tarjeta");
-  }
-};
-
-  // Manejar pago con MercadoPago (abrir app o webview)
-  const handleMercadoPagoPayment = async () => {
+  // Manejar pago con tarjeta (MercadoPago WebView)
+  const handleCardPayment = async () => {
     if (!preferenceId) {
-      Alert.alert(
-        "Error",
-        "No se pudo crear la preferencia de pago. Intenta nuevamente."
-      );
+      Alert.alert("Error", "No se pudo crear la preferencia de pago.");
       return;
     }
 
     try {
-      setPaymentError(null);
-
-      if (!sdkInitialized || !mercadoPagoSdk) {
-        throw new Error(
-          "El SDK de MercadoPago no está inicializado correctamente"
-        );
-      }
-
-      console.log("Iniciando pago con MercadoPago...");
-
-      // Configuración para el checkout de MercadoPago
-      const checkoutConfig = {
-        preferenceId: preferenceId,
-        publicKey: MP_PUBLIC_KEY,
-        language: "es-AR",
-        navigationController: null, // Solo para iOS native
-      };
-
-      // Iniciar el proceso de pago con MercadoPago
-      console.log("Abriendo MercadoPago...");
-      // Usar el método createPayment según la documentación
-      const paymentResult = await MercadoPagoCheckout.createPayment({
-        publicKey: MP_PUBLIC_KEY,
-        preferenceId: preferenceId,
-        language: "es-AR", // Opcional
-      });
-
-      console.log("Resultado del pago con MercadoPago:", paymentResult);
-
-      if (paymentResult) {
-        // MercadoPago devuelve diferentes formatos según plataforma
-        // Normalizar el resultado
-        const statusMap = {
-          approved: "approved",
-          in_process: "pending",
-          pending: "pending",
-          rejected: "rejected",
-          canceled: "rejected",
-          null: "rejected",
-        };
-
-        const paymentStatus = statusMap[paymentResult.status] || "pending";
-
-        // Crear un payment_id único si no lo hay
-        const tempPaymentId =
-          paymentResult.id ||
-          `MP-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-        setPaymentId(tempPaymentId);
-
-        // Preparar datos para actualizar el estado del pago en nuestro sistema
-        const paymentData = {
-          payment_id: tempPaymentId,
-          preferenceId: preferenceId,
-          items: cartItems,
-          buyerInfo: buyerInfo,
-          total: total,
-          paymentMethod: "MERCADOPAGO",
-          status: paymentStatus,
-          mercadoPagoResult: paymentResult, // Incluir el resultado completo
-        };
-
-        // Solo procesamos si el pago fue exitoso o está pendiente
-        if (paymentStatus === "approved" || paymentStatus === "pending") {
-          console.log(`Pago ${paymentStatus}, procesando...`);
-          onSubmit(paymentData);
-        } else {
-          // El pago fue rechazado
-          console.log("Pago rechazado por MercadoPago");
-          setPaymentError(
-            `El pago fue rechazado: ${
-              paymentResult.statusDetail || "Contacta a tu entidad emisora"
-            }`
-          );
-        }
-      } else {
-        // El usuario canceló el proceso
-        throw new Error("Proceso de pago cancelado");
-      }
+      console.log("🔶 MOBILE: Abriendo MercadoPago en navegador...");
+      
+      // URL de MercadoPago  
+      const url = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${preferenceId}`;
+      
+      // Abrir en navegador del sistema
+      await Linking.openURL(url);
+      
+      // Mensaje al usuario
+      Alert.alert(
+        "Completá tu pago", 
+        "Te redirigimos al navegador. Cuando termines, volvé a la app.",
+        [{ text: "OK" }]
+      );
+      
     } catch (error) {
-      console.error("Error en pago con MercadoPago:", error);
-
-      // Manejar específicamente cuando el usuario cancela
-      if (
-        error.message.includes("cancel") ||
-        error.message.includes("Usuario cerró MercadoPago")
-      ) {
-        setPaymentError("Proceso de pago cancelado");
-      } else {
-        setPaymentError(
-          "Error al procesar el pago con MercadoPago: " + error.message
-        );
-      }
+      console.error("Error:", error);
+      setPaymentError("No se pudo abrir el pago");
     }
   };
 
   // Manejar pago por transferencia
-  const handleTransferPayment = () => {
+  const handleTransferPayment = async () => {
     try {
       setPaymentError(null);
+      console.log("🔶 MOBILE: Procesando pago por transferencia...");
 
-      // Crear identificador temporal
+      // Payment ID temporal (igual que web)
       const paymentTimestamp = Date.now();
       const tempPaymentId = `TRANSFER-${paymentTimestamp}`;
-      setPaymentId(tempPaymentId);
 
-      console.log("Procesando pago por transferencia:", tempPaymentId);
-
-      // Procesar pago por transferencia
-      const paymentData = {
-        // Datos generales del pago
-        payment_id: tempPaymentId,
+      // ✅ PREPARAR DATOS EXACTAMENTE COMO LOS ESPERA createTransferOrder
+      const transferOrderData = {
         items: cartItems.map((item) => ({
           id: item.id,
           nombre: item.nombre || item.name,
-          descripcion: item.descripcion || item.description || "",
-          precio: item.precio || item.price || 0,
-          cantidad: item.cantidad || item.quantity || 1,
+          precio: parseFloat(item.precio || item.price || 0),
+          cantidad: parseInt(item.cantidad || item.quantity || 1),
           tipo: item.tipo || "producto",
           eventId: item.eventId || null,
-          fecha: item.fecha || null,
-          ubicacion: item.ubicacion || null,
+          eventTitle: item.eventTitle || null,
+          fecha: item.fecha || item.date,
+          ubicacion: item.ubicacion || item.location,
         })),
         buyerInfo: buyerInfo,
-        total: total,
-        paymentMethod: "TRANSFER",
         deliveryMethod: "email",
+        paymentMethod: "TRANSFER", // ✅ AQUÍ ESTÁ LA CLAVE!
+        total: total,
+        paymentId: tempPaymentId,
       };
 
-      onSubmit(paymentData);
+      console.log("🔶 MOBILE: Datos preparados:", {
+        paymentId: tempPaymentId,
+        items: transferOrderData.items.length,
+        total: transferOrderData.total,
+        paymentMethod: transferOrderData.paymentMethod // ✅ Esto debe ser "TRANSFER"
+      });
+
+      // ✅ LLAMAR DIRECTAMENTE A createTransferOrder CON LOS DATOS CORRECTOS
+      const response = await apiMobile.createTransferOrder(transferOrderData);
+
+      console.log("✅ MOBILE: ¡Transferencia procesada exitosamente!");
+
+      // ✅ PASAR RESPUESTA EXITOSA AL COMPONENTE PADRE
+      onSubmit({
+        success: true,
+        paymentId: tempPaymentId,
+        orderData: response,
+        paymentMethod: "TRANSFER"
+      });
+
     } catch (error) {
-      console.error("Error en pago por transferencia:", error);
-      setPaymentError(
-        "Error al procesar la solicitud de pago por transferencia: " +
-          error.message
+      console.error("❌ MOBILE: Error en transferencia:", error);
+      
+      // Mostrar error al usuario
+      setPaymentError(error.message);
+      
+      Alert.alert(
+        "Error de Pago",
+        error.message || "No se pudo procesar el pago. Intenta nuevamente.",
+        [{ text: "OK" }]
       );
     }
   };
@@ -361,7 +217,7 @@ const PaymentMethodStep = ({
   return (
     <ScrollView
       style={styles.container}
-      contentContainerStyle={styles.contentContainer}
+      contentContainerStyle={[styles.contentContainer, { paddingBottom: 100 }]}
       nestedScrollEnabled={true}
     >
       <Text style={styles.stepTitle}>Método de Pago</Text>
@@ -388,31 +244,6 @@ const PaymentMethodStep = ({
             ]}
           >
             Tarjeta
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.methodOption,
-            paymentMethod === "MERCADOPAGO" ? styles.selectedMethodOption : {},
-          ]}
-          onPress={() => setPaymentMethod("MERCADOPAGO")}
-        >
-          <Smartphone
-            size={24}
-            color={
-              paymentMethod === "MERCADOPAGO"
-                ? COLORS.primary
-                : COLORS.textSecondary
-            }
-          />
-          <Text
-            style={[
-              styles.methodText,
-              paymentMethod === "MERCADOPAGO" ? styles.selectedMethodText : {},
-            ]}
-          >
-            MercadoPago
           </Text>
         </TouchableOpacity>
 
@@ -452,104 +283,208 @@ const PaymentMethodStep = ({
       {/* Contenido específico según el método de pago seleccionado */}
       <View style={styles.paymentContent}>
         {paymentMethod === "CARD" && (
-          <MercadoPagoCardForm
-            onSubmit={handleCardSubmit}
-            onError={setPaymentError}
-            isProcessing={isProcessing}
-            cartTotal={total}
-            buyerInfo={buyerInfo}
-          />
-        )}
+          <View style={styles.cardContainer}>
+            <Text style={styles.cardTitle}>Pago con Tarjeta</Text>
 
-        {paymentMethod === "MERCADOPAGO" && (
-          <View style={styles.mercadoPagoContainer}>
-            <Text style={styles.mercadoPagoTitle}>Pago con MercadoPago</Text>
-
-            {!preferenceId && (
-              <ActivityIndicator
-                size="large"
-                color={COLORS.primary}
-                style={styles.loader}
-              />
+            {isCreatingPreference && (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color={COLORS.primary} />
+                <Text style={styles.loadingText}>
+                  Preparando formulario de pago...
+                </Text>
+              </View>
             )}
 
-            {preferenceId && (
+            {!isCreatingPreference && preferenceId && (
               <>
-                <Text style={styles.mercadoPagoInfo}>
-                  Serás redirigido a MercadoPago para completar tu pago de forma
-                  segura.
+                <Text style={styles.cardInfo}>
+                  Serás redirigido a un formulario seguro para completar tu pago
+                  con tarjeta de crédito o débito.
                 </Text>
 
+                <View style={styles.cardFeatures}>
+                  <Text style={styles.cardFeatureTitle}>
+                    ✅ Características:
+                  </Text>
+                  <Text style={styles.cardFeature}>• Pago 100% seguro</Text>
+                  <Text style={styles.cardFeature}>
+                    • Hasta 12 cuotas sin interés
+                  </Text>
+                  <Text style={styles.cardFeature}>
+                    • Todas las tarjetas aceptadas
+                  </Text>
+                  <Text style={styles.cardFeature}>
+                    • Procesamiento inmediato
+                  </Text>
+                </View>
+
                 <TouchableOpacity
-                  style={styles.mercadoPagoButton}
-                  onPress={handleMercadoPagoPayment}
-                  disabled={isProcessing || !sdkInitialized}
+                  style={styles.cardButton}
+                  onPress={handleCardPayment}
+                  disabled={isProcessing}
                 >
                   {isProcessing ? (
                     <ActivityIndicator size="small" color="#FFFFFF" />
                   ) : (
-                    <Text style={styles.mercadoPagoButtonText}>
-                      Pagar con MercadoPago
+                    <Text style={styles.cardButtonText}>
+                      Continuar con Tarjeta
                     </Text>
                   )}
                 </TouchableOpacity>
-
-                <Text style={styles.mercadoPagoSecondaryInfo}>
-                  Podrás pagar con tu cuenta de MercadoPago, tarjetas guardadas
-                  o escaneando un código QR.
-                </Text>
               </>
+            )}
+
+            {!isCreatingPreference && !preferenceId && (
+              <View style={styles.cardErrorContainer}>
+                <Text style={styles.cardErrorText}>
+                  No se pudo preparar el formulario de pago. Intenta seleccionar
+                  la opción nuevamente.
+                </Text>
+              </View>
             )}
           </View>
         )}
 
         {paymentMethod === "TRANSFER" && (
           <View style={styles.transferContainer}>
-            <Text style={styles.transferTitle}>Transferencia Bancaria</Text>
-
-            <View style={styles.bankInfoBox}>
-              <Text style={styles.bankInfoTitle}>Datos Bancarios:</Text>
-              <View style={styles.bankInfoRow}>
-                <Text style={styles.bankInfoLabel}>Banco:</Text>
-                <Text style={styles.bankInfoValue}>Banco Nación Argentina</Text>
+            {/* ✅ NUEVO: Header mejorado para transferencias */}
+            <View style={styles.transferHeader}>
+              <View style={styles.transferIcon}>
+                <Clock size={20} color="#FFD700" />
               </View>
-              <View style={styles.bankInfoRow}>
-                <Text style={styles.bankInfoLabel}>Titular:</Text>
-                <Text style={styles.bankInfoValue}>AGRONEA S.A.</Text>
+              <View style={styles.transferHeaderText}>
+                <Text style={styles.transferTitle}>Transferencia Bancaria</Text>
+                <Text style={styles.transferSubtitle}>Proceso simple y seguro</Text>
               </View>
-              <View style={styles.bankInfoRow}>
-                <Text style={styles.bankInfoLabel}>CUIT:</Text>
-                <Text style={styles.bankInfoValue}>30-71234567-8</Text>
-              </View>
-              <View style={styles.bankInfoRow}>
-                <Text style={styles.bankInfoLabel}>CBU:</Text>
-                <Text style={styles.bankInfoValue}>0110000000000000000000</Text>
-              </View>
-              <View style={styles.bankInfoRow}>
-                <Text style={styles.bankInfoLabel}>Alias:</Text>
-                <Text style={styles.bankInfoValue}>AGRONEA.2025.EVENTO</Text>
-              </View>
-
-              <Text style={styles.transferNote}>
-                Una vez realizada la transferencia, envía el comprobante a
-                pagos@agronea.com.ar indicando el número de orden que recibirás
-                al confirmar.
-              </Text>
-
-              <TouchableOpacity
-                style={styles.emailButton}
-                onPress={() => {
-                  Linking.openURL(
-                    "mailto:pagos@agronea.com.ar?subject=Comprobante de pago - AGRONEA 2025"
-                  );
-                }}
-              >
-                <Text style={styles.emailButtonText}>
-                  Enviar comprobante por email
-                </Text>
-              </TouchableOpacity>
             </View>
 
+            {/* ✅ NUEVO: Mensaje introductorio */}
+            <View style={styles.introMessage}>
+              <Info size={16} color={COLORS.primary} />
+              <Text style={styles.introText}>
+                Una vez que confirmes, te daremos todos los pasos para completar tu pago
+              </Text>
+            </View>
+
+            {/* ✅ MEJORADO: Datos bancarios con mejor diseño */}
+            <View style={styles.bankInfoBox}>
+              <Text style={styles.bankInfoTitle}>💳 Datos Bancarios</Text>
+              
+              <View style={styles.bankDataGrid}>
+                <View style={styles.bankDataItem}>
+                  <Text style={styles.bankDataLabel}>Banco:</Text>
+                  <Text style={styles.bankDataValue}>Banco Nación Argentina</Text>
+                </View>
+                
+                <View style={styles.bankDataItem}>
+                  <Text style={styles.bankDataLabel}>Titular:</Text>
+                  <Text style={styles.bankDataValue}>AGRONEA PRODUCCIONES S.R.L.</Text>
+                </View>
+                
+                <View style={styles.bankDataItem}>
+                  <Text style={styles.bankDataLabel}>CUIT:</Text>
+                  <Text style={styles.bankDataValue}>30-71212976-6</Text>
+                </View>
+                
+                {/* CBU con botón de copiar */}
+                <View style={styles.bankDataItem}>
+                  <Text style={styles.bankDataLabel}>CBU:</Text>
+                  <View style={styles.copyableContainer}>
+                    <Text style={styles.bankDataValue}>110230920023000470145</Text>
+                    <TouchableOpacity
+                      onPress={() => copyToClipboard('110230920023000470145', 'cbu')}
+                      style={[styles.copyButton, copiedItem === 'cbu' && styles.copyButtonSuccess]}
+                    >
+                      {copiedItem === 'cbu' ? (
+                        <CheckCircle2 size={14} color="#4CAF50" />
+                      ) : (
+                        <Copy size={14} color={COLORS.primary} />
+                      )}
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                
+                {/* Alias con botón de copiar */}
+                <View style={styles.bankDataItem}>
+                  <Text style={styles.bankDataLabel}>Alias:</Text>
+                  <View style={styles.copyableContainer}>
+                    <Text style={styles.bankDataValue}>PUESTO.CIPRES.PAIS</Text>
+                    <TouchableOpacity
+                      onPress={() => copyToClipboard('PUESTO.CIPRES.PAIS', 'alias')}
+                      style={[styles.copyButton, copiedItem === 'alias' && styles.copyButtonSuccess]}
+                    >
+                      {copiedItem === 'alias' ? (
+                        <CheckCircle2 size={14} color="#4CAF50" />
+                      ) : (
+                        <Copy size={14} color={COLORS.primary} />
+                      )}
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                
+                <View style={styles.bankDataItem}>
+                  <Text style={styles.bankDataLabel}>Monto:</Text>
+                  <Text style={[styles.bankDataValue, styles.amountValue]}>
+                    ${total?.toLocaleString() || "0"}
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            {/* ✅ NUEVO: Pasos a seguir */}
+            <View style={styles.stepsPreview}>
+              <Text style={styles.stepsTitle}>Próximos pasos:</Text>
+              
+              <View style={styles.stepPreviewItem}>
+                <View style={styles.stepNumber}>
+                  <Text style={styles.stepNumberText}>1</Text>
+                </View>
+                <Text style={styles.stepText}>Confirmar orden</Text>
+              </View>
+              
+              <View style={styles.stepPreviewItem}>
+                <View style={[styles.stepNumber, styles.stepNumberGreen]}>
+                  <Text style={styles.stepNumberText}>2</Text>
+                </View>
+                <Text style={styles.stepText}>Realizar transferencia</Text>
+              </View>
+              
+              <View style={styles.stepPreviewItem}>
+                <View style={[styles.stepNumber, styles.stepNumberBlue]}>
+                  <Text style={styles.stepNumberText}>3</Text>
+                </View>
+                <Text style={styles.stepText}>Enviar comprobante</Text>
+              </View>
+            </View>
+
+            {/* ✅ NUEVO: Botones de contacto rápido */}
+            <View style={styles.quickContactSection}>
+              <Text style={styles.quickContactTitle}>¿Necesitas ayuda?</Text>
+              
+              <View style={styles.quickContactButtons}>
+                <TouchableOpacity
+                  style={styles.emailQuickButton}
+                  onPress={() => {
+                    Linking.openURL("mailto:agroneacharata@gmail.com?subject=Consulta sobre transferencia - AGRONEA");
+                  }}
+                >
+                  <Mail size={16} color="#fff" />
+                  <Text style={styles.quickButtonText}>Email</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.whatsappQuickButton}
+                  onPress={() => {
+                    Linking.openURL("https://wa.me/+5493794222011?text=Hola! Tengo una consulta sobre el pago por transferencia.");
+                  }}
+                >
+                  <MessageCircle size={16} color="#fff" />
+                  <Text style={styles.quickButtonText}>WhatsApp</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Botón principal */}
             <TouchableOpacity
               style={styles.transferButton}
               onPress={handleTransferPayment}
@@ -564,10 +499,13 @@ const PaymentMethodStep = ({
               )}
             </TouchableOpacity>
 
-            <Text style={styles.transferSecondaryInfo}>
-              Al confirmar, registraremos tu pedido como pendiente de pago hasta
-              verificar la transferencia.
-            </Text>
+            {/* ✅ NUEVO: Nota importante */}
+            {/* <View style={styles.importantNote}>
+              <AlertTriangle size={16} color="#FFD700" />
+              <Text style={styles.importantNoteText}>
+                Al confirmar, recibirás instrucciones detalladas por email para completar tu pago
+              </Text>
+            </View> */}
           </View>
         )}
       </View>
@@ -608,7 +546,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    padding: 12,
+    padding: 16,
     borderWidth: 1,
     borderColor: COLORS.border,
     borderRadius: 8,
@@ -621,7 +559,8 @@ const styles = StyleSheet.create({
   methodText: {
     marginTop: 8,
     color: COLORS.textSecondary,
-    fontSize: 12,
+    fontSize: 14,
+    fontWeight: "500",
   },
   selectedMethodText: {
     color: COLORS.primary,
@@ -642,98 +581,254 @@ const styles = StyleSheet.create({
     color: "#ff0000",
     fontWeight: "500",
   },
-  mercadoPagoContainer: {
+
+  // Estilos para pago con tarjeta (sin cambios)
+  cardContainer: {
     padding: 16,
     backgroundColor: COLORS.card,
     borderRadius: 8,
-    alignItems: "center",
   },
-  mercadoPagoTitle: {
+  cardTitle: {
     fontSize: 18,
     fontWeight: "bold",
     color: COLORS.text,
     marginBottom: 16,
   },
-  loader: {
-    marginVertical: 24,
+  loadingContainer: {
+    alignItems: "center",
+    paddingVertical: 24,
   },
-  mercadoPagoInfo: {
-    textAlign: "center",
-    marginBottom: 24,
+  loadingText: {
+    marginTop: 12,
+    color: COLORS.textSecondary,
+    fontSize: 14,
+  },
+  cardInfo: {
+    fontSize: 14,
     color: COLORS.text,
+    marginBottom: 20,
+    lineHeight: 20,
   },
-  mercadoPagoButton: {
-    backgroundColor: "#009ee3", // Color de MercadoPago
+  cardFeatures: {
+    backgroundColor: COLORS.background,
+    padding: 12,
+    borderRadius: 6,
+    marginBottom: 20,
+  },
+  cardFeatureTitle: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: COLORS.text,
+    marginBottom: 8,
+  },
+  cardFeature: {
+    fontSize: 13,
+    color: COLORS.text,
+    marginBottom: 4,
+  },
+  cardButton: {
+    backgroundColor: COLORS.primary,
     borderRadius: 8,
     paddingVertical: 16,
-    paddingHorizontal: 24,
-    width: "100%",
     alignItems: "center",
   },
-  mercadoPagoButtonText: {
-    color: "#fff",
+  cardButtonText: {
+    color: "#FFFFFF",
     fontWeight: "bold",
     fontSize: 16,
   },
-  mercadoPagoSecondaryInfo: {
-    textAlign: "center",
-    marginTop: 16,
-    color: COLORS.textSecondary,
-    fontSize: 12,
+  cardErrorContainer: {
+    backgroundColor: "#ff000010",
+    padding: 16,
+    borderRadius: 8,
+    alignItems: "center",
   },
+  cardErrorText: {
+    color: "#ff0000",
+    fontSize: 14,
+    textAlign: "center",
+  },
+
+  // ✅ NUEVOS ESTILOS para transferencia mejorada
   transferContainer: {
     padding: 16,
     backgroundColor: COLORS.card,
     borderRadius: 8,
   },
+  transferHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  transferIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "rgba(255, 215, 0, 0.2)",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  transferHeaderText: {
+    flex: 1,
+  },
   transferTitle: {
     fontSize: 18,
     fontWeight: "bold",
     color: COLORS.text,
+  },
+  transferSubtitle: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    marginTop: 2,
+  },
+  introMessage: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(10, 143, 60, 0.1)",
+    padding: 12,
+    borderRadius: 8,
     marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "rgba(10, 143, 60, 0.3)",
+  },
+  introText: {
+    marginLeft: 8,
+    color: COLORS.text,
+    fontSize: 14,
+    flex: 1,
   },
   bankInfoBox: {
-    backgroundColor: COLORS.background,
+    backgroundColor: "rgba(33, 150, 243, 0.1)",
     borderRadius: 8,
     padding: 16,
-    marginBottom: 24,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "rgba(33, 150, 243, 0.3)",
   },
   bankInfoTitle: {
     fontSize: 16,
     fontWeight: "bold",
+    color: "#2196F3",
+    marginBottom: 12,
+  },
+  bankDataGrid: {
+    gap: 10,
+  },
+  bankDataItem: {
+    marginBottom: 8,
+  },
+  bankDataLabel: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    fontWeight: "500",
+  },
+  bankDataValue: {
+    fontSize: 14,
+    color: COLORS.text,
+    fontWeight: "bold",
+    marginTop: 2,
+  },
+  amountValue: {
+    fontSize: 16,
+    color: "#FFD700",
+  },
+  copyableContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 2,
+  },
+  copyButton: {
+    padding: 6,
+    marginLeft: 8,
+    borderRadius: 4,
+    backgroundColor: "rgba(33, 150, 243, 0.2)",
+  },
+  copyButtonSuccess: {
+    backgroundColor: "rgba(76, 175, 80, 0.3)",
+  },
+  stepsPreview: {
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+  },
+  stepsTitle: {
+    fontSize: 14,
+    fontWeight: "bold",
     color: COLORS.text,
     marginBottom: 12,
   },
-  bankInfoRow: {
+  stepPreviewItem: {
     flexDirection: "row",
+    alignItems: "center",
     marginBottom: 8,
   },
-  bankInfoLabel: {
-    width: 80,
-    fontWeight: "bold",
-    color: COLORS.text,
-  },
-  bankInfoValue: {
-    flex: 1,
-    color: COLORS.text,
-  },
-  transferNote: {
-    marginTop: 16,
-    fontStyle: "italic",
-    color: COLORS.textSecondary,
-    marginBottom: 16,
-  },
-  emailButton: {
-    backgroundColor: COLORS.primary + "80",
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
+  stepNumber: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: "#2196F3",
+    justifyContent: "center",
     alignItems: "center",
-    marginTop: 8,
+    marginRight: 12,
   },
-  emailButtonText: {
+  stepNumberGreen: {
+    backgroundColor: "#4CAF50",
+  },
+  stepNumberBlue: {
+    backgroundColor: "#9C27B0",
+  },
+  stepNumberText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 12,
+  },
+  stepText: {
+    fontSize: 14,
     color: COLORS.text,
-    fontWeight: "500",
+  },
+  quickContactSection: {
+    backgroundColor: "rgba(255, 215, 0, 0.1)",
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "rgba(255, 215, 0, 0.3)",
+  },
+  quickContactTitle: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#FFD700",
+    marginBottom: 8,
+    textAlign: "center",
+  },
+  quickContactButtons: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
+  emailQuickButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f44336",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+  },
+  whatsappQuickButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#25D366",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+  },
+  quickButtonText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "bold",
+    marginLeft: 6,
   },
   transferButton: {
     backgroundColor: COLORS.primary,
@@ -741,17 +836,27 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     width: "100%",
     alignItems: "center",
+    marginBottom: 12,
   },
   transferButtonText: {
     color: COLORS.text,
     fontWeight: "bold",
     fontSize: 16,
   },
-  transferSecondaryInfo: {
-    textAlign: "center",
-    marginTop: 16,
-    color: COLORS.textSecondary,
+  importantNote: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(255, 215, 0, 0.1)",
+    padding: 10,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: "rgba(255, 215, 0, 0.3)",
+  },
+  importantNoteText: {
+    marginLeft: 8,
     fontSize: 12,
+    color: COLORS.textSecondary,
+    flex: 1,
   },
   backButton: {
     flexDirection: "row",

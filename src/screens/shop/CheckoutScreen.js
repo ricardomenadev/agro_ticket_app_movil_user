@@ -16,7 +16,6 @@ import { useStore } from "../../context/StoreContext";
 import * as apiMobile from "../../api/apiMobile";
 
 // Importar los componentes modulares
-// import OrderSummary from './OrderSummary';
 import BuyerInfoStep from "../../components/shop/BuyerInfoStep";
 import DeliveryMethodStep from "../../components/shop/DeliveryMethodStep";
 import PaymentMethodStep from "../../components/shop/PaymentMethodStep";
@@ -57,107 +56,72 @@ const CheckoutScreen = ({ navigation }) => {
   };
 
   // Procesar pago según el método seleccionado
-  const handleProcessPayment = async (paymentData) => {
+ const handleProcessPayment = async (paymentData) => {
   try {
-    console.log("Procesando pago:", paymentMethod);
+    console.log("🔶 CHECKOUT: Procesando pago:", paymentMethod);
+    console.log("🔶 CHECKOUT: Datos recibidos:", paymentData);
     setIsProcessing(true);
     setError(null);
 
-    // Verificar que hay items en el carrito
     if (!cartItems || cartItems.length === 0) {
       throw new Error("No hay productos en el carrito");
     }
 
-    // Asegurarse de que paymentId/payment_id sean strings
-    if (paymentData.payment_id && typeof paymentData.payment_id !== 'string') {
-      paymentData.payment_id = String(paymentData.payment_id);
-      console.log(`Convertido payment_id a string: ${paymentData.payment_id}`);
-    }
-
-    if (paymentData.paymentId && typeof paymentData.paymentId !== 'string') {
-      paymentData.paymentId = String(paymentData.paymentId);
-      console.log(`Convertido paymentId a string: ${paymentData.paymentId}`);
-    }
-
-    // Asegurar consistencia: si existe paymentId pero no payment_id, usarlo
-    if (!paymentData.payment_id && paymentData.paymentId) {
-      paymentData.payment_id = paymentData.paymentId;
-      console.log(`Asignado payment_id desde paymentId: ${paymentData.payment_id}`);
-    }
-
-    console.log(`Tipo de payment_id: ${typeof paymentData.payment_id}`);
-
-    // Determinar qué función de API usar según el método de pago
-    let response;
-    if (paymentMethod === "CARD") {
-      console.log("Procesando pago con tarjeta de crédito");
-      // Agregar información adicional necesaria
-      const cardPaymentData = {
-        ...paymentData,
-        paymentMethod: "CARD",
-        deliveryMethod: deliveryMethod,
-      };
-
-      // Verificación adicional antes de enviar
-      console.log(`ID de pago final: ${cardPaymentData.payment_id} (${typeof cardPaymentData.payment_id})`);
+    if (paymentMethod === "TRANSFER") {
+      console.log("🔶 CHECKOUT: Procesando respuesta de transferencia...");
       
-      response = await apiMobile.processCardPayment(cardPaymentData);
-    } else if (paymentMethod === "MERCADOPAGO") {
-      console.log("Procesando pago con MercadoPago");
-      // Este método generalmente redirigiría a MercadoPago
-      // Por ahora, simulamos una respuesta exitosa
-      response = {
-        success: true,
-        status: "pending",
-        payment_id: String(paymentData.payment_id), // Asegurar que sea string
-        message: "Procesando pago con MercadoPago",
-      };
-    } else if (paymentMethod === "TRANSFER") {
-      console.log("Procesando pago por transferencia");
-      // Crear una orden pendiente de pago por transferencia
-      response = await apiMobile.createOrder({
-        items: cartItems,
-        buyerInfo: buyerInfo,
-        deliveryMethod: deliveryMethod,
-        paymentMethod: "TRANSFER",
-        total: total,
-        payment_id: String(paymentData.payment_id), // Asegurar que sea string
-      });
+      if (paymentData && paymentData.success && paymentData.orderData) {
+        console.log("✅ CHECKOUT: Transferencia ya procesada, navegando...");
+
+        // ✅ NAVEGAR PRIMERO (antes de limpiar carrito)
+        navigation.replace("PaymentConfirmation", {
+          orderId: paymentData.orderData.order?.orderNumber || paymentData.paymentId,
+          paymentMethod: "TRANSFER",
+          paymentId: paymentData.paymentId,
+          status: "PENDING",
+        });
+
+        // // ✅ LIMPIAR CARRITO DESPUÉS de navegar (con delay para asegurar navegación)
+        // setTimeout(() => {
+        //   console.log("🧹 CHECKOUT: Limpiando carrito después de navegar...");
+        //   clearCart();
+        // }, 100);
+
+      } else {
+        throw new Error("No se recibieron datos válidos de la transferencia");
+      }
+
+    } else if (paymentMethod === "CARD") {
+      console.log("🔶 CHECKOUT: Procesando respuesta de tarjeta...");
+      
+      if (paymentData && paymentData.success) {
+        console.log("✅ CHECKOUT: Pago con tarjeta exitoso, navegando...");
+        
+        // ✅ NAVEGAR PRIMERO
+        navigation.replace("PaymentConfirmation", {
+          orderId: paymentData.orderData?.order?.orderNumber || paymentData.paymentId,
+          paymentMethod: "CARD",
+          paymentId: paymentData.paymentId,
+          status: paymentData.status || "APPROVED",
+        });
+
+        // ✅ LIMPIAR CARRITO DESPUÉS
+        // setTimeout(() => {
+        //   console.log("🧹 CHECKOUT: Limpiando carrito después de navegar...");
+        //   clearCart();
+        // }, 2000);
+
+      } else {
+        throw new Error("Error al procesar el pago con tarjeta");
+      }
+
     } else {
       throw new Error("Método de pago no válido");
     }
 
-    // Verificar respuesta
-    if (response && (response.success || response.status === "SUCCESS")) {
-      console.log("Pago procesado correctamente:", response);
-
-      // Asegurar que payment_id es string en la respuesta también
-      if (response.payment_id && typeof response.payment_id !== 'string') {
-        response.payment_id = String(response.payment_id);
-        console.log(`Convertido payment_id de respuesta a string: ${response.payment_id}`);
-      }
-
-      // Limpiar carrito después de compra exitosa
-      clearCart();
-
-      // Navegar a la pantalla de confirmación
-      navigation.replace("PaymentConfirmation", {
-        orderId: response.order?.orderNumber || response.orderId,
-        paymentMethod: paymentMethod,
-        paymentId: String(response.payment_id || paymentData.payment_id), // Asegurar que sea string
-      });
-    } else {
-      // Manejar error de procesamiento
-      console.error("Error en respuesta del servidor:", response);
-      setError(
-        response.error || "Error al procesar el pago. Intenta nuevamente."
-      );
-    }
   } catch (error) {
-    console.error("Error procesando pago:", error);
-    setError(
-      error.message || "Error al procesar el pago. Intenta nuevamente."
-    );
+    console.error("🔴 CHECKOUT: Error procesando pago:", error);
+    setError(error.message || "Error al procesar el pago. Intenta nuevamente.");
   } finally {
     setIsProcessing(false);
   }
@@ -293,16 +257,54 @@ const CheckoutScreen = ({ navigation }) => {
       {error && (
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity
+            style={styles.errorButton}
+            onPress={() => setError(null)}
+          >
+            <Text style={styles.errorButtonText}>Cerrar</Text>
+          </TouchableOpacity>
         </View>
       )}
 
       {/* Contenido principal */}
       <View style={styles.content}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView contentContainerStyle={[styles.contentContainer, { paddingBottom: 100 }]}>
           {renderCurrentStep()}
 
-          {/* Resumen de la orden siempre visible */}
-          {/* <OrderSummary cartItems={cartItems} total={total} /> */}
+          {/* Resumen de la orden en el paso final */}
+          {currentStep === 2 && (
+            <View style={styles.orderSummary}>
+              <Text style={styles.summaryTitle}>Resumen de tu compra</Text>
+              
+              {cartItems.map((item, index) => (
+                <View key={index} style={styles.summaryItem}>
+                  <Text style={styles.summaryItemName}>
+                    {item.nombre || item.name}
+                  </Text>
+                  <Text style={styles.summaryItemDetails}>
+                    Cantidad: {item.cantidad || item.quantity} × $
+                    {(item.precio || item.price).toLocaleString()}
+                  </Text>
+                  <Text style={styles.summaryItemTotal}>
+                    $
+                    {(
+                      (item.precio || item.price) *
+                      (item.cantidad || item.quantity)
+                    ).toLocaleString()}
+                  </Text>
+                </View>
+              ))}
+              
+              <View style={styles.summaryDivider} />
+              
+              <View style={styles.summaryTotal}>
+                <Text style={styles.summaryTotalLabel}>Total:</Text>
+                <Text style={styles.summaryTotalValue}>
+                  ${total.toLocaleString()}
+                </Text>
+              </View>
+            </View>
+          )}
         </ScrollView>
       </View>
     </SafeAreaView>
@@ -391,7 +393,7 @@ const styles = StyleSheet.create({
   },
   errorContainer: {
     margin: 16,
-    padding: 12,
+    padding: 16,
     backgroundColor: "#ff000020",
     borderWidth: 1,
     borderColor: "#ff0000",
@@ -399,6 +401,20 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: "#ff0000",
+    fontSize: 14,
+    marginBottom: 12,
+  },
+  errorButton: {
+    alignSelf: "flex-end",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: "#ff0000",
+    borderRadius: 4,
+  },
+  errorButtonText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "bold",
   },
   content: {
     flex: 1,
@@ -406,6 +422,64 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 16,
     paddingBottom: 40,
+  },
+  
+  // Estilos para el resumen de orden
+  orderSummary: {
+    marginTop: 24,
+    padding: 16,
+    backgroundColor: COLORS.card,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  summaryTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: COLORS.text,
+    marginBottom: 16,
+  },
+  summaryItem: {
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+  },
+  summaryItemName: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: COLORS.text,
+    marginBottom: 4,
+  },
+  summaryItemDetails: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    marginBottom: 4,
+  },
+  summaryItemTotal: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: COLORS.primary,
+    textAlign: "right",
+  },
+  summaryDivider: {
+    height: 1,
+    backgroundColor: COLORS.primary,
+    marginVertical: 12,
+  },
+  summaryTotal: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  summaryTotalLabel: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: COLORS.text,
+  },
+  summaryTotalValue: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: COLORS.primary,
   },
 });
 

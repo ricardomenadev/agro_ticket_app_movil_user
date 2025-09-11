@@ -3,8 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, Linking, Platform, Ani
 import { MapPin, Navigation } from 'lucide-react-native';
 import { COLORS } from '../../styles/theme';
 
-
-const LocationMap = () => {
+const LocationCharata = () => {
   // Referencias para animaciones
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
@@ -38,13 +37,11 @@ const LocationMap = () => {
           toValue: 1.05,
           duration: 1200,
           useNativeDriver: true,
-          
         }),
         Animated.timing(buttonAnim, {
           toValue: 1,
           duration: 1200,
           useNativeDriver: true,
-          
         }),
       ])
     ).start();
@@ -54,7 +51,7 @@ const LocationMap = () => {
   const openMaps = () => {
     const latitude = '-27.213689';
     const longitude = '-61.187300';
-    const label = 'Expo AgroNea 2025';
+    const label = 'Expo AgroNea Charata 2025';
     
     const url = Platform.select({
       ios: `maps:0,0?q=${label}@${latitude},${longitude}`,
@@ -79,7 +76,7 @@ const LocationMap = () => {
     >
       <View style={styles.header}>
         <MapPin size={24} color={COLORS.primary} />
-        <Text style={styles.title}>EXPO AGRONEA</Text>
+        <Text style={styles.title}>EXPO AGRONEA - CHARATA</Text>
       </View>
       
       <Text style={styles.subtitle}>Ruta 89, km 72.5 a 5 kilómetros de Charata | Chaco</Text>
@@ -90,12 +87,12 @@ const LocationMap = () => {
         onPress={openMaps}
       >
         <Image 
-          source={require('../../../assets/images/map-preview.jpg')} 
+          source={require('../../../assets/images/logos/logoAgronea2.png')} 
           style={styles.mapImage}
           resizeMode="cover"
         />
         <View style={styles.mapOverlay}>
-          <MapPin size={42} color={COLORS.primary} />
+          {/* <MapPin size={42} color={COLORS.primary} /> */}
         </View>
       </TouchableOpacity>
       
@@ -115,7 +112,7 @@ const LocationMap = () => {
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 24,
+    marginVertical: 12,
     marginHorizontal: 16,
     backgroundColor: COLORS.card,
     borderRadius: 12,
@@ -185,4 +182,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LocationMap;
+export default LocationCharata;

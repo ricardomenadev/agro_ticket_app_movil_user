@@ -480,6 +480,25 @@ export function StoreProvider({ children }) {
     });
   }, [dispatch]);
 
+
+  const loadEventDetails = useCallback(async (eventId) => {
+  console.log('🔄 Cargando detalles completos del evento:', eventId);
+  
+  try {
+    setLoading(true);
+    const eventDetails = await apiMobile.fetchEventById(eventId);
+    
+    console.log('✅ Detalles del evento obtenidos:', eventDetails);
+    return eventDetails;
+  } catch (err) {
+    console.error("❌ Error cargando detalles del evento:", err);
+    return null;
+  } finally {
+    setLoading(false);
+  }
+}, []);
+
+
   // Establecer método de entrega
   const setDeliveryMethod = useCallback((method) => {
     console.log(`🔄 Estableciendo método de entrega: ${method}`);
@@ -553,6 +572,7 @@ export function StoreProvider({ children }) {
     // Funciones para cargar datos
     loadEvents,
     loadProducts,
+    loadEventDetails,
     
     // Cálculos
     totalItems,

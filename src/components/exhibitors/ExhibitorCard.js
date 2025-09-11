@@ -1,43 +1,102 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
-import { ChevronRight } from 'lucide-react-native';
-import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
+import { ChevronRight, MapPin, Package, Newspaper, Calendar } from 'lucide-react-native';
 import { COLORS } from '../../styles/theme';
 
-const ExhibitorCard = ({ exhibitor }) => {
-  const navigation = useNavigation();
-
+const ExhibitorCard = ({ exhibitor, onPress }) => {
+  
   // Función para navegar al perfil del expositor
-  const goToExhibitorProfile = () => {
-    navigation.navigate('ExhibitorProfile', { exhibitorId: exhibitor.id });
+  const handlePress = () => {
+    if (onPress) {
+      onPress();
+    }
   };
 
+  const getImageUrl = (imagePath) => {
+  if (!imagePath) return null;
+  
+  // Tu URL de ngrok para desarrollo
+  const baseBackendUrl = __DEV__ 
+    ? 'https://19b278b633aa.ngrok-free.app'  // Cambia solo esta línea cuando cambies ngrok
+    : 'https://api.agronea.store';
+  
+  if (imagePath.startsWith("http")) {
+    return imagePath;
+  }
+  
+  if (imagePath.startsWith("/uploads")) {
+    return `${baseBackendUrl}${imagePath}`;
+  }
+  
+  return imagePath;
+};
+
   return (
-    <TouchableOpacity 
-      style={styles.container} 
+    <TouchableOpacity
+      style={styles.container}
       activeOpacity={0.8}
-      onPress={goToExhibitorProfile}
+      onPress={handlePress}
     >
       <View style={styles.innerContainer}>
-        <Image 
-          source={exhibitor.logo ? { uri: exhibitor.logo } : { uri: 'https://via.placeholder.com/150' }} 
-          style={styles.logo} 
-        />
+        {/* Logo del expositor */}
+        <View style={styles.logoContainer}>
+          {exhibitor.logo ? (
+            <Image
+              source={{ uri: getImageUrl(exhibitor.logo) }}
+              style={styles.logo}
+              defaultSource={require('../../../assets/images/placeholder.png')}
+            />
+          ) : (
+            <View style={[styles.logo, styles.logoPlaceholder]}>
+              <Text style={styles.logoText}>
+                {exhibitor.name?.charAt(0)?.toUpperCase() || '?'}
+              </Text>
+            </View>
+          )}
+        </View>
+
+        {/* Contenido */}
         <View style={styles.contentContainer}>
+          {/* Header con nombre */}
           <View style={styles.headerRow}>
-            <Text style={styles.nameText}>{exhibitor.name}</Text>
-            {exhibitor.highlighted && (
-              <View style={styles.highlightBadge}>
-                <Ionicons name="star" size={10} color="white" style={styles.highlightIcon} />
-                <Text style={styles.highlightText}>Destacado</Text>
-              </View>
-            )}
+            <Text style={styles.nameText} numberOfLines={2}>
+              {exhibitor.name || 'Sin nombre'}
+            </Text>
           </View>
-          <Text style={styles.descriptionText} numberOfLines={2}>{exhibitor.description}</Text>
+
+          {/* Descripción */}
+          <Text style={styles.descriptionText} numberOfLines={2}>
+            {exhibitor.description || 'Empresa participante en AGRONEA 2025'}
+          </Text>
+
+          {/* Estadísticas */}
+          {exhibitor.stats && (
+            <View style={styles.statsRow}>
+              <View style={styles.statItem}>
+                <Package size={12} color={COLORS.primary} />
+                <Text style={styles.statText}>{exhibitor.stats.products || 0}</Text>
+              </View>
+              <View style={styles.statItem}>
+                <Newspaper size={12} color={COLORS.primary} />
+                <Text style={styles.statText}>{exhibitor.stats.news || 0}</Text>
+              </View>
+              <View style={styles.statItem}>
+                <Calendar size={12} color={COLORS.primary} />
+                <Text style={styles.statText}>{exhibitor.stats.events || 0}</Text>
+              </View>
+            </View>
+          )}
+
+          {/* Footer */}
           <View style={styles.footerRow}>
-            <Text style={styles.standText}>Stand {exhibitor.stand}</Text>
-            <TouchableOpacity style={styles.profileButton} onPress={goToExhibitorProfile}>
+            <View style={styles.standContainer}>
+              <MapPin size={14} color={COLORS.secondary} />
+              <Text style={styles.standText}>
+                Stand {exhibitor.stand || 'Por confirmar'}
+              </Text>
+            </View>
+            
+            <TouchableOpacity style={styles.profileButton} onPress={handlePress}>
               <Text style={styles.profileButtonText}>Ver perfil</Text>
               <ChevronRight size={14} color={COLORS.primary} />
             </TouchableOpacity>
@@ -52,83 +111,103 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: COLORS.card,
     borderRadius: 12,
-    marginBottom: 16,
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   innerContainer: {
     flexDirection: 'row',
-    padding: 12,
+    padding: 16,
+  },
+  logoContainer: {
+    marginRight: 12,
   },
   logo: {
     width: 64,
-    height: 64, 
+    height: 64,
     borderRadius: 8,
-    backgroundColor: '#2A2A2A', // Color de fondo mientras carga
+    backgroundColor: COLORS.background,
+  },
+  logoPlaceholder: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.primary + '20',
+    borderWidth: 1,
+    borderColor: COLORS.primary + '40',
+  },
+  logoText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: COLORS.primary,
   },
   contentContainer: {
-    marginLeft: 12,
     flex: 1,
+    justifyContent: 'space-between',
   },
   headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    flexWrap: 'wrap',
+    marginBottom: 8,
   },
   nameText: {
     fontWeight: 'bold',
     color: COLORS.text,
     fontSize: 16,
-  },
-  highlightBadge: {
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  highlightIcon: {
-    marginRight: 4,
-  },
-  highlightText: {
-    color: 'white',
-    fontSize: 12,
+    lineHeight: 22,
   },
   descriptionText: {
     color: COLORS.textSecondary,
     fontSize: 14,
-    marginTop: 4,
     lineHeight: 20,
+    marginBottom: 12,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    marginBottom: 12,
+  },
+  statItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  statText: {
+    color: COLORS.textSecondary,
+    fontSize: 12,
+    marginLeft: 4,
+    fontWeight: '600',
   },
   footerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 8,
+  },
+  standContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
   },
   standText: {
     color: COLORS.secondary,
     fontWeight: '600',
     fontSize: 13,
+    marginLeft: 4,
   },
   profileButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(10, 143, 60, 0.1)',
-    paddingVertical: 4,
-    paddingHorizontal: 10,
+    backgroundColor: COLORS.primary + '15',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
     borderRadius: 16,
   },
   profileButtonText: {
     fontSize: 12,
     color: COLORS.primary,
     marginRight: 4,
+    fontWeight: '600',
   },
 });
 

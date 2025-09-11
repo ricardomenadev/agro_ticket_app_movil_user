@@ -3,74 +3,124 @@ import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { ShoppingCart } from 'lucide-react-native';
 import { COLORS } from '../../constants/colors';
 
-// SVG componentes para tickets (versiones simplificadas)
-const GeneralTicketSVG = (props) => (
-  <View style={{
-    width: props.width || '100%', 
-    height: props.height || '100%', 
-    backgroundColor: '#0A8F3C20', 
-    justifyContent: 'center', 
-    alignItems: 'center'
-  }}>
-    <Text style={{color: COLORS.primary || '#0A8F3C', fontWeight: 'bold'}}>
-      🎫 Entrada General
-    </Text>
-  </View>
-);
+// 🔧 CONFIGURACIÓN DIRECTA - IGUAL QUE EN apiMobile.js
+const API_BASE_URL = 'https://api.agronea.store';
 
-const ParkingTicketSVG = (props) => (
-  <View style={{
-    width: props.width || '100%', 
-    height: props.height || '100%', 
-    backgroundColor: '#0066CC20', 
-    justifyContent: 'center', 
-    alignItems: 'center'
-  }}>
-    <Text style={{color: '#0066CC', fontWeight: 'bold'}}>
-      🚗 Estacionamiento
-    </Text>
-  </View>
-);
+// ✅ FUNCIÓN PARA FORMATEAR URLs DE IMÁGENES (igual que en apiMobile.js)
+const formatProductImage = (imageUrl) => {
+  console.log('🔍 ProductCard formatProductImage - URL recibida:', imageUrl);
+  
+  if (!imageUrl) {
+    console.log('❌ No hay URL de imagen, usando placeholder');
+    return `${API_BASE_URL}/images/products/placeholder.png`;
+  }
+
+  // Si la URL ya es completa (incluye http/https), usarla directamente
+  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+    // Si contiene localhost, reemplazar con la URL base configurada
+    if (imageUrl.includes('localhost:5000')) {
+      const newUrl = imageUrl.replace('http://localhost:5000', API_BASE_URL);
+      console.log('🔄 ProductCard URL reemplazada de localhost:', newUrl);
+      return newUrl;
+    }
+    console.log('✅ ProductCard URL completa directa:', imageUrl);
+    return imageUrl;
+  }
+
+  // Si es una ruta relativa, construir URL completa
+  const cleanPath = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+  const finalUrl = `${API_BASE_URL}${cleanPath}`;
+  console.log('🏗️ ProductCard URL construida:', finalUrl);
+  return finalUrl;
+};
+
+// // SVG componentes para tickets (versiones simplificadas)
+// const GeneralTicketSVG = (props) => (
+//   <View style={{
+//     width: props.width || '100%', 
+//     height: props.height || '100%', 
+//     backgroundColor: '#0A8F3C20', 
+//     justifyContent: 'center', 
+//     alignItems: 'center'
+//   }}>
+//     <Text style={{color: COLORS.primary || '#0A8F3C', fontWeight: 'bold'}}>
+//       🎫 Entrada General
+//     </Text>
+//   </View>
+// );
+
+// const ParkingTicketSVG = (props) => (
+//   <View style={{
+//     width: props.width || '100%', 
+//     height: props.height || '100%', 
+//     backgroundColor: '#0066CC20', 
+//     justifyContent: 'center', 
+//     alignItems: 'center'
+//   }}>
+//     <Text style={{color: '#0066CC', fontWeight: 'bold'}}>
+//       🚗 Estacionamiento
+//     </Text>
+//   </View>
+// );
 
 const ProductCard = ({ product, onAddToCart, onPress, featured = false }) => {
-  // Renderizar la imagen adecuada (SVG o URI)
+  
+  // ✅ FUNCIÓN MEJORADA PARA RENDERIZAR IMÁGENES
   const renderImage = () => {
+    // Para tickets y estacionamiento, usar SVGs
     if (product.tipo === 'ticket') {
       return <GeneralTicketSVG width="100%" height={featured ? 180 : 120} />;
     } else if (product.tipo === 'parking') {
       return <ParkingTicketSVG width="100%" height={featured ? 180 : 120} />;
-    } else {
-      // Si hay una imagen, intentar mostrarla
-      if (product.imagen && typeof product.imagen === 'string') {
-        // Asegúrate de que la URL sea completa
-        let imageUrl = product.imagen;
+    } 
+    
+    // Para productos normales, usar imágenes
+    else {
+      // Obtener URL de imagen de múltiples fuentes posibles
+      let imageUrl = null;
+      
+      if (product.images && Array.isArray(product.images) && product.images.length > 0) {
+        imageUrl = product.images[0].url;
+        console.log("✅ ProductCard imagen obtenida de product.images[0].url:", imageUrl);
+      } else if (product.imagen) {
+        imageUrl = product.imagen;
+        console.log("✅ ProductCard imagen obtenida de product.imagen:", imageUrl);
+      } else if (product.image) {
+        imageUrl = product.image;
+        console.log("✅ ProductCard imagen obtenida de product.image:", imageUrl);
+      }
+      
+      // Si hay imagen, formatearla y mostrarla
+      if (imageUrl && typeof imageUrl === 'string') {
+        const formattedImageUrl = formatProductImage(imageUrl);
         
-        // Si la imagen no comienza con http, añadir URL base del servidor
-        if (!imageUrl.startsWith('http')) {
-          // Usa la URL base de tu API
-          const API_BASE_URL = 'https://140e-181-105-226-40.ngrok-free.app/api/mobile'; // Ajusta según corresponda
-          imageUrl = `${API_BASE_URL}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
-        }
-        
-        console.log("URL de imagen:", imageUrl); // Debugging
+        console.log("🖼️ ProductCard URL final de imagen:", formattedImageUrl);
         
         return (
           <Image
-            source={{ uri: imageUrl }}
+            source={{ uri: formattedImageUrl }}
             style={featured ? styles.featuredProductImage : styles.productImage}
             resizeMode="cover"
-            onError={(e) => console.log(`Error cargando imagen (${imageUrl}):`, e.nativeEvent.error)}
+            onError={(e) => {
+              console.error(`❌ ProductCard Error cargando imagen (${formattedImageUrl}):`, e.nativeEvent.error);
+            }}
+            onLoad={() => {
+              console.log("✅ ProductCard Imagen cargada exitosamente:", formattedImageUrl);
+            }}
           />
         );
-      } else {
-        // Si no hay imagen, mostrar un placeholder
+      } 
+      
+      // Si no hay imagen, mostrar placeholder
+      else {
+        console.log("❌ ProductCard No hay imagen disponible para el producto:", product.nombre);
         return (
           <View style={[
             featured ? styles.featuredProductImage : styles.productImage,
             { justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.border || '#333333' }
           ]}>
-            <Text style={{ color: COLORS.text || '#FFFFFF' }}>
-              Imagen no disponible
+            <Text style={{ color: COLORS.text || '#FFFFFF', textAlign: 'center', fontSize: 12 }}>
+              📷{'\n'}Imagen no{'\n'}disponible
             </Text>
           </View>
         );

@@ -5,10 +5,10 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
   Linking,
+  SafeAreaView,
+  Image,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "../../constants/colors";
 
@@ -30,103 +30,83 @@ const CategoryCard = ({ title, icon, description, onPress }) => {
 };
 
 const VisitorGuideScreen = ({ navigation }) => {
+  const handleAlojamiento = () => {
+  navigation.navigate("Accommodation");
+};
+
+  const handleEmergencias = () => {
+  navigation.navigate("Emergency");
+};
+
+  const handleProveedores = () => {
+  navigation.navigate("Providers");
+};
+
+  const handleGoogleMaps = () => {
+    Linking.openURL("https://maps.google.com/?q=Charata,Chaco,Argentina");
+  };
+
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Image
-          source={require("../../../assets/images/charata-city.jpg")}
-          style={styles.headerImage}
-          resizeMode="cover"
-        />
-        <LinearGradient
-          colors={["transparent", "rgba(0,0,0,0.8)"]}
-          style={styles.gradient}
-        />
-        <View style={styles.headerContent}>
+    <SafeAreaView style={styles.container}>
+      <ScrollView style={styles.scrollView}>
+        {/* Header con logo */}
+        <View style={styles.header}>
+          <Image
+            source={require('../../../assets/images/logos/agronea-logo.png')}
+            style={styles.logoImage}
+            resizeMode="contain"
+          />
           <Text style={styles.headerTitle}>Guía del Visitante</Text>
           <Text style={styles.headerSubtitle}>
-            Todo lo que necesitas para disfrutar Charata
+            Todo lo que necesitas para tu visita a Charata
           </Text>
         </View>
-      </View>
 
-      <View style={styles.content}>
-        <Text style={styles.sectionTitle}>Servicios Esenciales</Text>
+        <View style={styles.content}>
+          <Text style={styles.sectionTitle}>Servicios Esenciales</Text>
 
-        <CategoryCard
-          title="Alojamiento"
-          icon="bed"
-          description="Hoteles, posadas y alojamientos disponibles en la ciudad y alrededores."
-          onPress={() => console.log("Alojamiento")}
-        />
+          <CategoryCard
+            title="Alojamiento"
+            icon="bed"
+            description="Hoteles, posadas y alojamientos disponibles en la ciudad y alrededores."
+            onPress={handleAlojamiento}
+          />
 
-        <CategoryCard
-          title="Gastronomía"
-          icon="restaurant"
-          description="Restaurantes, bares y lugares para comer en Charata."
-          onPress={() => console.log("Gastronomía")}
-        />
+          {/* <CategoryCard
+            title="Emergencias"
+            icon="medkit"
+            description="Hospitales, farmacias y servicios de emergencia disponibles."
+            onPress={handleEmergencias}
+          /> */}
 
-        <CategoryCard
-          title="Transporte"
-          icon="car"
-          description="Opciones de transporte público, taxis y remises en la ciudad."
-          onPress={() => console.log("Transporte")}
-        />
+          <CategoryCard
+            title="Proveedores"
+            icon="business"
+            description="Proveedores locales, servicios y comercios de la región."
+            onPress={handleProveedores}
+          />
 
-        <Text style={styles.sectionTitle}>Turismo</Text>
-
-        <CategoryCard
-          title="Lugares de Interés"
-          icon="location"
-          description="Atractivos turísticos y lugares para visitar en la región."
-          onPress={() => console.log("Lugares de Interés")}
-        />
-
-        <CategoryCard
-          title="Actividades"
-          icon="bicycle"
-          description="Actividades recreativas y tours disponibles."
-          onPress={() => console.log("Actividades")}
-        />
-
-        <Text style={styles.sectionTitle}>Información Útil</Text>
-
-        <CategoryCard
-          title="Emergencias"
-          icon="medkit"
-          description="Hospitales, farmacias y servicios de emergencia."
-          onPress={() => console.log("Emergencias")}
-        />
-
-        <CategoryCard
-          title="Servicios Bancarios"
-          icon="card"
-          description="Bancos, cajeros automáticos y casas de cambio."
-          onPress={() => console.log("Servicios Bancarios")}
-        />
-
-        <View style={styles.mapContainer}>
-          <Text style={styles.mapTitle}>Mapa de Charata</Text>
-          <TouchableOpacity
-            style={styles.mapButton}
-            onPress={() =>
-              Linking.openURL(
-                "https://maps.google.com/?q=Charata,Chaco,Argentina"
-              )
-            }
-          >
-            <Ionicons
-              name="map"
-              size={20}
-              color="white"
-              style={styles.mapIcon}
-            />
-            <Text style={styles.mapButtonText}>Ver en Google Maps</Text>
-          </TouchableOpacity>
+          <View style={styles.mapContainer}>
+            <Text style={styles.mapTitle}>Mapa de Charata</Text>
+            <Text style={styles.mapDescription}>
+              Explora la ciudad y encuentra los mejores lugares
+            </Text>
+            <TouchableOpacity
+              style={styles.mapButton}
+              onPress={handleGoogleMaps}
+            >
+              <Ionicons
+                name="map"
+                size={20}
+                color="white"
+                style={styles.mapIcon}
+              />
+              <Text style={styles.mapButtonText}>Ver en Google Maps</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -134,38 +114,33 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
+    marginBottom: 50,
+  },
+  scrollView: {
+    flex: 1,
   },
   header: {
-    height: 200,
-    position: "relative",
+    alignItems: 'center',
+    padding: 32,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
   },
-  headerImage: {
-    width: "100%",
-    height: "100%",
-  },
-  gradient: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: "50%",
-  },
-  headerContent: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 16,
+  logoImage: {
+    width: 100,
+    height: 100,
+    marginBottom: 16,
   },
   headerTitle: {
     fontSize: 24,
-    fontWeight: "bold",
-    color: "white",
+    fontWeight: 'bold',
+    color: COLORS.text,
     marginBottom: 8,
+    textAlign: 'center',
   },
   headerSubtitle: {
     fontSize: 16,
-    color: "rgba(255,255,255,0.8)",
+    color: COLORS.textSecondary,
+    textAlign: 'center',
   },
   content: {
     padding: 16,
@@ -173,8 +148,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: COLORS.secondary,
-    marginTop: 24,
+    color: COLORS.primary,
     marginBottom: 16,
   },
   categoryCard: {
@@ -184,6 +158,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   categoryIcon: {
     width: 50,
@@ -206,18 +185,30 @@ const styles = StyleSheet.create({
   categoryDescription: {
     fontSize: 14,
     color: COLORS.textSecondary,
+    lineHeight: 20,
   },
   mapContainer: {
     marginTop: 32,
     backgroundColor: COLORS.card,
     borderRadius: 12,
-    padding: 16,
+    padding: 20,
     alignItems: "center",
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   mapTitle: {
     fontSize: 18,
     fontWeight: "bold",
     color: COLORS.text,
+    marginBottom: 8,
+  },
+  mapDescription: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
     marginBottom: 16,
   },
   mapButton: {
@@ -227,6 +218,11 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 24,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   mapIcon: {
     marginRight: 8,

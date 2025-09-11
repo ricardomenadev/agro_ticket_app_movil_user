@@ -334,7 +334,7 @@ export const detailedExhibitors = {
       stand: 'A-12',
       description: 'Líder mundial en maquinaria agrícola con soluciones innovadoras',
       logo: 'https://via.placeholder.com/200/0A8F3C/FFFFFF?text=JD',
-      highlighted: true,
+      highlighted: false,
       verified: true
     },
     {
@@ -344,7 +344,7 @@ export const detailedExhibitors = {
       stand: 'B-05',
       description: 'Equipos agrícolas de alta potencia y rendimiento para operaciones comerciales',
       logo: 'https://via.placeholder.com/200/B21830/FFFFFF?text=CASE',
-      highlighted: true,
+      highlighted: false,
       verified: true
     },
     {
@@ -354,7 +354,7 @@ export const detailedExhibitors = {
       stand: 'C-08',
       description: 'Soluciones innovadoras para una agricultura más inteligente y sostenible',
       logo: 'https://via.placeholder.com/200/006CB7/FFFFFF?text=NH',
-      highlighted: true,
+      highlighted: false,
       verified: true
     },
     {

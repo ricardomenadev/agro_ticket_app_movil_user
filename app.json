@@ -1,28 +1,62 @@
 {
   "expo": {
-    "name": "agro_app_movil_user",
+    "name": "Agronea Producciones",
     "slug": "agro_app_movil_user",
     "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "orientation": "default",
+    "icon": "./assets/logoAgronea2.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/logoAgronea2.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.agroapp.user",
+      "deploymentTarget": "13.4",
+      "buildNumber": "1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "CFBundleDisplayName": "Agronea Producciones"
+      },
+      "icon": "./assets/logoAgronea2.png"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/logoAgronea2.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.agroapp.user",
+      "versionCode": 19,
+      "compileSdkVersion": 35,
+      "targetSdkVersion": 35,
+      "screenOrientation": "default",
+      "windowSoftInputMode": "adjustResize"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
-    }
+      "favicon": "./assets/logoAgronea2.png"
+    },
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "542dc9de-3794-4562-8c40-b287c953b005"
+      }
+    },
+    "plugins": [
+      "expo-font",
+      "expo-system-ui",
+      [
+        "expo-screen-orientation",
+        {
+          "initialOrientation": "DEFAULT"
+        }
+      ]
+    ]
   }
 }

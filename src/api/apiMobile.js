@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Configuración base
 
-const API_URL = 'https://3eeb-181-105-226-35.ngrok-free.app/api/mobile' || 'http://localhost:5000/api/mobile';
+const API_URL = 'https://api.agronea.store/api/mobile' || 'http://localhost:5000/api/mobile';
 const API_TIMEOUT = 15000; // 15 segundos
 
 console.log('☀️ API_URL configurada:', API_URL);
@@ -339,44 +339,62 @@ export const createOrder = async (orderData) => {
   }
 };
 
-// Verificar estado de una orden
-export const checkOrderStatus = async (orderId) => {
-  console.log(`🔄 Iniciando checkOrderStatus para ID: ${orderId}`);
+// ✅ AGREGAR esta función a tu apiMobile.js (después de checkOrderStatus)
+
+/**
+ * Obtiene detalles completos de una orden por payment_id
+ * Replica la funcionalidad de getOrderDetails del store web
+ * @param {string} orderId - payment_id o orderNumber a buscar
+ * @returns {Promise<Object>} - Detalles completos de la orden
+ */
+export const getOrderDetails = async (orderId) => {
   try {
-    console.log(`📡 Solicitando GET: ${ENDPOINTS.ORDER_BY_ID(orderId)}`);
-    const response = await apiClient.get(ENDPOINTS.ORDER_BY_ID(orderId));
-    
-    console.log('✅ Respuesta de estado de orden recibida');
-    console.log('📊 Estructura de respuesta:', Object.keys(response.data));
-    
-    if (response.data && response.data.status === 'SUCCESS' && response.data.data && response.data.data.order) {
-      const order = response.data.data.order;
-      console.log(`🎉 Éxito en checkOrderStatus: OrderID=${order.id}, Status=${order.status}`);
-      return {
-        success: true,
-        order: order
-      };
-    } else {
-      console.warn('⚠️ Estructura de respuesta inesperada:', response.data);
-      
-      // Intento alternativo
-      if (response.data && response.data.order) {
-        console.log('🔍 Encontrada estructura alternativa de orden');
-        return {
-          success: true,
-          order: response.data.order
-        };
+    console.log(`🔍 MOBILE: Obteniendo detalles para orderId/payment_id: ${orderId}`);
+   
+    // Primero intentar usando la ruta específica para payment_id
+    try {
+      console.log(`📡 MOBILE: Solicitando GET: /store/orders/payment/${orderId}`);
+      const response = await apiClient.get(`/store/orders/payment/${orderId}`);
+      console.log("✅ MOBILE: Respuesta de búsqueda por payment_id:", response.data);
+     
+      // Verificar si la respuesta incluye tickets
+      if (response.data && response.data.data && response.data.data.order) {
+        const orderData = response.data.data.order;
+        console.log("🎫 MOBILE: Tickets en la orden:", 
+                    orderData.tickets ? orderData.tickets.length : "ninguno");
       }
-      
-      console.error(`❌ No se pudo interpretar la respuesta como orden (ID: ${orderId})`);
-      return {
-        success: false,
-        error: 'No se encontró la orden'
-      };
+     
+      // La condición correcta debe verificar status === 'SUCCESS', no success
+      if (response.data && response.data.status === 'SUCCESS') {
+        console.log("✅ MOBILE: Orden encontrada por payment_id exitosamente");
+        return response.data;
+      }
+    } catch (paymentError) {
+      console.log("⚠️ MOBILE: Error buscando por payment_id:", paymentError.message);
+    }
+   
+    // Solo llegar aquí si la primera búsqueda no tuvo éxito
+    try {
+      console.log(`📡 MOBILE: Solicitando GET: /store/orders/${orderId}`);
+      const response = await apiClient.get(`/store/orders/${orderId}`);
+      console.log("✅ MOBILE: Respuesta de búsqueda por orderId:", response.data);
+     
+      // Verificar si la respuesta incluye tickets
+      if (response.data && response.data.data && response.data.data.order) {
+        const orderData = response.data.data.order;
+        console.log("🎫 MOBILE: Tickets en la orden:",
+                    orderData.tickets ? orderData.tickets.length : "ninguno");
+      }
+     
+      console.log("✅ MOBILE: Orden encontrada por orderId exitosamente");
+      return response.data;
+    } catch (orderError) {
+      console.log("❌ MOBILE: Error buscando por orderId:", orderError.message);
+      throw new Error(`No se pudo encontrar la orden con ID: ${orderId}`);
     }
   } catch (error) {
-    console.error(`❌ Error en checkOrderStatus para ID ${orderId}:`, error);
-    return handleApiError(error);
+    console.error("❌ MOBILE: Error obteniendo detalles de la orden:", error);
+    throw error;
   }
 };
 
@@ -626,14 +644,77 @@ export const processCardPayment = async (paymentData) => {
   };
   
 
+  /**
+ * Crea una orden para pago por transferencia bancaria.
+ * IMPORTANTE: Esta función debe usarse ÚNICAMENTE para pagos por transferencia.
+ * 
+ * @param {Object} orderData - Datos de la orden
+ * @returns {Promise} - Promesa con la respuesta del servidor
+ */
+export const createTransferOrder = async (orderData) => {
+  try {
+    // Verificar que el método de pago sea transferencia
+    if (orderData.paymentMethod !== "TRANSFER" && 
+        orderData.paymentMethod !== "transfer") {
+      console.error("🔴 MOBILE: createTransferOrder solo debe usarse para transferencias bancarias");
+      throw new Error("Método de pago no permitido para esta operación");
+    }
+    
+    // Registrar los datos recibidos para depuración
+    console.log("🔶 MOBILE: Datos de la orden recibidos en createTransferOrder:", orderData);
+    console.log("🔶 MOBILE: Items recibidos:", orderData.items);
+    
+    // Estandarizar el método de pago
+    const standardOrderData = {
+      ...orderData,
+      paymentMethod: "TRANSFER" // Asegurar que se use el formato estandarizado
+    };
+    
+    console.log("🔶 MOBILE: Creando orden para pago por transferencia:", standardOrderData);
+    
+    // Llamar al endpoint correcto para procesar la orden
+    const response = await apiClient.post('/store/orders', standardOrderData);
+    
+    // Guardar la información del pedido para recuperarla si es necesario
+    // En móvil usamos AsyncStorage en lugar de localStorage
+    try {
+      const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+      await AsyncStorage.setItem('lastTransferOrder', JSON.stringify(response.data));
+      console.log("🔶 MOBILE: Orden guardada en AsyncStorage");
+    } catch (storageError) {
+      console.warn("🟡 MOBILE: No se pudo guardar en AsyncStorage:", storageError);
+      // No fallar por esto, es solo para recuperación
+    }
+    
+    console.log("🔶 MOBILE: Respuesta de creación de orden por transferencia:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("🔴 MOBILE: Error al crear orden para transferencia:", error);
+    
+    // Parsear el error de manera similar a tu función web
+    if (error.response) {
+      // Error del servidor
+      const serverError = error.response.data;
+      throw new Error(serverError.message || 'Error del servidor al crear la orden');
+    } else if (error.request) {
+      // Error de red
+      throw new Error('Error de conexión. Verifica tu internet.');
+    } else {
+      // Error de configuración
+      throw new Error(error.message || 'Error inesperado al crear la orden');
+    }
+  }
+};
+
 export default {
   fetchEvents,
   fetchEventById,
   fetchAllProducts,
   fetchProductById,
   createOrder,
-  checkOrderStatus,
+  getOrderDetails,
   createMercadoPagoPreference,
   processCardPayment,
-  checkPaymentStatus
+  checkPaymentStatus,
+  createTransferOrder
 };

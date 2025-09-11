@@ -143,7 +143,7 @@ const AgroneaTV = () => {
   
   // Abrir el canal de YouTube
   const openYouTubeChannel = () => {
-    Linking.openURL('https://www.youtube.com/channel/CHANNEL_ID');
+    Linking.openURL('https://www.youtube.com/@agroneaproducciones');
   };
 
   return (

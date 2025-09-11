@@ -62,13 +62,13 @@ const HomeFooter = () => {
     Linking.openURL('mailto:agroneacharata@gmail.com');
   };
   
-  const openPhone = () => {
-    Linking.openURL('tel:03731421873');
+  const openWhatsApp = () => {
+    Linking.openURL('https://wa.me/5493794222011');
   };
   
   const openMap = () => {
-    Linking.openURL('https://maps.app.goo.gl/yourGoogleMapsLink');
-  };
+  Linking.openURL('https://maps.app.goo.gl/rKai7BcMQEF3x6Z46');
+};
 
   return (
     <Animated.View 
@@ -80,21 +80,22 @@ const HomeFooter = () => {
         }
       ]}
     >
-      {/* Logo como imagen en lugar de texto */}
+      {/* Logo */}
       <View style={styles.logoContainer}>
         <Image 
-          source={require('../../../assets/images/logos/agronea-logo2.png')}
+          source={require('../../../assets/images/logos/logoAgronea2.png')}
           style={styles.logoImage}
-          resizeMode="cover"
+          resizeMode="contain"
         />
+        <Text style={styles.tagline}>Conectando el campo argentino desde 1997</Text>
       </View>
       
       <View style={styles.separator} />
       
       <View style={styles.infoSection}>
-        <TouchableOpacity style={styles.infoRow} onPress={openPhone}>
+        <TouchableOpacity style={styles.infoRow} onPress={openWhatsApp}>
           <Phone size={16} color={COLORS.primary} style={styles.infoIcon} />
-          <Text style={styles.infoText}>03731 42-1873</Text>
+          <Text style={styles.infoText}>+54 379 4222011</Text>
         </TouchableOpacity>
         
         <TouchableOpacity style={styles.infoRow} onPress={openEmail}>
@@ -119,16 +120,15 @@ const HomeFooter = () => {
       <View style={styles.separator} />
       
       <View style={styles.socialSection}>
-        <SocialButton Icon={Youtube} url="https://youtube.com/agroneaTV" color="#FF0000" />
-        <SocialButton Icon={Instagram} url="https://instagram.com/agronea" color="#E1306C" />
-        <SocialButton Icon={Facebook} url="https://facebook.com/agronea" color="#1877F2" />
-        <SocialButton Icon={Twitter} url="https://twitter.com/agronea" color="#1DA1F2" />
-        <SocialButton Icon={Linkedin} url="https://linkedin.com/company/agronea" color="#0A66C2" />
+        <SocialButton Icon={Youtube} url="https://www.youtube.com/@agroneaproducciones" color="#FF0000" />
+        <SocialButton Icon={Instagram} url="https://www.instagram.com/agroneachaco/?hl=es" color="#E1306C" />
+        <SocialButton Icon={Facebook} url="https://www.facebook.com/agroneachaco" color="#1877F2" />
+        <SocialButton Icon={Linkedin} url="https://www.linkedin.com/in/agronea-producciones-07b095162" color="#0A66C2" />
       </View>
       
-      <View style={styles.eventInfoContainer}>
-        <Text style={styles.eventDate}>4·5·6 DE JULIO</Text>
-        <Text style={styles.eventLocation}>CHARATA | CHACO | ARGENTINA</Text>
+      <View style={styles.corporateInfoContainer}>
+        <Text style={styles.companyName}>AGRONEA PRODUCCIONES</Text>
+        <Text style={styles.companyExperience}>27 AÑOS CONECTANDO EL CAMPO ARGENTINO</Text>
       </View>
     </Animated.View>
   );
@@ -158,6 +158,13 @@ const styles = StyleSheet.create({
   logoImage: {
     width: 600,
     height: 300,
+  },
+  tagline: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    fontStyle: 'italic',
+    marginTop: -20,
+    marginBottom: 8,
   },
   separator: {
     height: 1,
@@ -194,17 +201,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: 8,
   },
-  eventInfoContainer: {
+  corporateInfoContainer: {
     alignItems: 'center',
     marginTop: 16,
   },
-  eventDate: {
+  companyName: {
     fontSize: 16,
     fontWeight: 'bold',
     color: COLORS.text,
     marginBottom: 4,
   },
-  eventLocation: {
+  companyExperience: {
     fontSize: 12,
     color: COLORS.textSecondary,
     letterSpacing: 1,
