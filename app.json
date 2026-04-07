@@ -4,18 +4,17 @@
     "slug": "agro_app_movil_user",
     "version": "1.0.0",
     "orientation": "default",
-    "icon": "./assets/logoAgronea2.png",
+    "icon": "./assets/logoAgronea3.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": false,
     "splash": {
-      "image": "./assets/logoAgronea2.png",
+      "image": "./assets/logoAgronea3.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.agroapp.user",
-      "deploymentTarget": "13.4",
       "buildNumber": "1",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
@@ -25,15 +24,11 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/logoAgronea2.png",
+        "foregroundImage": "./assets/logoAgronea3.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.agroapp.user",
-      "versionCode": 19,
-      "compileSdkVersion": 35,
-      "targetSdkVersion": 35,
-      "screenOrientation": "default",
-      "windowSoftInputMode": "adjustResize"
+      "versionCode": 19
     },
     "web": {
       "favicon": "./assets/logoAgronea2.png"
