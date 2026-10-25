@@ -9,10 +9,9 @@ import { useNavigation } from "@react-navigation/native";
 
 import AgroneaTV from "../components/home/AgroneaTv";
 import CountdownTimer from "../components/home/CountdownTimer";
-import { C, SectionHeader, PriceCard, PriceCardEmpty, NewsCard, SampleBadge } from "../components/feed/FeedCards";
-import { NEWS_NEA, NEWS_NATIONAL, SAMPLE } from "../constants/feedSample";
+import { C, SectionHeader, PriceCard, PriceCardEmpty, NewsCard, NewsEmpty } from "../components/feed/FeedCards";
 import { fetchEvents } from "../api/apiMobile";
-import { useMarkets } from "../api/apiFeed";
+import { useMarkets, useNews } from "../api/apiFeed";
 
 // Precios que se muestran en el inicio (el resto, en Mercados)
 const HOME_PRICES = [
@@ -68,6 +67,7 @@ const HomeScreen = () => {
   const navigation = useNavigation();
   const [event, setEvent] = useState(null);
   const { markets } = useMarkets();
+  const { news, loading: newsLoading } = useNews();
 
   useEffect(() => {
     fetchEvents()
@@ -108,17 +108,36 @@ const HomeScreen = () => {
           ))}
         </View>
 
-        {SAMPLE ? <SampleBadge /> : null}
-        <SectionHeader title="Noticias del campo · NEA" />
-        <NewsCard item={NEWS_NEA[0]} big />
-        {NEWS_NEA.slice(1).map((n) => (
-          <NewsCard key={n.id} item={n} />
-        ))}
+        {/* Noticias, en este orden: Agronea (si hay), NEA, agro del país y muy poca economía */}
+        {news?.agronea?.length ? (
+          <>
+            <SectionHeader title="Novedades de Agronea" />
+            {news.agronea.map((n, i) => (
+              <NewsCard key={n.id} item={n} big={i === 0} />
+            ))}
+          </>
+        ) : null}
 
-        <SectionHeader title="Lo importante del país" />
-        {NEWS_NATIONAL.map((n) => (
-          <NewsCard key={n.id} item={n} />
-        ))}
+        <SectionHeader title="Noticias del campo · NEA" />
+        {news?.nea?.length ? news.nea.map((n, i) => <NewsCard key={n.id} item={n} big={i === 0} />) : <NewsEmpty loading={newsLoading} />}
+
+        {news?.national?.length ? (
+          <>
+            <SectionHeader title="Agro en el país" />
+            {news.national.map((n) => (
+              <NewsCard key={n.id} item={n} />
+            ))}
+          </>
+        ) : null}
+
+        {news?.economy?.length ? (
+          <>
+            <SectionHeader title="Economía que importa" />
+            {news.economy.map((n) => (
+              <NewsCard key={n.id} item={n} />
+            ))}
+          </>
+        ) : null}
 
         <AgroneaTV />
 

@@ -2,9 +2,11 @@
 import React, { useState } from "react";
 import { View, ScrollView, StyleSheet, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { C, SectionHeader, NewsCard, SampleBadge, trendOf } from "../components/feed/FeedCards";
-import { NEWS_MARKETS, SAMPLE } from "../constants/feedSample";
-import { useMarkets } from "../api/apiFeed";
+import { C, SectionHeader, NewsCard, trendOf } from "../components/feed/FeedCards";
+import { useMarkets, useNews } from "../api/apiFeed";
+
+// Noticias que hablan de precios y mercados (de las que ya vienen en el feed)
+const MARKET_WORDS = /precio|mercado|pizarra|cotiza|export|ca[ñn]uelas|remate|d[oó]lar|retencion|chicago|cosecha/i;
 
 const TABS = [
   { id: "grains", label: "Granos", eyebrow: "PIZARRA ROSARIO · $ POR TONELADA", source: "Bolsa de Comercio de Rosario" },
@@ -36,6 +38,10 @@ const Board = ({ children }) => <View style={styles.board}>{children}</View>;
 const MarketsScreen = () => {
   const [tab, setTab] = useState("grains");
   const { markets, loading } = useMarkets();
+  const { news } = useNews();
+  const marketNews = [...(news?.economy || []), ...(news?.national || []), ...(news?.nea || [])]
+    .filter((n) => n.category === "economia" || MARKET_WORDS.test(n.title))
+    .slice(0, 4);
   const current = TABS.find((t) => t.id === tab);
   const block = markets?.[tab];
 
@@ -107,11 +113,14 @@ const MarketsScreen = () => {
           {block?.date ? ` · ${block.date}` : ""}
         </Text>
 
-        <SectionHeader title="Noticias de mercado" />
-        {SAMPLE ? <SampleBadge /> : null}
-        {NEWS_MARKETS.map((n) => (
-          <NewsCard key={n.id} item={n} />
-        ))}
+        {marketNews.length ? (
+          <>
+            <SectionHeader title="Noticias de mercado" />
+            {marketNews.map((n) => (
+              <NewsCard key={n.id} item={n} />
+            ))}
+          </>
+        ) : null}
 
         <View style={{ height: 110 }} />
       </ScrollView>

@@ -1,6 +1,7 @@
 // Piezas del rediseño: encabezados de sección, tarjetas de precio y de noticia.
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Image, Linking } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 // Fondo negro: el verde y el dorado quedan solo como acentos, para que resalten
 export const C = {
@@ -59,23 +60,47 @@ export const PriceCardEmpty = () => (
   </View>
 );
 
-export const NewsCard = ({ item, big }) => (
-  <View style={[s.newsCard, big && s.newsCardBig]}>
-    {big ? <View style={s.newsPhotoBig}><Text style={s.muted12}>foto</Text></View> : <View style={s.newsPhoto}><Text style={s.muted11}>foto</Text></View>}
-    <View style={big ? s.newsBodyBig : s.newsBody}>
-      <View style={s.tagRow}>
-        {item.featured ? <Text style={s.featured}>DESTACADA</Text> : null}
-        <Text style={[s.tag, item.featured && { color: C.muted }]}>{item.tag}</Text>
-      </View>
-      <Text style={big ? s.newsTitleBig : s.newsTitle}>{item.title}</Text>
-      <Text style={s.muted11}>{item.source} · {item.ago}</Text>
-    </View>
-  </View>
-);
+const CATEGORY = { agronea: "AGRONEA", agricultura: "AGRICULTURA", ganaderia: "GANADERÍA", inta: "INTA", economia: "ECONOMÍA", otros: "CAMPO" };
 
-export const SampleBadge = () => (
+const ago = (date) => {
+  const min = Math.max(1, Math.round((Date.now() - new Date(date)) / 60000));
+  if (min < 60) return `hace ${min} min`;
+  const h = Math.round(min / 60);
+  if (h < 24) return `hace ${h} h`;
+  const d = Math.round(h / 24);
+  return d === 1 ? "ayer" : `hace ${d} días`;
+};
+
+/** Noticia del feed (o de ejemplo con tag/ago). Al tocarla abre la nota en el navegador. */
+export const NewsCard = ({ item, big }) => {
+  const tag = item.tag || [CATEGORY[item.category] || "CAMPO", item.region === "nea" ? "NEA" : null].filter(Boolean).join(" · ");
+  const when = item.ago || (item.publishedAt ? ago(item.publishedAt) : "");
+  const photo = item.imageUrl ? (
+    <Image source={{ uri: item.imageUrl }} style={big ? s.newsPhotoBig : s.newsPhoto} resizeMode="cover" accessibilityIgnoresInvertColors />
+  ) : (
+    <View style={big ? s.newsPhotoBig : s.newsPhoto}>
+      <Ionicons name="leaf-outline" size={big ? 34 : 22} color={C.muted} />
+    </View>
+  );
+  const open = () => item.url && Linking.openURL(item.url).catch(() => {});
+  return (
+    <TouchableOpacity style={[s.newsCard, big && s.newsCardBig]} onPress={open} disabled={!item.url} activeOpacity={0.85} accessibilityRole="link">
+      {photo}
+      <View style={big ? s.newsBodyBig : s.newsBody}>
+        <View style={s.tagRow}>
+          {item.featured ? <Text style={s.featured}>DESTACADA</Text> : null}
+          <Text style={[s.tag, item.category === "agronea" && { color: C.gold }]} numberOfLines={1}>{tag}</Text>
+        </View>
+        <Text style={big ? s.newsTitleBig : s.newsTitle} numberOfLines={big ? 4 : 3}>{item.title}</Text>
+        <Text style={s.muted11}>{item.source}{when ? ` · ${when}` : ""}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+export const NewsEmpty = ({ loading }) => (
   <View style={s.sample}>
-    <Text style={s.sampleText}>Noticias de ejemplo · muy pronto se cargan solas todos los días</Text>
+    <Text style={[s.sampleText, { color: C.muted }]}>{loading ? "Cargando noticias…" : "Sin noticias por ahora. Probá más tarde."}</Text>
   </View>
 );
 
