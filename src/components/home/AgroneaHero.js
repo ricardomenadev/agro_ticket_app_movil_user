@@ -9,6 +9,13 @@ import { useStore } from "../../context/StoreContext";
 import { useShowcase } from "../../api/apiFeed";
 import { C } from "../feed/FeedCards";
 
+// Redes de Agronea (mismos links que el pie del inicio)
+const SOCIAL = [
+  { id: "yt", icon: "logo-youtube", eyebrow: "AGRONEA TV", title: "Reviví lo mejor de Agronea", text: "Charlas, demostraciones y entrevistas en nuestro canal.", cta: "Ver el canal", url: "https://www.youtube.com/@agroneaproducciones", colors: ["#b31217", "#3b0b0b"] },
+  { id: "ig", icon: "logo-instagram", eyebrow: "INSTAGRAM", title: "Seguinos en @agroneachaco", text: "Fotos, videos y todas las novedades del evento.", cta: "Seguir", url: "https://www.instagram.com/agroneachaco/", colors: ["#c13584", "#5b1a8b"] },
+  { id: "fb", icon: "logo-facebook", eyebrow: "FACEBOOK", title: "Sumate a Agronea Chaco", text: "Enterate primero de fechas, entradas y sorteos.", cta: "Ir a la página", url: "https://www.facebook.com/agroneachaco", colors: ["#1877f2", "#0b3a7a"] },
+];
+
 const W = Dimensions.get("window").width - 36 - 4; // menos el borde dorado
 const H = 220;
 const API_BASE = "https://api.agronea.store";
@@ -66,6 +73,21 @@ const AgroneaHero = ({ agroneaNews }) => {
       </LinearGradient>
     ) : null,
 
+    ...SOCIAL.map((s) => (
+      <LinearGradient key={s.id} colors={s.colors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[styles.slide, styles.radius, styles.slideInner]}>
+        <View style={styles.socialRow}>
+          <View style={styles.socialIcon}>
+            <Ionicons name={s.icon} size={34} color="#fff" />
+          </View>
+          <View style={{ flex: 1, gap: 4 }}>
+            <Text style={styles.socialEyebrow}>{s.eyebrow}</Text>
+            <Text style={styles.title} numberOfLines={2}>{s.title}</Text>
+            <Text style={styles.socialText} numberOfLines={2}>{s.text}</Text>
+          </View>
+        </View>
+        <Cta label={s.cta} onPress={() => Linking.openURL(s.url).catch(() => {})} />
+      </LinearGradient>
+    )),
   ].filter(Boolean);
 
   // Borde dorado que "respira": el bloque de Agronea es lo que más se ve del inicio
@@ -133,6 +155,10 @@ const styles = StyleSheet.create({
   text: { color: C.soft, fontSize: 13, lineHeight: 18 },
   productImg: { width: H * 0.85, height: H, backgroundColor: "#fff" },
   frame: { borderWidth: 2, borderRadius: 22, overflow: "hidden" },
+  socialRow: { flexDirection: "row", alignItems: "center", gap: 14 },
+  socialIcon: { width: 64, height: 64, borderRadius: 32, backgroundColor: "rgba(255,255,255,0.18)", alignItems: "center", justifyContent: "center" },
+  socialEyebrow: { color: "#fff", opacity: 0.85, fontSize: 10, letterSpacing: 2, fontWeight: "700" },
+  socialText: { color: "#fff", opacity: 0.9, fontSize: 13, lineHeight: 18 },
   cta: { flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "flex-start", backgroundColor: C.gold, borderRadius: 10, paddingHorizontal: 12, minHeight: 38, marginTop: 4 },
   ctaText: { color: "#000", fontWeight: "800", fontSize: 13 },
   dots: { flexDirection: "row", justifyContent: "center", gap: 6, marginTop: 8 },
