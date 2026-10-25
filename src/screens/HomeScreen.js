@@ -8,11 +8,19 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 
 import AgroneaTV from "../components/home/AgroneaTv";
-import MediaAliadosCarousel from "../components/home/MediaAliadosCarousel";
 import CountdownTimer from "../components/home/CountdownTimer";
-import { C, SectionHeader, PriceCard, NewsCard, SampleBadge } from "../components/feed/FeedCards";
-import { MARKETS, NEWS_NEA, NEWS_NATIONAL, SAMPLE } from "../constants/feedSample";
+import { C, SectionHeader, PriceCard, PriceCardEmpty, NewsCard, SampleBadge } from "../components/feed/FeedCards";
+import { NEWS_NEA, NEWS_NATIONAL, SAMPLE } from "../constants/feedSample";
 import { fetchEvents } from "../api/apiMobile";
+import { useMarkets } from "../api/apiFeed";
+
+// Precios que se muestran en el inicio (el resto, en Mercados)
+const HOME_PRICES = [
+  { block: "grains", id: "soja", place: "Rosario", unit: "tn" },
+  { block: "grains", id: "maiz", place: "Rosario", unit: "tn" },
+  { block: "grains", id: "girasol", place: "Rosario", unit: "tn" },
+  { block: "cattle", id: "novillos", place: "Cañuelas", unit: "kg vivo" },
+];
 
 const SOCIAL = [
   { id: "ig", label: "Instagram", icon: "logo-instagram", color: "#dd2a7b", url: "https://www.instagram.com/agroneachaco/" },
@@ -59,6 +67,7 @@ const EventBlock = ({ event, onBuy }) => (
 const HomeScreen = () => {
   const navigation = useNavigation();
   const [event, setEvent] = useState(null);
+  const { markets } = useMarkets();
 
   useEffect(() => {
     fetchEvents()
@@ -87,23 +96,19 @@ const HomeScreen = () => {
 
         {event ? <EventBlock event={event} onBuy={() => navigation.navigate("Shop")} /> : null}
 
-        {/* Publicidad: auspiciantes y medios aliados */}
-        <MediaAliadosCarousel />
-
-        {SAMPLE ? <SampleBadge /> : null}
-
         <SectionHeader title="Mercados de hoy" action="Ver todo" onAction={() => navigation.navigate("Markets")} />
         <View style={styles.grid}>
-          <View style={styles.gridRow}>
-            <PriceCard item={MARKETS.grains[0]} />
-            <PriceCard item={MARKETS.grains[1]} />
-          </View>
-          <View style={styles.gridRow}>
-            <PriceCard item={MARKETS.grains[2]} />
-            <PriceCard item={MARKETS.cattle[0]} />
-          </View>
+          {[HOME_PRICES.slice(0, 2), HOME_PRICES.slice(2)].map((row, r) => (
+            <View key={r} style={styles.gridRow}>
+              {row.map((p) => {
+                const item = markets?.[p.block]?.items?.find((i) => i.id === p.id);
+                return item ? <PriceCard key={p.id} item={item} place={p.place} unit={p.unit} /> : <PriceCardEmpty key={p.id} />;
+              })}
+            </View>
+          ))}
         </View>
 
+        {SAMPLE ? <SampleBadge /> : null}
         <SectionHeader title="Noticias del campo · NEA" />
         <NewsCard item={NEWS_NEA[0]} big />
         {NEWS_NEA.slice(1).map((n) => (

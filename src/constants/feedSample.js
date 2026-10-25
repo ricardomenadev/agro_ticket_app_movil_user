@@ -1,23 +1,7 @@
-// Datos de EJEMPLO para el rediseño: se reemplazan por el feed diario del servidor (precios y noticias).
-// shortcut: datos fijos, hasta que exista /api/mobile/feed en el backend.
+// Noticias de EJEMPLO para el rediseño (los precios ya vienen del servidor: api/apiFeed.js).
+// shortcut: noticias fijas, hasta que exista el feed de noticias en el backend.
 
 export const SAMPLE = true;
-
-export const MARKETS = {
-  updatedAt: "Ejemplo",
-  grains: [
-    { id: "soja", name: "Soja", place: "Rosario", price: null, change: 0, unit: "tn" },
-    { id: "maiz", name: "Maíz", place: "Rosario", price: null, change: 0, unit: "tn" },
-    { id: "girasol", name: "Girasol", place: "Rosario", price: null, change: 0, unit: "tn" },
-    { id: "trigo", name: "Trigo", place: "Rosario", price: null, change: 0, unit: "tn" },
-    { id: "sorgo", name: "Sorgo", place: "Rosario", price: null, change: 0, unit: "tn" },
-  ],
-  cattle: [
-    { id: "novillo", name: "Novillo", place: "Cañuelas", price: null, change: 0, unit: "kg vivo" },
-    { id: "vaquillona", name: "Vaquillona", place: "Cañuelas", price: null, change: 0, unit: "kg vivo" },
-    { id: "ternero", name: "Ternero", place: "Cañuelas", price: null, change: 0, unit: "kg vivo" },
-  ],
-};
 
 export const NEWS_NEA = [
   { id: "n1", tag: "AGRICULTURA · CHACO", title: "Acá va la noticia más importante del día para el NEA", source: "Ejemplo", ago: "hace 2 h", featured: true },

@@ -30,17 +30,32 @@ export const SectionHeader = ({ title, action, onAction }) => (
   </View>
 );
 
-export const PriceCard = ({ item }) => {
-  const color = item.change > 0 ? C.greenLight : item.change < 0 ? C.down : C.muted;
-  const arrow = item.change > 0 ? "▲" : item.change < 0 ? "▼" : "=";
+/** Variación del día: el % si ya hay día anterior guardado; si no, la tendencia que publica la fuente. */
+export const trendOf = (item) => {
+  const dir = item.change != null ? Math.sign(item.change) : item.trend === "up" ? 1 : item.trend === "down" ? -1 : 0;
+  const color = dir > 0 ? C.greenLight : dir < 0 ? C.down : C.muted;
+  const arrow = dir > 0 ? "▲" : dir < 0 ? "▼" : "=";
+  const label = item.change != null ? `${Math.abs(item.change).toFixed(1).replace(".", ",")} %` : dir > 0 ? "subió" : dir < 0 ? "bajó" : "sin cambios";
+  return { color, text: `${arrow} ${label}` };
+};
+
+export const PriceCard = ({ item, place, unit }) => {
+  const t = trendOf(item);
   return (
     <View style={s.priceCard}>
-      <Text style={s.muted12}>{item.name} · {item.place}</Text>
-      <Text style={s.price}>{money(item.price)}</Text>
-      <Text style={[s.change, { color }]}>{arrow} {Math.abs(item.change).toFixed(1).replace(".", ",")} % por {item.unit}</Text>
+      <Text style={s.muted12}>{item.name} · {place}</Text>
+      <Text style={s.price}>{money(item.price)}{item.estimated ? <Text style={s.muted11}> (est.)</Text> : null}</Text>
+      <Text style={[s.change, { color: t.color }]}>{t.text} · por {unit}</Text>
     </View>
   );
 };
+
+export const PriceCardEmpty = () => (
+  <View style={s.priceCard}>
+    <Text style={s.muted12}>Cargando precios…</Text>
+    <Text style={s.price}>$ —</Text>
+  </View>
+);
 
 export const NewsCard = ({ item, big }) => (
   <View style={[s.newsCard, big && s.newsCardBig]}>
@@ -58,7 +73,7 @@ export const NewsCard = ({ item, big }) => (
 
 export const SampleBadge = () => (
   <View style={s.sample}>
-    <Text style={s.sampleText}>Datos de ejemplo · se actualizan solos cuando esté conectado el servidor</Text>
+    <Text style={s.sampleText}>Noticias de ejemplo · muy pronto se cargan solas todos los días</Text>
   </View>
 );
 

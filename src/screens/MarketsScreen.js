@@ -1,48 +1,90 @@
-// Mercados: pizarra de granos (Rosario), hacienda (Cañuelas) y noticias de mercado.
+// Mercados: pizarra de granos (Rosario), hacienda (Cañuelas), dólar oficial y noticias de mercado.
 import React, { useState } from "react";
-import { View, ScrollView, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { View, ScrollView, StyleSheet, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { C, SectionHeader, NewsCard, SampleBadge } from "../components/feed/FeedCards";
-import { MARKETS, NEWS_MARKETS, SAMPLE } from "../constants/feedSample";
+import { C, SectionHeader, NewsCard, SampleBadge, trendOf } from "../components/feed/FeedCards";
+import { NEWS_MARKETS, SAMPLE } from "../constants/feedSample";
+import { useMarkets } from "../api/apiFeed";
 
 const TABS = [
-  { id: "grains", label: "Granos", eyebrow: "PIZARRA ROSARIO · $ POR TONELADA" },
-  { id: "cattle", label: "Hacienda", eyebrow: "MERCADO DE CAÑUELAS · $ POR KG VIVO" },
+  { id: "grains", label: "Granos", eyebrow: "PIZARRA ROSARIO · $ POR TONELADA", source: "Bolsa de Comercio de Rosario" },
+  { id: "cattle", label: "Hacienda", eyebrow: "MERCADO DE CAÑUELAS · $ POR KG VIVO (PROMEDIO)", source: "Mercado Agroganadero de Cañuelas" },
+  { id: "dollar", label: "Dólar", eyebrow: "DÓLAR OFICIAL · BANCO NACIÓN", source: "Cotización oficial" },
 ];
 
 const money = (n) => (n == null ? "$ —" : `$ ${Math.round(n).toLocaleString("es-AR")}`);
 
 const Row = ({ item, last }) => {
-  const color = item.change > 0 ? C.greenLight : item.change < 0 ? C.down : C.muted;
-  const arrow = item.change > 0 ? "▲" : item.change < 0 ? "▼" : "=";
+  const t = trendOf(item);
   return (
     <View style={[styles.row, !last && styles.rowBorder]}>
       <View>
         <Text style={styles.rowName}>{item.name}</Text>
-        <Text style={styles.rowSub}>{item.place}</Text>
+        {item.heads ? <Text style={styles.rowSub}>{item.heads.toLocaleString("es-AR")} cabezas</Text> : null}
+        {item.estimated ? <Text style={styles.rowSub}>Sin cotización · precio estimado</Text> : null}
       </View>
       <View style={{ alignItems: "flex-end" }}>
         <Text style={styles.rowPrice}>{money(item.price)}</Text>
-        <Text style={[styles.rowChange, { color }]}>{arrow} {Math.abs(item.change).toFixed(1).replace(".", ",")} %</Text>
+        <Text style={[styles.rowChange, { color: t.color }]}>{t.text}</Text>
       </View>
     </View>
   );
 };
 
+const Board = ({ children }) => <View style={styles.board}>{children}</View>;
+
 const MarketsScreen = () => {
   const [tab, setTab] = useState("grains");
+  const { markets, loading } = useMarkets();
   const current = TABS.find((t) => t.id === tab);
-  const items = MARKETS[tab];
+  const block = markets?.[tab];
+
+  const renderBoard = () => {
+    if (!markets) {
+      return (
+        <Board>
+          <View style={styles.loading}>
+            {loading ? <ActivityIndicator color={C.greenLight} /> : <Text style={styles.rowSub}>No se pudieron cargar los precios. Probá de nuevo con señal.</Text>}
+          </View>
+        </Board>
+      );
+    }
+    if (tab === "dollar") {
+      const d = markets.dollar;
+      return (
+        <Board>
+          <View style={[styles.row, styles.rowBorder]}>
+            <Text style={styles.rowName}>Compra</Text>
+            <Text style={styles.rowPrice}>{money(d?.buy)}</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.rowName}>Venta</Text>
+            <Text style={styles.rowPrice}>{money(d?.sell)}</Text>
+          </View>
+        </Board>
+      );
+    }
+    const items = block?.items || [];
+    return (
+      <Board>
+        {items.length ? (
+          items.map((item, i) => <Row key={item.id} item={item} last={i === items.length - 1} />)
+        ) : (
+          <View style={styles.loading}>
+            <Text style={styles.rowSub}>Sin datos por ahora.</Text>
+          </View>
+        )}
+      </Board>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View>
           <Text style={styles.title}>Mercados</Text>
-          <Text style={styles.subtitle}>Se actualiza todos los días · fuentes oficiales</Text>
+          <Text style={styles.subtitle}>Se actualiza solo durante el día · fuentes oficiales</Text>
         </View>
-
-        {SAMPLE ? <SampleBadge /> : null}
 
         <View style={styles.tabs}>
           {TABS.map((t) => (
@@ -59,13 +101,14 @@ const MarketsScreen = () => {
         </View>
 
         <Text style={styles.eyebrow}>{current.eyebrow}</Text>
-        <View style={styles.board}>
-          {items.map((item, i) => (
-            <Row key={item.id} item={item} last={i === items.length - 1} />
-          ))}
-        </View>
+        {renderBoard()}
+        <Text style={styles.source}>
+          Fuente: {current.source}
+          {block?.date ? ` · ${block.date}` : ""}
+        </Text>
 
         <SectionHeader title="Noticias de mercado" />
+        {SAMPLE ? <SampleBadge /> : null}
         {NEWS_MARKETS.map((n) => (
           <NewsCard key={n.id} item={n} />
         ))}
@@ -94,6 +137,8 @@ const styles = StyleSheet.create({
   rowSub: { color: C.muted, fontSize: 11 },
   rowPrice: { color: C.text, fontSize: 17, fontWeight: "800" },
   rowChange: { fontSize: 12 },
+  loading: { padding: 24, alignItems: "center" },
+  source: { color: C.muted, fontSize: 11, marginTop: -6 },
 });
 
 export default MarketsScreen;
