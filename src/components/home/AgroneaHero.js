@@ -14,6 +14,7 @@ const SOCIAL = [
   { id: "yt", icon: "logo-youtube", eyebrow: "AGRONEA TV", title: "Reviví lo mejor de Agronea", text: "Charlas, demostraciones y entrevistas en nuestro canal.", cta: "Ver el canal", url: "https://www.youtube.com/@agroneaproducciones", colors: ["#b31217", "#3b0b0b"] },
   { id: "ig", icon: "logo-instagram", eyebrow: "INSTAGRAM", title: "Seguinos en @agroneachaco", text: "Fotos, videos y todas las novedades del evento.", cta: "Seguir", url: "https://www.instagram.com/agroneachaco/", colors: ["#c13584", "#5b1a8b"] },
   { id: "fb", icon: "logo-facebook", eyebrow: "FACEBOOK", title: "Sumate a Agronea Chaco", text: "Enterate primero de fechas, entradas y sorteos.", cta: "Ir a la página", url: "https://www.facebook.com/agroneachaco", colors: ["#1877f2", "#0b3a7a"] },
+  { id: "x", icon: "logo-x", eyebrow: "X", title: "Seguinos en @AgroneaChaco", text: "Las novedades del evento al instante.", cta: "Seguir", url: "https://x.com/AgroneaChaco", colors: ["#2a2a2a", "#000000"] },
 ];
 
 const W = Dimensions.get("window").width - 36 - 4; // menos el borde dorado

@@ -157,6 +157,14 @@ const ContactScreen = () => {
             </TouchableOpacity>
 
             <TouchableOpacity 
+              style={[styles.socialButton, { backgroundColor: '#00000020' }]}
+              onPress={() => handleSocial('https://x.com/AgroneaChaco')}
+            >
+              <Ionicons name="logo-x" size={24} color="#000000" />
+              <Text style={styles.socialText}>X</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
               style={[styles.socialButton, { backgroundColor: '#0A66C220' }]}
               onPress={() => handleSocial('https://www.linkedin.com/in/agronea-producciones-07b095162')}
             >

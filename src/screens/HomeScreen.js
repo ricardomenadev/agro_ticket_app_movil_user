@@ -38,6 +38,7 @@ const SOCIAL = [
   { id: "ig", label: "Instagram", icon: "logo-instagram", color: "#dd2a7b", url: "https://www.instagram.com/agroneachaco/" },
   { id: "fb", label: "Facebook", icon: "logo-facebook", color: "#1877f2", url: "https://www.facebook.com/agroneachaco" },
   { id: "yt", label: "YouTube", icon: "logo-youtube", color: "#d62d20", url: "https://www.youtube.com/@agroneaproducciones" },
+  { id: "x", label: "X", icon: "logo-x", color: "#000000", url: "https://x.com/AgroneaChaco" },
 ];
 const WHATSAPP = "https://wa.me/5493794222011";
 const OFFICE_MAP = "https://maps.app.goo.gl/rKai7BcMQEF3x6Z46";
