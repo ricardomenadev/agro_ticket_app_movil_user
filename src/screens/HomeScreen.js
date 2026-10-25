@@ -9,6 +9,7 @@ import { useNavigation } from "@react-navigation/native";
 
 import AgroneaTV from "../components/home/AgroneaTv";
 import CountdownTimer from "../components/home/CountdownTimer";
+import AgroneaHero from "../components/home/AgroneaHero";
 import { C, SectionHeader, PriceCard, PriceCardEmpty, NewsCard, NewsEmpty } from "../components/feed/FeedCards";
 import { fetchEvents } from "../api/apiMobile";
 import { useMarkets, useNews } from "../api/apiFeed";
@@ -95,6 +96,8 @@ const HomeScreen = () => {
         </View>
 
         {event ? <EventBlock event={event} onBuy={() => navigation.navigate("Shop")} /> : null}
+
+        <AgroneaHero agroneaNews={news?.agronea?.[0]} />
 
         <SectionHeader title="Mercados de hoy" action="Ver todo" onAction={() => navigation.navigate("Markets")} />
         <View style={styles.grid}>
