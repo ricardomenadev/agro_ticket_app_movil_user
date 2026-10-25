@@ -3,6 +3,7 @@
 import React, { useMemo, useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image, ImageBackground, Linking, ActivityIndicator, Modal, Pressable } from "react-native";
 import { useShopCart } from "../../context/ShopCartContext";
+import ProductSheet from "../../components/shop/ProductSheet";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
@@ -56,10 +57,10 @@ const AdBanner = () => {
   );
 };
 
-const ProductTile = ({ product, qty, onAdd, onRemove }) => {
+const ProductTile = ({ product, qty, onAdd, onRemove, onOpen }) => {
   const img = imageOf(product);
   return (
-    <View style={styles.tile}>
+    <TouchableOpacity style={styles.tile} onPress={onOpen} activeOpacity={0.9} accessibilityRole="button" accessibilityLabel={`Ver ${product.nombre}`}>
       <View style={[styles.tileImgWrap, !img && { backgroundColor: C.photo }]}>
         {img ? <Image source={{ uri: img }} style={styles.tileImg} resizeMode="cover" /> : <Ionicons name={isTicket(product) ? "ticket-outline" : "bag-handle-outline"} size={34} color={C.muted} />}
         {onSale(product) ? <Text style={styles.saleBadge}>OFERTA</Text> : null}
@@ -86,14 +87,21 @@ const ProductTile = ({ product, qty, onAdd, onRemove }) => {
           )}
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
+};
+
+// Todas las fotos del producto (la API manda `imagenes`; si no, la principal)
+const photosOf = (p) => {
+  const list = (p.imagenes?.length ? p.imagenes : [p.imagen]).map((url) => imageOf({ imagen: url }));
+  return [...new Set(list.filter(Boolean))];
 };
 
 const ShopScreen = () => {
   const { products, events, loading } = useStore();
   const tabBarHeight = useBottomTabBarHeight();
   const [filter, setFilter] = useState("all");
+  const [detail, setDetail] = useState(null); // producto abierto en el detalle
   const { items: cart, count, change, open, setOpen } = useShopCart();
 
   // Entradas y estacionamientos solo de eventos a la venta (la lista trae también los de ediciones pasadas)
@@ -138,6 +146,13 @@ const ShopScreen = () => {
           </TouchableOpacity>
         </View>
 
+        {count ? (
+          <TouchableOpacity style={styles.viewCart} onPress={() => setOpen(true)} activeOpacity={0.85} accessibilityRole="button">
+            <Ionicons name="bag-check-outline" size={20} color="#000" />
+            <Text style={styles.viewCartText}>Ver carrito ({count}) · {money(total)}</Text>
+          </TouchableOpacity>
+        ) : null}
+
         <View style={styles.chips}>
           {filters.map((f) => (
             <TouchableOpacity
@@ -160,7 +175,7 @@ const ShopScreen = () => {
         ) : shown.length ? (
           <View style={styles.grid}>
             {shown.map((p) => (
-              <ProductTile key={p.id} product={p} qty={cart[p.id]} onAdd={() => change(p.id, 1)} onRemove={() => change(p.id, -1)} />
+              <ProductTile key={p.id} product={p} qty={cart[p.id]} onAdd={() => change(p.id, 1)} onRemove={() => change(p.id, -1)} onOpen={() => setDetail(p)} />
             ))}
           </View>
         ) : (
@@ -168,7 +183,23 @@ const ShopScreen = () => {
         )}
       </ScrollView>
 
-      {/* Carrito: sube desde abajo al tocar el ícono de arriba o el botón amarillo del menú */}
+      {detail ? (
+        <ProductSheet
+          key={detail.id}
+          product={detail}
+          photos={photosOf(detail)}
+          price={priceOf(detail)}
+          oldPrice={onSale(detail) ? detail.precio : null}
+          inCart={cart[detail.id] || 0}
+          onSave={(qty) => {
+            change(detail.id, qty - (cart[detail.id] || 0));
+            setDetail(null);
+          }}
+          onClose={() => setDetail(null)}
+        />
+      ) : null}
+
+      {/* Carrito: sube desde abajo al tocar "Ver carrito" o el ícono de la bolsa */}
       <Modal visible={open} transparent animationType="slide" onRequestClose={() => setOpen(false)}>
         <Pressable style={styles.sheetBackdrop} onPress={() => setOpen(false)} accessibilityLabel="Cerrar carrito" />
         <View style={styles.sheet}>
@@ -225,6 +256,8 @@ const styles = StyleSheet.create({
   title: { color: C.text, fontSize: 24, fontWeight: "800" },
   cartIcon: { width: 44, height: 44, borderRadius: 14, borderWidth: 1, borderColor: C.border, backgroundColor: C.card, alignItems: "center", justifyContent: "center" },
   cartBadge: { position: "absolute", top: -6, right: -6, minWidth: 20, height: 20, borderRadius: 10, backgroundColor: C.gold, color: "#000", fontSize: 11, fontWeight: "800", textAlign: "center", lineHeight: 20, overflow: "hidden" },
+  viewCart: { minHeight: 48, borderRadius: 14, backgroundColor: C.gold, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 },
+  viewCartText: { color: "#000", fontWeight: "800", fontSize: 15 },
   chips: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 8 },
   chip: { minHeight: 38, paddingHorizontal: 16, borderRadius: 19, borderWidth: 1, borderColor: C.borderStrong, justifyContent: "center" },
   chipActive: { backgroundColor: C.green, borderColor: C.green },

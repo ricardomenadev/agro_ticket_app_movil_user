@@ -36,14 +36,15 @@ import { useShopCart } from "../context/ShopCartContext";
 // Importamos el tema y colores
 import { COLORS } from "../constants/colors";
 
-// Botón amarillo de la Tienda: muestra cuántos productos hay en el carrito y, estando ya en la tienda, lo abre
-const ShopTabButton = ({ onPress, accessibilityState, "aria-selected": ariaSelected }) => {
+// Botón amarillo de la Tienda: siempre lleva a la tienda (el carrito se abre desde adentro) y muestra cuántos productos hay
+const ShopTabButton = ({ onPress, accessibilityState }) => {
   const { count, setOpen } = useShopCart();
-  // react-navigation 7 avisa la pestaña activa con aria-selected (antes, accessibilityState.selected)
-  const inShop = Boolean(ariaSelected ?? accessibilityState?.selected);
   return (
     <TouchableOpacity
-      onPress={inShop && count ? () => setOpen(true) : onPress}
+      onPress={() => {
+        setOpen(false); // volver a la tienda es ver los productos, nunca el carrito encima
+        onPress();
+      }}
       style={styles.shopBtnWrap}
       accessibilityRole="button"
       accessibilityLabel={count ? `Tienda, ${count} en el carrito` : "Tienda"}
@@ -54,7 +55,7 @@ const ShopTabButton = ({ onPress, accessibilityState, "aria-selected": ariaSelec
         <Ionicons name="bag-handle-outline" size={26} color="#000000" />
         {count ? <Text style={styles.shopBadge}>{count}</Text> : null}
       </View>
-      <Text style={styles.shopLabel}>{inShop && count ? "Ver carrito" : "Tienda"}</Text>
+      <Text style={styles.shopLabel}>Tienda</Text>
     </TouchableOpacity>
   );
 };
