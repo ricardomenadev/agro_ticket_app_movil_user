@@ -1,561 +1,272 @@
-import React, { useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-  StatusBar,
-  Linking,
-  Alert,
-  Animated,
-  Dimensions,
-  Easing,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '../../styles/theme';
+// Tienda: entradas y productos de Agronea todo el año. El carrito se arma acá y el pago se hace en
+// agronea.store con Mercado Pago (el link lleva el carrito; los precios los vuelve a calcular el servidor).
+import React, { useMemo, useState } from "react";
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image, ImageBackground, Linking, ActivityIndicator, Modal, Pressable } from "react-native";
+import { useShopCart } from "../../context/ShopCartContext";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons } from "@expo/vector-icons";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { useStore } from "../../context/StoreContext";
+import { useShowcase } from "../../api/apiFeed";
+import { C } from "../../components/feed/FeedCards";
 
-const { width: screenWidth } = Dimensions.get('window');
+const STORE_URL = "https://agronea.store";
+const API_BASE = "https://api.agronea.store";
 
-const STORE_URL = 'https://agronea.store';
+const imageOf = (p) => {
+  const url = p.images?.[0]?.url || p.imagen || p.image;
+  if (!url || /placeholder/.test(url)) return null;
+  return /^https?:\/\//.test(url) ? url.replace("http://localhost:5000", API_BASE) : `${API_BASE}${url.startsWith("/") ? "" : "/"}${url}`;
+};
+const isTicket = (p) => /^(ticket|parking)_/.test(p.sku || "");
+const priceOf = (p) => (p.discountPrice && p.discountPrice < p.precio ? p.discountPrice : p.precio);
+const onSale = (p) => Boolean(p.discountPrice && p.discountPrice < p.precio);
+const money = (n) => `$ ${Math.round(n || 0).toLocaleString("es-AR")}`;
 
-const openStore = async () => {
-  try {
-    const supported = await Linking.canOpenURL(STORE_URL);
-    if (supported) {
-      await Linking.openURL(STORE_URL);
-    } else {
-      Alert.alert('Error', 'No se puede abrir el enlace. Visitá agronea.store desde tu navegador.');
-    }
-  } catch {
-    Alert.alert('Error', 'Hubo un problema al abrir la tienda. Intentá nuevamente.');
-  }
+// Ítem del carrito web (mismo formato que guarda agronea.store en el teléfono)
+const cartItem = (p, cantidad) => {
+  const sku = p.sku || "";
+  if (sku.startsWith("ticket_")) return { id: sku, tipo: "ticket", eventId: sku.slice(7), cantidad };
+  if (sku.startsWith("parking_")) return { id: sku, tipo: "parking", eventId: sku.replace(/^parking_(moto_|vehicle_)?/, ""), cantidad };
+  return { id: p.id, tipo: "producto", eventId: null, cantidad };
+};
+const base64url = (s) => btoa(unescape(encodeURIComponent(s))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+
+const AdBanner = () => {
+  const showcase = useShowcase();
+  const photo = showcase?.images?.[0]?.url || showcase?.images?.[0];
+  const title = showcase?.settings?.title || "Agronea";
+  const subtitle = showcase?.settings?.subtitle || "El evento del agro del Norte Argentino";
+  const content = (
+    <LinearGradient colors={photo ? ["rgba(0,0,0,0.15)", "rgba(0,0,0,0.85)"] : ["#0b3d1f", "#0a0a0a"]} style={styles.adInner}>
+      <View style={styles.adLogoCard}>
+        <Image source={require("../../../assets/images/logo_agronea_producciones.png")} style={styles.adLogo} resizeMode="contain" accessibilityLabel="Agronea Producciones" />
+      </View>
+      <Text style={styles.adTitle}>{title}</Text>
+      <Text style={styles.adText}>{subtitle}</Text>
+    </LinearGradient>
+  );
+  return photo ? (
+    <ImageBackground source={{ uri: typeof photo === "string" ? photo : photo.url }} style={styles.ad} imageStyle={{ borderRadius: 18 }}>
+      {content}
+    </ImageBackground>
+  ) : (
+    <View style={styles.ad}>{content}</View>
+  );
 };
 
-// ── PATRÓN DE CUADRADOS — identidad visual Agronea
-// Mismo elemento que en los tickets y cards del web
-const PatternGrid = ({ cols = 8, rows = 6, color = 'rgba(10,143,60,0.12)' }) => {
-  const squares = Array.from({ length: cols * rows });
+const ProductTile = ({ product, qty, onAdd, onRemove }) => {
+  const img = imageOf(product);
   return (
-    <View style={[StyleSheet.absoluteFill, { flexDirection: 'row', flexWrap: 'wrap', padding: 5, gap: 4 }]}>
-      {squares.map((_, i) => (
-        <View
-          key={i}
-          style={{
-            width: (screenWidth - 10 - (cols - 1) * 4) / cols,
-            height: ((screenWidth * 0.55) - 10 - (rows - 1) * 4) / rows,
-            borderRadius: 3,
-            backgroundColor: color,
-          }}
-        />
-      ))}
+    <View style={styles.tile}>
+      <View style={[styles.tileImgWrap, !img && { backgroundColor: C.photo }]}>
+        {img ? <Image source={{ uri: img }} style={styles.tileImg} resizeMode="cover" /> : <Ionicons name={isTicket(product) ? "ticket-outline" : "bag-handle-outline"} size={34} color={C.muted} />}
+        {onSale(product) ? <Text style={styles.saleBadge}>OFERTA</Text> : null}
+      </View>
+      <View style={styles.tileBody}>
+        <Text style={styles.tileName} numberOfLines={2}>{product.nombre}</Text>
+        {onSale(product) ? <Text style={styles.oldPrice}>{money(product.precio)}</Text> : null}
+        <View style={styles.tileRow}>
+          <Text style={styles.tilePrice}>{money(priceOf(product))}</Text>
+          {qty ? (
+            <View style={styles.qtyRow}>
+              <TouchableOpacity onPress={onRemove} style={styles.qtyBtn} accessibilityLabel={`Quitar uno de ${product.nombre}`}>
+                <Ionicons name="remove" size={18} color={C.text} />
+              </TouchableOpacity>
+              <Text style={styles.qty}>{qty}</Text>
+              <TouchableOpacity onPress={onAdd} style={[styles.qtyBtn, styles.qtyAdd]} accessibilityLabel={`Agregar otro ${product.nombre}`}>
+                <Ionicons name="add" size={18} color="#000" />
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <TouchableOpacity onPress={onAdd} style={[styles.qtyBtn, styles.qtyAdd]} accessibilityLabel={`Agregar ${product.nombre} al carrito`}>
+              <Ionicons name="add" size={20} color="#000" />
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
     </View>
   );
 };
 
-// ── CATEGORY CARD — mismo estilo que ProductCard del web
-const CategoryCard = ({ icon, title, description, delay, index }) => {
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(20)).current;
-
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, { toValue: 1, duration: 400, delay, useNativeDriver: true }),
-      Animated.timing(slideAnim, {
-        toValue: 0, duration: 400, delay,
-        easing: Easing.out(Easing.ease), useNativeDriver: true,
-      }),
-    ]).start();
-  }, []);
-
-  return (
-    <Animated.View
-      style={[
-        styles.categoryCard,
-        { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
-        index % 2 === 0 ? { marginRight: 6 } : { marginLeft: 6 },
-      ]}
-    >
-      {/* Línea de acento verde→dorado — igual que ProductCard web */}
-      <View style={styles.categoryCardAccent} />
-
-      <View style={styles.categoryIconContainer}>
-        <Ionicons name={icon} size={24} color="#4ade80" />
-      </View>
-      <Text style={styles.categoryTitle}>{title}</Text>
-      <Text style={styles.categoryDescription}>{description}</Text>
-    </Animated.View>
-  );
-};
-
-// ── FEATURE ITEM
-const FeatureItem = ({ text, delay }) => {
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(16)).current;
-
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, { toValue: 1, duration: 350, delay, useNativeDriver: true }),
-      Animated.timing(slideAnim, {
-        toValue: 0, duration: 350, delay,
-        easing: Easing.out(Easing.ease), useNativeDriver: true,
-      }),
-    ]).start();
-  }, []);
-
-  return (
-    <Animated.View style={[styles.featureItem, { opacity: fadeAnim, transform: [{ translateX: slideAnim }] }]}>
-      <View style={styles.featureCheck}>
-        <Ionicons name="checkmark" size={11} color="white" />
-      </View>
-      <Text style={styles.featureText}>{text}</Text>
-    </Animated.View>
-  );
-};
-
 const ShopScreen = () => {
-  const buttonScale = useRef(new Animated.Value(1)).current;
-  const heroFade   = useRef(new Animated.Value(0)).current;
-  const heroSlide  = useRef(new Animated.Value(20)).current;
+  const { products, events, loading } = useStore();
+  const tabBarHeight = useBottomTabBarHeight();
+  const [filter, setFilter] = useState("all");
+  const { items: cart, count, change, open, setOpen } = useShopCart();
 
-  useEffect(() => {
-    // Entrada del hero
-    Animated.parallel([
-      Animated.timing(heroFade,  { toValue: 1, duration: 500, delay: 100, useNativeDriver: true }),
-      Animated.timing(heroSlide, {
-        toValue: 0, duration: 500, delay: 100,
-        easing: Easing.out(Easing.ease), useNativeDriver: true,
-      }),
-    ]).start();
-
-    // Pulso sutil en el botón CTA
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(buttonScale, { toValue: 1.025, duration: 1200, useNativeDriver: true }),
-        Animated.timing(buttonScale, { toValue: 1,     duration: 1200, useNativeDriver: true }),
-      ]),
-    ).start();
-  }, []);
-
-  const categories = [
-    { icon: 'ticket-outline',  title: 'Entradas',        description: 'Acceso general al evento y actividades' },
-    { icon: 'shirt-outline',   title: 'Merchandising',   description: 'Remeras, gorras y productos oficiales' },
-    { icon: 'gift-outline',    title: 'Souvenirs',       description: 'Recuerdos únicos de AGRONEA 2026' },
-    { icon: 'car-outline',     title: 'Estacionamiento', description: 'Zonas seguras para vehículos y motos' },
+  // Entradas y estacionamientos solo de eventos a la venta (la lista trae también los de ediciones pasadas)
+  const available = useMemo(() => {
+    const onSaleEvents = new Set((events || []).map((e) => e.id));
+    return (products || []).filter(
+      (p) => p.precio > 0 && (p.stock == null || p.stock > 0) && (!isTicket(p) || onSaleEvents.has(cartItem(p, 1).eventId))
+    );
+  }, [products, events]);
+  const hasSales = available.some(onSale);
+  const filters = [
+    { id: "all", label: "Todo" },
+    { id: "tickets", label: "Entradas" },
+    { id: "products", label: "Productos" },
+    ...(hasSales ? [{ id: "sale", label: "Ofertas" }] : []),
   ];
+  const shown = available
+    .filter((p) => (filter === "tickets" ? isTicket(p) : filter === "products" ? !isTicket(p) : filter === "sale" ? onSale(p) : true))
+    .sort((a, b) => Number(b.destacado) - Number(a.destacado));
 
-  const features = [
-    'Pago seguro con múltiples métodos',
-    'Entrega inmediata de tickets digitales',
-    'Soporte para consultas antes del evento',
-    'Precios oficiales garantizados',
-  ];
+  const lines = available.filter((p) => cart[p.id]);
+  const total = lines.reduce((s, p) => s + priceOf(p) * cart[p.id], 0);
+
+  const pay = () => {
+    try {
+      const link = `${STORE_URL}/?carrito=${base64url(JSON.stringify(lines.map((p) => cartItem(p, cart[p.id]))))}`;
+      setOpen(false);
+      Linking.openURL(link).catch((err) => console.error("[tienda] no se pudo abrir el pago", err));
+    } catch (err) {
+      console.error("[tienda] no se pudo armar el carrito", err);
+    }
+  };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <StatusBar backgroundColor="transparent" barStyle="light-content" translucent />
-
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-
-        {/* ── HERO — patrón de cuadrados + brillo radial + texto ── */}
-        <View style={styles.heroContainer}>
-
-          {/* Fondo base oscuro con gradiente verde sutil */}
-          <LinearGradient
-            colors={['#0a1a0a', '#080808', '#050505']}
-            start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-            style={StyleSheet.absoluteFill}
-          />
-
-          {/* Patrón de cuadrados redondeados — identidad Agronea */}
-          <PatternGrid cols={8} rows={6} color="rgba(10,143,60,0.1)" />
-
-          {/* Brillo radial verde centrado */}
-          <View style={styles.heroGlow} />
-
-          {/* Contenido del hero */}
-          <Animated.View
-            style={[
-              styles.heroContent,
-              { opacity: heroFade, transform: [{ translateY: heroSlide }] },
-            ]}
-          >
-            {/* Eyebrow */}
-            <Text style={styles.heroEyebrow}>Tienda oficial · Agronea 2026</Text>
-
-            {/* Título grande — igual que el web */}
-            <Text style={styles.heroTitle}>
-              TIENDA{'\n'}
-              <Text style={styles.heroTitleAccent}>AGRONEA</Text>
-            </Text>
-
-            {/* Píldoras — mismo estilo que los tickets */}
-            <View style={styles.heroPills}>
-              {['28ª Edición', 'Jul 3–5 · 2026'].map((text) => (
-                <View key={text} style={styles.heroPill}>
-                  <Text style={styles.heroPillText}>{text}</Text>
-                </View>
-              ))}
-            </View>
-          </Animated.View>
-
-          {/* Línea cromática inferior — igual que en todos los componentes del web */}
-          <View style={styles.heroLine} />
-
-        </View>
-
-        {/* ── BODY ── */}
-        <View style={styles.body}>
-
-          {/* Metadata del evento — igual que el hero web */}
-          <View style={styles.metaRow}>
-            {[
-              { label: 'Fecha', value: '3, 4 y 5 de Julio' },
-              { label: 'Lugar', value: 'Ruta 16 km 264' },
-              { label: 'Edición', value: '28ª' },
-            ].map(({ label, value }) => (
-              <View key={label} style={styles.metaItem}>
-                <Text style={styles.metaLabel}>{label}</Text>
-                <Text style={styles.metaValue}>{value}</Text>
-              </View>
-            ))}
-          </View>
-
-          <Text style={styles.description}>
-            Conseguí tus entradas y productos oficiales de AGRONEA 2026 desde nuestra tienda online. Rápido, seguro y desde donde estés.
-          </Text>
-
-          {/* Sección categorías */}
-          <Text style={styles.sectionLabel}>¿QUÉ ENCONTRÁS?</Text>
-          <View style={styles.categoriesGrid}>
-            {categories.map((cat, i) => (
-              <CategoryCard
-                key={cat.title}
-                icon={cat.icon}
-                title={cat.title}
-                description={cat.description}
-                index={i}
-                delay={200 + i * 80}
-              />
-            ))}
-          </View>
-
-          {/* Features card */}
-          <View style={styles.featuresCard}>
-            {features.map((f, i) => (
-              <FeatureItem key={f} text={f} delay={500 + i * 70} />
-            ))}
-          </View>
-
-          {/* CTA principal */}
-          <Animated.View style={[styles.buttonWrapper, { transform: [{ scale: buttonScale }] }]}>
-            <TouchableOpacity onPress={openStore} activeOpacity={0.85} style={styles.buttonTouchable}>
-              <LinearGradient
-                colors={['#0A8F3C', '#064D20']}
-                start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-                style={styles.button}
-              >
-                <Ionicons name="bag-handle-outline" size={20} color="white" />
-                <Text style={styles.buttonText}>IR A LA TIENDA</Text>
-                <Ionicons name="arrow-forward" size={16} color="rgba(255,255,255,0.6)" />
-              </LinearGradient>
-            </TouchableOpacity>
-          </Animated.View>
-
-          {/* URL row */}
-          <TouchableOpacity style={styles.urlRow} onPress={openStore} activeOpacity={0.7}>
-            <Ionicons name="globe-outline" size={14} color="#0A8F3C" />
-            <Text style={styles.urlText}>agronea.store</Text>
-            <Ionicons name="open-outline" size={13} color="rgba(255,255,255,0.25)" />
+    <SafeAreaView style={styles.safe} edges={["top"]}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: tabBarHeight + 30 }]} showsVerticalScrollIndicator={false}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Tienda</Text>
+          <TouchableOpacity style={styles.cartIcon} onPress={() => setOpen(true)} accessibilityRole="button" accessibilityLabel={`Ver carrito, ${count} productos`}>
+            <Ionicons name="bag-handle-outline" size={22} color={C.text} />
+            {count ? <Text style={styles.cartBadge}>{count}</Text> : null}
           </TouchableOpacity>
-
-          {/* Nota informativa */}
-          <View style={styles.note}>
-            <Ionicons name="information-circle-outline" size={15} color="rgba(255,255,255,0.25)" />
-            <Text style={styles.noteText}>
-              Guardá el enlace en favoritos para acceder rápido antes del evento.
-            </Text>
-          </View>
-
         </View>
+
+        <View style={styles.chips}>
+          {filters.map((f) => (
+            <TouchableOpacity
+              key={f.id}
+              onPress={() => setFilter(f.id)}
+              style={[styles.chip, filter === f.id && styles.chipActive]}
+              accessibilityRole="button"
+              accessibilityState={{ selected: filter === f.id }}
+            >
+              <Text style={[styles.chipText, filter === f.id && styles.chipTextActive]}>{f.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <AdBanner />
+
+        <Text style={styles.section}>{filter === "tickets" ? "Entradas" : filter === "sale" ? "Ofertas" : "Productos"}</Text>
+        {loading && !available.length ? (
+          <ActivityIndicator color={C.greenLight} style={{ marginTop: 24 }} />
+        ) : shown.length ? (
+          <View style={styles.grid}>
+            {shown.map((p) => (
+              <ProductTile key={p.id} product={p} qty={cart[p.id]} onAdd={() => change(p.id, 1)} onRemove={() => change(p.id, -1)} />
+            ))}
+          </View>
+        ) : (
+          <Text style={styles.empty}>{filter === "tickets" ? "Las entradas salen a la venta cuando se acerca la próxima edición." : "No hay productos por ahora."}</Text>
+        )}
       </ScrollView>
+
+      {/* Carrito: sube desde abajo al tocar el ícono de arriba o el botón amarillo del menú */}
+      <Modal visible={open} transparent animationType="slide" onRequestClose={() => setOpen(false)}>
+        <Pressable style={styles.sheetBackdrop} onPress={() => setOpen(false)} accessibilityLabel="Cerrar carrito" />
+        <View style={styles.sheet}>
+          <View style={styles.sheetHandle} />
+          <View style={styles.sheetHeader}>
+            <Text style={styles.sheetTitle}>Tu carrito</Text>
+            <TouchableOpacity onPress={() => setOpen(false)} hitSlop={12} accessibilityLabel="Cerrar carrito">
+              <Ionicons name="close" size={24} color={C.text} />
+            </TouchableOpacity>
+          </View>
+          {lines.length ? (
+            <>
+              <ScrollView style={{ maxHeight: 340 }}>
+                {lines.map((p) => (
+                  <View key={p.id} style={styles.line}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.lineName} numberOfLines={2}>{p.nombre}</Text>
+                      <Text style={styles.linePrice}>{money(priceOf(p))} c/u</Text>
+                    </View>
+                    <View style={styles.qtyRow}>
+                      <TouchableOpacity onPress={() => change(p.id, -1)} style={styles.qtyBtn} accessibilityLabel={`Quitar uno de ${p.nombre}`}>
+                        <Ionicons name="remove" size={18} color={C.text} />
+                      </TouchableOpacity>
+                      <Text style={styles.qty}>{cart[p.id]}</Text>
+                      <TouchableOpacity onPress={() => change(p.id, 1)} style={[styles.qtyBtn, styles.qtyAdd]} accessibilityLabel={`Agregar otro ${p.nombre}`}>
+                        <Ionicons name="add" size={18} color="#000" />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ))}
+              </ScrollView>
+              <View style={styles.sheetTotalRow}>
+                <Text style={styles.sheetTotalLabel}>Total</Text>
+                <Text style={styles.sheetTotal}>{money(total)}</Text>
+              </View>
+              <TouchableOpacity style={styles.payBtn} onPress={pay} activeOpacity={0.85}>
+                <Text style={styles.payBtnText}>Pagar con Mercado Pago</Text>
+              </TouchableOpacity>
+              <Text style={styles.sheetNote}>Se abre la tienda de Agronea para terminar el pago de forma segura.</Text>
+            </>
+          ) : (
+            <Text style={styles.empty}>Todavía no agregaste nada.</Text>
+          )}
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#050505',
-  },
-  scrollContent: {
-    paddingBottom: 48,
-  },
-
-  // ── HERO
-  heroContainer: {
-    height: screenWidth * 0.65, // proporcional al ancho de pantalla
-    position: 'relative',
-    overflow: 'hidden',
-    justifyContent: 'flex-end',
-  },
-  heroGlow: {
-    position: 'absolute',
-    width: screenWidth * 0.7,
-    height: screenWidth * 0.7,
-    borderRadius: screenWidth * 0.35,
-    backgroundColor: 'transparent',
-    // Brillo radial simulado con sombra
-    shadowColor: '#0A8F3C',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.25,
-    shadowRadius: 80,
-    alignSelf: 'center',
-    top: '20%',
-  },
-  heroContent: {
-    padding: 24,
-    paddingBottom: 28,
-  },
-  heroEyebrow: {
-    fontSize: 9,
-    letterSpacing: 3,
-    textTransform: 'uppercase',
-    color: 'rgba(10,143,60,0.85)',
-    marginBottom: 8,
-    fontWeight: '600',
-  },
-  heroTitle: {
-    fontSize: 44,
-    fontWeight: '900',
-    color: '#fff',
-    letterSpacing: -2,
-    lineHeight: 40,
-    marginBottom: 12,
-  },
-  heroTitleAccent: {
-    color: '#FFD700',
-  },
-  heroPills: {
-    flexDirection: 'row',
-    gap: 8,
-    flexWrap: 'wrap',
-  },
-  heroPill: {
-    backgroundColor: 'rgba(10,143,60,0.12)',
-    borderWidth: 1,
-    borderColor: 'rgba(10,143,60,0.3)',
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 3,
-  },
-  heroPillText: {
-    fontSize: 9,
-    fontWeight: '700',
-    color: '#4ade80',
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-  },
-  // Línea cromática — igual que en el web
-  heroLine: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 2,
-    // LinearGradient no funciona en View nativo, simulamos con un degradé de color
-    backgroundColor: '#0A8F3C',
-    opacity: 0.8,
-  },
-
-  // ── BODY
-  body: {
-    paddingHorizontal: 16,
-    paddingTop: 20,
-  },
-
-  // Metadata del evento
-  metaRow: {
-    flexDirection: 'row',
-    gap: 20,
-    marginBottom: 18,
-    paddingBottom: 18,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.06)',
-  },
-  metaItem: {},
-  metaLabel: {
-    fontSize: 8,
-    letterSpacing: 2,
-    textTransform: 'uppercase',
-    color: 'rgba(255,255,255,0.25)',
-    marginBottom: 2,
-  },
-  metaValue: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: 'rgba(255,255,255,0.75)',
-  },
-
-  description: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.35)',
-    lineHeight: 21,
-    marginBottom: 24,
-  },
-
-  sectionLabel: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: 'rgba(255,255,255,0.25)',
-    letterSpacing: 2,
-    marginBottom: 12,
-  },
-
-  // Category cards — mismo estilo que ProductCard web
-  categoriesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: 20,
-  },
-  categoryCard: {
-    width: (screenWidth - 32 - 12) / 2,
-    backgroundColor: '#0d1117',
-    borderRadius: 12,
-    padding: 14,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(10,143,60,0.2)',
-    overflow: 'hidden',
-  },
-  // Línea de acento igual que ProductCard web
-  categoryCardAccent: {
-    height: 2,
-    marginHorizontal: -14,
-    marginBottom: 12,
-    marginTop: -14,
-    backgroundColor: '#0A8F3C',
-    opacity: 0.6,
-  },
-  categoryIconContainer: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: 'rgba(10,143,60,0.12)',
-    borderWidth: 1,
-    borderColor: 'rgba(10,143,60,0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 10,
-  },
-  categoryTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#fff',
-    marginBottom: 4,
-  },
-  categoryDescription: {
-    fontSize: 11,
-    color: 'rgba(255,255,255,0.3)',
-    lineHeight: 16,
-  },
-
-  // Features card
-  featuresCard: {
-    backgroundColor: '#0d1117',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 24,
-    borderWidth: 1,
-    borderColor: 'rgba(10,143,60,0.2)',
-    gap: 12,
-  },
-  featureItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  featureCheck: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#0A8F3C',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  featureText: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.7)',
-    flex: 1,
-  },
-
-  // Botón CTA
-  buttonWrapper: {
-    marginBottom: 12,
-    borderRadius: 14,
-    overflow: 'hidden',
-    shadowColor: '#0A8F3C',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 10,
-  },
-  buttonTouchable: {
-    borderRadius: 14,
-    overflow: 'hidden',
-  },
-  button: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 17,
-    paddingHorizontal: 24,
-    gap: 10,
-  },
-  buttonText: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: 'white',
-    flex: 1,
-    textAlign: 'center',
-    letterSpacing: 1,
-  },
-
-  // URL row
-  urlRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    paddingVertical: 10,
-    marginBottom: 16,
-  },
-  urlText: {
-    fontSize: 14,
-    color: '#0A8F3C',
-    fontWeight: '600',
-  },
-
-  // Nota informativa
-  note: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 8,
-    backgroundColor: '#0d1117',
-    borderRadius: 12,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
-    marginBottom: 70,
-  },
-  noteText: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.3)',
-    lineHeight: 18,
-    flex: 1,
-  },
+  safe: { flex: 1, backgroundColor: C.bg },
+  content: { padding: 18, gap: 14 },
+  header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  title: { color: C.text, fontSize: 24, fontWeight: "800" },
+  cartIcon: { width: 44, height: 44, borderRadius: 14, borderWidth: 1, borderColor: C.border, backgroundColor: C.card, alignItems: "center", justifyContent: "center" },
+  cartBadge: { position: "absolute", top: -6, right: -6, minWidth: 20, height: 20, borderRadius: 10, backgroundColor: C.gold, color: "#000", fontSize: 11, fontWeight: "800", textAlign: "center", lineHeight: 20, overflow: "hidden" },
+  chips: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 8 },
+  chip: { minHeight: 38, paddingHorizontal: 16, borderRadius: 19, borderWidth: 1, borderColor: C.borderStrong, justifyContent: "center" },
+  chipActive: { backgroundColor: C.green, borderColor: C.green },
+  chipText: { color: C.soft, fontSize: 13 },
+  chipTextActive: { color: C.text, fontWeight: "700" },
+  ad: { borderRadius: 18, overflow: "hidden", borderWidth: 1, borderColor: C.border },
+  adInner: { padding: 20, alignItems: "center", gap: 6, minHeight: 170, justifyContent: "center" },
+  // logo original sobre blanco, como en la web
+  adLogoCard: { backgroundColor: "#fff", borderRadius: 14, paddingHorizontal: 14, paddingVertical: 6, marginBottom: 6 },
+  adLogo: { width: 180, height: 90 },
+  adTitle: { color: C.gold, fontSize: 18, fontWeight: "800", textAlign: "center" },
+  adText: { color: C.soft, fontSize: 13, textAlign: "center", lineHeight: 18 },
+  section: { color: C.text, fontSize: 16, fontWeight: "700", marginTop: 4 },
+  grid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", rowGap: 12 },
+  tile: { width: "48.5%", backgroundColor: C.card, borderRadius: 16, borderWidth: 1, borderColor: C.border, overflow: "hidden" },
+  tileImgWrap: { height: 120, backgroundColor: "#fff", alignItems: "center", justifyContent: "center" },
+  tileImg: { width: "100%", height: "100%" },
+  saleBadge: { position: "absolute", top: 8, left: 8, backgroundColor: C.gold, color: "#000", fontSize: 10, fontWeight: "800", paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6, overflow: "hidden" },
+  tileBody: { padding: 10, gap: 4 },
+  tileName: { color: C.text, fontSize: 13, fontWeight: "700", lineHeight: 17, minHeight: 34 },
+  oldPrice: { color: C.muted, fontSize: 11, textDecorationLine: "line-through" },
+  tileRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  tilePrice: { color: C.text, fontSize: 15, fontWeight: "800", flexShrink: 1 },
+  qtyRow: { flexDirection: "row", alignItems: "center", gap: 6 },
+  qtyBtn: { width: 34, height: 34, borderRadius: 10, borderWidth: 1, borderColor: C.borderStrong, alignItems: "center", justifyContent: "center" },
+  qtyAdd: { backgroundColor: C.greenLight, borderColor: C.greenLight },
+  qty: { color: C.text, fontWeight: "800", minWidth: 16, textAlign: "center" },
+  empty: { color: C.muted, fontSize: 13, textAlign: "center", marginTop: 16 },
+  sheetBackdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.6)" },
+  sheet: { backgroundColor: "#111", borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 18, paddingBottom: 32, gap: 12, borderTopWidth: 1, borderColor: C.border },
+  sheetHandle: { alignSelf: "center", width: 44, height: 5, borderRadius: 3, backgroundColor: C.borderStrong },
+  sheetHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  sheetTitle: { color: C.text, fontSize: 20, fontWeight: "800" },
+  line: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: C.border },
+  lineName: { color: C.text, fontSize: 14, fontWeight: "700" },
+  linePrice: { color: C.muted, fontSize: 12, marginTop: 2 },
+  sheetTotalRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "baseline", marginTop: 4 },
+  sheetTotalLabel: { color: C.muted, fontSize: 14 },
+  sheetTotal: { color: C.text, fontSize: 22, fontWeight: "800" },
+  payBtn: { minHeight: 52, borderRadius: 14, backgroundColor: C.green, alignItems: "center", justifyContent: "center" },
+  payBtnText: { color: "#fff", fontWeight: "800", fontSize: 16 },
+  sheetNote: { color: C.muted, fontSize: 11, textAlign: "center" },
 });
 
 export default ShopScreen;

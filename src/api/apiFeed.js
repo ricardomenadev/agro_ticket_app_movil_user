@@ -13,6 +13,18 @@ export const fetchMarkets = async () => {
   return json.data;
 };
 
+// Vitrina de la tienda (título, texto y fotos que se editan en el panel): /api/store/showcase
+export const fetchShowcase = async () => {
+  const res = await fetch(`${API_URL.replace(/\/mobile$/, "")}/store/showcase`);
+  if (!res.ok) throw new Error(`vitrina: ${res.status}`);
+  return (await res.json()).data;
+};
+
+export const useShowcase = () => {
+  const { data } = useCachedFeed("agroFeed.showcase", fetchShowcase);
+  return data;
+};
+
 export const fetchNews = async () => {
   const res = await fetch(`${API_URL}/feed/news`);
   if (!res.ok) throw new Error(`noticias: ${res.status}`);

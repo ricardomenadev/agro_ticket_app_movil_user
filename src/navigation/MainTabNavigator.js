@@ -31,25 +31,33 @@ import ChatFAB from '../components/common/ChatFAB';
 import MarketsScreen from "../screens/MarketsScreen";
 import TicketsScreen from "../screens/TicketsScreen";
 import { TouchableOpacity, View, Text } from "react-native";
+import { useShopCart } from "../context/ShopCartContext";
 
 // Importamos el tema y colores
 import { COLORS } from "../constants/colors";
 
-const ShopTabButton = ({ onPress, accessibilityState }) => (
-  <TouchableOpacity
-    onPress={onPress}
-    style={styles.shopBtnWrap}
-    accessibilityRole="button"
-    accessibilityLabel="Tienda"
-    accessibilityState={accessibilityState}
-    activeOpacity={0.85}
-  >
-    <View style={styles.shopBtn}>
-      <Ionicons name="bag-handle-outline" size={26} color="#000000" />
-    </View>
-    <Text style={styles.shopLabel}>Tienda</Text>
-  </TouchableOpacity>
-);
+// Botón amarillo de la Tienda: muestra cuántos productos hay en el carrito y, estando ya en la tienda, lo abre
+const ShopTabButton = ({ onPress, accessibilityState, "aria-selected": ariaSelected }) => {
+  const { count, setOpen } = useShopCart();
+  // react-navigation 7 avisa la pestaña activa con aria-selected (antes, accessibilityState.selected)
+  const inShop = Boolean(ariaSelected ?? accessibilityState?.selected);
+  return (
+    <TouchableOpacity
+      onPress={inShop && count ? () => setOpen(true) : onPress}
+      style={styles.shopBtnWrap}
+      accessibilityRole="button"
+      accessibilityLabel={count ? `Tienda, ${count} en el carrito` : "Tienda"}
+      accessibilityState={accessibilityState}
+      activeOpacity={0.85}
+    >
+      <View style={styles.shopBtn}>
+        <Ionicons name="bag-handle-outline" size={26} color="#000000" />
+        {count ? <Text style={styles.shopBadge}>{count}</Text> : null}
+      </View>
+      <Text style={styles.shopLabel}>{inShop && count ? "Ver carrito" : "Tienda"}</Text>
+    </TouchableOpacity>
+  );
+};
 
 const Tab = createBottomTabNavigator();
 const MoreStack = createStackNavigator();
@@ -288,6 +296,23 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     elevation: 6,
+  },
+  shopBadge: {
+    position: "absolute",
+    top: -6,
+    right: -8,
+    minWidth: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: "#0A8F3C",
+    color: "#ffffff",
+    fontSize: 12,
+    fontWeight: "800",
+    textAlign: "center",
+    lineHeight: 22,
+    overflow: "hidden",
+    borderWidth: 2,
+    borderColor: "#000000",
   },
   shopLabel: {
     color: "#F5C400",

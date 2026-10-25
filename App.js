@@ -11,6 +11,7 @@ import { StoreProvider } from './src/context/StoreContext';
 import UpdateModal from './src/components/common/UpdateModal';
 import { registerForPushNotifications } from './src/utils/pushNotifications';
 import AnimatedSplash from './src/components/common/AnimatedSplash';
+import { ShopCartProvider } from './src/context/ShopCartContext';
 
 export default function App() {
   const [versionChecked, setVersionChecked] = useState(false);
@@ -37,10 +38,12 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <StoreProvider>
-        <NavigationContainer>
-          <StatusBar style="light" backgroundColor="transparent" translucent={true} />
-          <MainTabNavigator versionChecked={versionChecked} />
-        </NavigationContainer>
+        <ShopCartProvider>
+          <NavigationContainer>
+            <StatusBar style="light" backgroundColor="transparent" translucent={true} />
+            <MainTabNavigator versionChecked={versionChecked} />
+          </NavigationContainer>
+        </ShopCartProvider>
         <UpdateModal onDismiss={() => setVersionChecked(true)} />
         {!splashDone && <AnimatedSplash onDone={() => setSplashDone(true)} />}
       </StoreProvider>
