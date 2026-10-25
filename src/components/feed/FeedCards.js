@@ -2,19 +2,21 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
+// Fondo negro: el verde y el dorado quedan solo como acentos, para que resalten
 export const C = {
-  bg: "#06100a",
-  card: "#0d1a12",
-  border: "#213a2a",
-  borderStrong: "#2f4a39",
+  bg: "#000000",
+  card: "#121212",
+  border: "#262626",
+  borderStrong: "#3a3a3a",
   green: "#0A8F3C",
   greenLight: "#4ade80",
   greenDeep: "#0b2414",
   gold: "#F5C400",
   text: "#ffffff",
-  muted: "#9fb3a6",
-  soft: "#cfe6d6",
+  muted: "#a3a3a3",
+  soft: "#d4d4d4",
   down: "#fb923c",
+  photo: "#1f1f1f",
 };
 
 const money = (n) => (n == null ? "$ —" : `$ ${Math.round(n).toLocaleString("es-AR")}`);
@@ -88,8 +90,8 @@ const s = StyleSheet.create({
   muted11: { color: C.muted, fontSize: 11 },
   newsCard: { flexDirection: "row", gap: 12, backgroundColor: C.card, borderColor: C.border, borderWidth: 1, borderRadius: 16, padding: 10 },
   newsCardBig: { flexDirection: "column", padding: 0, overflow: "hidden", borderRadius: 18 },
-  newsPhoto: { width: 72, height: 72, borderRadius: 12, backgroundColor: "#1d3a27", alignItems: "center", justifyContent: "center" },
-  newsPhotoBig: { height: 150, backgroundColor: "#1d3a27", alignItems: "center", justifyContent: "center" },
+  newsPhoto: { width: 72, height: 72, borderRadius: 12, backgroundColor: C.photo, alignItems: "center", justifyContent: "center" },
+  newsPhotoBig: { height: 150, backgroundColor: C.photo, alignItems: "center", justifyContent: "center" },
   newsBody: { flex: 1, gap: 4 },
   newsBodyBig: { padding: 14, gap: 6 },
   tagRow: { flexDirection: "row", alignItems: "center", gap: 8 },

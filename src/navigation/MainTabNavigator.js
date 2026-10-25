@@ -45,7 +45,7 @@ const ShopTabButton = ({ onPress, accessibilityState }) => (
     activeOpacity={0.85}
   >
     <View style={styles.shopBtn}>
-      <Ionicons name="bag-handle-outline" size={26} color="#06100a" />
+      <Ionicons name="bag-handle-outline" size={26} color="#000000" />
     </View>
     <Text style={styles.shopLabel}>Tienda</Text>
   </TouchableOpacity>
@@ -191,7 +191,7 @@ const MainTabNavigator = () => {
           },
         ],
         tabBarActiveTintColor: "#4ade80",
-        tabBarInactiveTintColor: "#9fb3a6",
+        tabBarInactiveTintColor: "#a3a3a3",
         tabBarLabelStyle: styles.tabBarLabel,
       }}
     >
@@ -257,9 +257,9 @@ const MainTabNavigator = () => {
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: "#0a140d",
+    backgroundColor: "#0a0a0a",
     borderTopWidth: 1,
-    borderTopColor: "#213a2a",
+    borderTopColor: "#262626",
     paddingTop: 5,
     position: "absolute",
     elevation: 8,
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
     borderRadius: 29,
     backgroundColor: "#F5C400",
     borderWidth: 4,
-    borderColor: "#06100a",
+    borderColor: "#000000",
     alignItems: "center",
     justifyContent: "center",
     elevation: 6,

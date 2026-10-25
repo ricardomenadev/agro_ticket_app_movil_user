@@ -28,7 +28,7 @@ const AnimatedSplash = ({ onDone }) => {
 
   return (
     <Animated.View style={[StyleSheet.absoluteFill, { opacity: fade, zIndex: 100, elevation: 100 }]} pointerEvents="none">
-      <LinearGradient colors={["#14a84a", "#0b5e2c", "#06100a"]} locations={[0, 0.45, 1]} style={styles.bg}>
+      <LinearGradient colors={["#0b3d1f", "#050505", "#000000"]} locations={[0, 0.5, 1]} style={styles.bg}>
         <Animated.Image
           source={require("../../../assets/images/logo_splash_blanco.png")}
           resizeMode="contain"

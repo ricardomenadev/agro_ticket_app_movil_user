@@ -148,7 +148,7 @@ const HomeScreen = () => {
         </View>
 
         {!event ? (
-          <LinearGradient colors={["#0f6e3f", "#0b2414"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.next}>
+          <LinearGradient colors={["#1a1a1a", "#0a0a0a"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.next}>
             <View style={{ flex: 1 }}>
               <Text style={styles.nextEyebrow}>PRÓXIMA EDICIÓN</Text>
               <Text style={styles.nextTitle}>Agronea 2027</Text>
