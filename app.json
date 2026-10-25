@@ -20,7 +20,11 @@
         "ITSAppUsesNonExemptEncryption": false,
         "CFBundleDisplayName": "Agronea Producciones"
       },
-      "icon": "./assets/logoAgronea2.png"
+      "icon": "./assets/logoAgronea2.png",
+      "associatedDomains": [
+        "applinks:agronea.store",
+        "applinks:www.agronea.store"
+      ]
     },
     "android": {
       "adaptiveIcon": {
@@ -35,6 +39,28 @@
         "android.permission.READ_MEDIA_IMAGES",
         "android.permission.READ_MEDIA_VIDEO",
         "android.permission.READ_EXTERNAL_STORAGE"
+      ],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "agronea.store",
+              "pathPrefix": "/mis-entradas"
+            },
+            {
+              "scheme": "https",
+              "host": "www.agronea.store",
+              "pathPrefix": "/mis-entradas"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
       ]
     },
     "web": {
@@ -74,6 +100,7 @@
           "isAccessMediaLocationEnabled": false
         }
       ]
-    ]
+    ],
+    "scheme": "agronea"
   }
 }

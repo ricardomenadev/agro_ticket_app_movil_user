@@ -6,7 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { C } from "../components/feed/FeedCards";
-import { useMyOrders, lookupOrder, passTicket, recoverTicket } from "../api/apiMyTickets";
+import { useMyOrders, lookupOrder, fetchOrder, passTicket, recoverTicket } from "../api/apiMyTickets";
 import OrderCard from "../components/tickets/OrderCard";
 import TicketQrModal from "../components/tickets/TicketQrModal";
 import PassTicketSheet from "../components/tickets/PassTicketSheet";
@@ -24,8 +24,9 @@ const Field = ({ label, ...props }) => (
   </View>
 );
 
-const TicketsScreen = () => {
+const TicketsScreen = ({ route, navigation }) => {
   const { orders, refreshing, refresh, upsert, remove } = useMyOrders();
+  const linkToken = route?.params?.token;
   const [form, setForm] = useState({ orderNumber: "", dni: "", email: "" });
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState(null); // { ok, text }
@@ -40,6 +41,21 @@ const TicketsScreen = () => {
       if (!seen) setGuide(true);
     });
   }, [orders]);
+
+  // Llegó desde el link del mail: se carga esa compra sola, sin pedir los datos
+  useEffect(() => {
+    if (!linkToken) return;
+    navigation?.setParams({ token: undefined });
+    (async () => {
+      try {
+        const order = await fetchOrder(linkToken);
+        await upsert(linkToken, order);
+        setMsg({ ok: true, text: `Listo: cargamos tu compra ${order.orderNumber}. Quedó guardada en este teléfono.` });
+      } catch (err) {
+        setMsg({ ok: false, text: err.message });
+      }
+    })();
+  }, [linkToken, navigation, upsert]);
 
   const closeGuide = () => {
     setGuide(false);
