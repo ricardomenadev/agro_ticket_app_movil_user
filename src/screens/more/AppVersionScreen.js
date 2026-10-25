@@ -27,70 +27,69 @@ const InfoCard = ({ icon, title, description, color = COLORS.primary }) => {
   );
 };
 
-const DeveloperCard = ({ onPress }) => {
+// Card de WESYX con el nuevo lenguaje visual — fondo oscuro + acento naranja
+const WesyxCard = ({ onPress }) => {
   return (
-    <TouchableOpacity style={styles.developerCard} onPress={onPress}>
-      <View style={styles.developerHeader}>
-        <View style={[styles.developerIcon, { backgroundColor: '#FFD70020' }]}>
-          <Ionicons name="code-slash" size={32} color="#FFD700" />
-        </View>
-        <View style={styles.developerInfo}>
-          <Text style={styles.developerName}>Wesyx Development</Text>
-          <Text style={styles.developerTagline}>Desarrollado por profesionales</Text>
-        </View>
-      </View>
-      
-      <View style={styles.developerFeatures}>
-        <View style={styles.featureItem}>
-          <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
-          <Text style={styles.featureText}>Desarrollo móvil nativo</Text>
-        </View>
-        <View style={styles.featureItem}>
-          <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
-          <Text style={styles.featureText}>Backend escalable</Text>
-        </View>
-        <View style={styles.featureItem}>
-          <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
-          <Text style={styles.featureText}>Soporte 24/7</Text>
-        </View>
+    <TouchableOpacity style={styles.wesyxCard} onPress={onPress} activeOpacity={0.9}>
+      {/* Encabezado con logo tipográfico */}
+      <View style={styles.wesyxHeader}>
+        <Text style={styles.wesyxLogo}>
+          WESY<Text style={styles.wesyxX}>X</Text>
+        </Text>
+        <Text style={styles.wesyxSub}>SOFTWARE DESIGN</Text>
+        <View style={styles.wesyxDivider} />
       </View>
 
-      <View style={styles.contactButtons}>
-        <View style={styles.contactButton}>
-          <Ionicons name="globe-outline" size={16} color="#FFD700" />
-          <Text style={styles.contactButtonText}>wesyx.com</Text>
-        </View>
-        <View style={styles.contactButton}>
-          <Ionicons name="logo-whatsapp" size={16} color="#25D366" />
-          <Text style={styles.contactButtonText}>Contacto</Text>
-        </View>
+      {/* Features */}
+      <View style={styles.wesyxFeatures}>
+        {[
+          'Desarrollo móvil nativo iOS & Android',
+          'Backend escalable y APIs',
+          'Sitios web y e-commerce',
+        ].map((f) => (
+          <View key={f} style={styles.wesyxFeatureRow}>
+            <View style={styles.wesyxFeatureDot} />
+            <Text style={styles.wesyxFeatureText}>{f}</Text>
+          </View>
+        ))}
+      </View>
+
+      {/* Botones de contacto */}
+      <View style={styles.wesyxButtons}>
+        <TouchableOpacity
+          style={styles.wesyxBtnWhatsapp}
+          onPress={() => Linking.openURL('https://wa.me/+5493794739888?text=Hola, me interesa desarrollar una app para mi empresa')}
+          activeOpacity={0.85}
+        >
+          <Ionicons name="logo-whatsapp" size={16} color="white" />
+          <Text style={styles.wesyxBtnText}>WhatsApp</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.wesyxBtnWeb}
+          onPress={() => Linking.openURL('https://wesyx.com')}
+          activeOpacity={0.85}
+        >
+          <Ionicons name="globe-outline" size={16} color="rgba(255,255,255,0.8)" />
+          <Text style={styles.wesyxBtnTextWeb}>wesyx.com</Text>
+        </TouchableOpacity>
       </View>
     </TouchableOpacity>
   );
 };
 
 const AppVersionScreen = () => {
-  const appVersion = "1.0.0";
+  const appVersion = "1.1.0";
   const buildNumber = "18";
-  const releaseDate = "Agosto 2025";
+  const releaseDate = "Abril 2026";
 
   const handleDeveloperContact = () => {
     Alert.alert(
       "Contactar Desarrollador",
-      "¿Cómo te gustaría contactar a Wesyx Development?",
+      "¿Cómo te gustaría contactar a WESYX?",
       [
-        {
-          text: "WhatsApp",
-          onPress: () => Linking.openURL('https://wa.me/+5493794739888')
-        },
-        {
-          text: "Sitio Web",
-          onPress: () => Linking.openURL('https://wesyx.com')
-        },
-        {
-          text: "Cancelar",
-          style: "cancel"
-        }
+        { text: "WhatsApp", onPress: () => Linking.openURL('https://wa.me/+5493794739888') },
+        { text: "Sitio Web", onPress: () => Linking.openURL('https://wesyx.com') },
+        { text: "Cancelar", style: "cancel" },
       ]
     );
   };
@@ -103,7 +102,7 @@ const AppVersionScreen = () => {
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView}>
         <View style={styles.header}>
-          <Image 
+          <Image
             source={require('../../../assets/logoAgronea2.png')}
             style={styles.logoImage}
             resizeMode="contain"
@@ -114,22 +113,20 @@ const AppVersionScreen = () => {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Información de la App</Text>
-          
-          <InfoCard 
+
+          <InfoCard
             icon="information-circle"
             title={`Versión ${appVersion}`}
             description={`Build ${buildNumber} - Lanzamiento ${releaseDate}`}
             color="#2196F3"
           />
-
-          <InfoCard 
+          <InfoCard
             icon="shield-checkmark"
             title="Estado de la App"
             description="Funcionando correctamente - Última actualización disponible"
             color="#4CAF50"
           />
-
-          <InfoCard 
+          <InfoCard
             icon="rocket"
             title="Nuevas Funcionalidades"
             description="Expositores, eventos, noticias y tienda oficial"
@@ -137,57 +134,19 @@ const AppVersionScreen = () => {
           />
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Desarrollo Profesional</Text>
-          <DeveloperCard onPress={handleDeveloperContact} />
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>¿Necesitas una App para tu Empresa?</Text>
-          
-          <View style={styles.promotionCard}>
-            <View style={styles.promotionHeader}>
-              <Ionicons name="trending-up" size={28} color="#FFD700" />
-              <Text style={styles.promotionTitle}>Wesyx Development</Text>
-            </View>
-            
-            <Text style={styles.promotionDescription}>
-              Creamos aplicaciones móviles profesionales para empresas que buscan 
-              crecer y conectar mejor con sus clientes.
-            </Text>
-
-            <View style={styles.promotionFeatures}>
-              <View style={styles.promotionFeature}>
-                <Ionicons name="phone-portrait" size={20} color={COLORS.primary} />
-                <Text style={styles.promotionFeatureText}>Apps iOS & Android</Text>
-              </View>
-              <View style={styles.promotionFeature}>
-                <Ionicons name="globe" size={20} color={COLORS.primary} />
-                <Text style={styles.promotionFeatureText}>Sitios Web</Text>
-              </View>
-              <View style={styles.promotionFeature}>
-                <Ionicons name="server" size={20} color={COLORS.primary} />
-                <Text style={styles.promotionFeatureText}>Sistemas Backend</Text>
-              </View>
-              <View style={styles.promotionFeature}>
-                <Ionicons name="storefront" size={20} color={COLORS.primary} />
-                <Text style={styles.promotionFeatureText}>E-commerce</Text>
-              </View>
-            </View>
-
-            <TouchableOpacity 
-              style={styles.promotionButton}
-              onPress={() => Linking.openURL('https://wa.me/+5493794739888?text=Hola, me interesa desarrollar una app para mi empresa')}
-            >
-              <Ionicons name="logo-whatsapp" size={20} color="white" />
-              <Text style={styles.promotionButtonText}>Consultar Presupuesto</Text>
-            </TouchableOpacity>
+        {/* ── SECCIÓN WESYX ── */}
+        <View style={styles.wesyxSection}>
+          <View style={styles.wesyxSectionHeader}>
+            <View style={styles.wesyxAccentLine} />
+            <Text style={styles.wesyxSectionTitle}>Desarrollado por</Text>
+            <View style={styles.wesyxAccentLine} />
           </View>
+          <WesyxCard onPress={handleDeveloperContact} />
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Soporte Técnico</Text>
-          
+
           <TouchableOpacity style={styles.supportItem} onPress={handleSupport}>
             <Ionicons name="headset" size={24} color="#25D366" />
             <View style={styles.supportContent}>
@@ -201,12 +160,8 @@ const AppVersionScreen = () => {
         </View>
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            © 2025 AGRONEA PRODUCCIONES S.R.L
-          </Text>
-          <Text style={styles.footerSubtext}>
-            Sistema desarrollado y administrado por Wesyx.com
-          </Text>
+          <Text style={styles.footerText}>© 2025 AGRONEA PRODUCCIONES S.R.L</Text>
+          <Text style={styles.footerSubtext}>Sistema desarrollado por WESYX Software Design</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -226,15 +181,6 @@ const styles = StyleSheet.create({
     padding: 32,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
-  },
-  appIcon: {
-    width: 80,
-    height: 80,
-    borderRadius: 20,
-    backgroundColor: COLORS.primary + '20',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
   },
   logoImage: {
     width: 100,
@@ -292,125 +238,127 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     lineHeight: 20,
   },
-  developerCard: {
-    backgroundColor: COLORS.card,
-    borderRadius: 12,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: '#FFD70030',
-  },
-  developerHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  developerIcon: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
-  },
-  developerInfo: {
-    flex: 1,
-  },
-  developerName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: COLORS.text,
-    marginBottom: 4,
-  },
-  developerTagline: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-  },
-  developerFeatures: {
-    marginBottom: 16,
-  },
-  featureItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  featureText: {
-    fontSize: 14,
-    color: COLORS.text,
-    marginLeft: 8,
-  },
-  contactButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  contactButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.background,
-    paddingVertical: 8,
+
+  // ── SECCIÓN WESYX ──
+  wesyxSection: {
     paddingHorizontal: 16,
-    borderRadius: 20,
+    paddingVertical: 8,
   },
-  contactButtonText: {
-    fontSize: 14,
-    color: COLORS.text,
-    marginLeft: 4,
-    fontWeight: '500',
-  },
-  promotionCard: {
-    backgroundColor: COLORS.card,
-    borderRadius: 12,
-    padding: 20,
-    borderWidth: 2,
-    borderColor: '#FFD70030',
-  },
-  promotionHeader: {
+  wesyxSectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
+    gap: 12,
   },
-  promotionTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: COLORS.text,
-    marginLeft: 12,
+  wesyxAccentLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#FF6B1A40',
   },
-  promotionDescription: {
-    fontSize: 16,
-    color: COLORS.textSecondary,
-    lineHeight: 24,
-    marginBottom: 20,
+  wesyxSectionTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: 'rgba(255,255,255,0.5)',
+    letterSpacing: 2,
+    textTransform: 'uppercase',
   },
-  promotionFeatures: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: 20,
+  wesyxCard: {
+    backgroundColor: '#0a0a0a',
+    borderRadius: 20,
+    borderTopWidth: 2,
+    borderTopColor: '#FF6B1A',
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderBottomWidth: 1,
+    borderLeftColor: '#FF6B1A20',
+    borderRightColor: '#FF6B1A20',
+    borderBottomColor: '#FF6B1A20',
+    padding: 20,
+    gap: 16,
   },
-  promotionFeature: {
+  wesyxHeader: {
+    alignItems: 'center',
+    gap: 4,
+  },
+  wesyxLogo: {
+    fontSize: 28,
+    
+    color: 'white',
+    letterSpacing: 4,
+    fontFamily: 'Orbitron-Bold',
+  },
+  wesyxX: {
+    color: '#FF6B1A',
+  },
+  wesyxSub: {
+    fontSize: 9,
+    color: 'rgba(255,255,255,0.45)',
+    letterSpacing: 5,
+    fontFamily: 'Orbitron-Bold',
+  },
+  wesyxDivider: {
+    width: 32,
+    height: 2,
+    backgroundColor: '#FF6B1A',
+    borderRadius: 2,
+    marginTop: 8,
+  },
+  wesyxFeatures: {
+    gap: 8,
+  },
+  wesyxFeatureRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: '50%',
-    marginBottom: 12,
+    gap: 10,
   },
-  promotionFeatureText: {
-    fontSize: 14,
-    color: COLORS.text,
-    marginLeft: 8,
+  wesyxFeatureDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: '#FF6B1A',
   },
-  promotionButton: {
+  wesyxFeatureText: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.65)',
+  },
+  wesyxButtons: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  wesyxBtnWhatsapp: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 8,
     backgroundColor: '#25D366',
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    borderRadius: 25,
+    paddingVertical: 12,
+    borderRadius: 12,
   },
-  promotionButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
+  wesyxBtnWeb: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: 'rgba(255,107,26,0.15)',
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#FF6B1A40',
+  },
+  wesyxBtnText: {
+    fontSize: 13,
+    fontWeight: '700',
     color: 'white',
-    marginLeft: 8,
   },
+  wesyxBtnTextWeb: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.75)',
+  },
+
+  // Soporte y footer
   supportItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -437,7 +385,7 @@ const styles = StyleSheet.create({
     padding: 32,
     borderTopWidth: 1,
     borderTopColor: COLORS.border,
-    marginBottom: 40,
+    marginBottom: 100,
   },
   footerText: {
     fontSize: 14,

@@ -51,7 +51,7 @@ const HomeHeader = () => {
             ]}
           >
             <Text style={styles.title}>Agronea </Text>
-            <Text style={styles.title}>2025</Text>
+            <Text style={styles.title}>2026</Text>
           </Animated.View>
         </View>
         

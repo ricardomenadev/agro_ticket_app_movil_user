@@ -1,381 +1,282 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Linking, ScrollView, Dimensions, Animated, Easing } from 'react-native';
-import { Play, Youtube, ChevronRight } from 'lucide-react-native';
+import React, { useRef, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Linking,
+  Animated,
+  Easing,
+  Dimensions,
+} from 'react-native';
+import { Video, ResizeMode } from 'expo-av';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS } from '../../styles/theme';
 
+const { width: screenWidth } = Dimensions.get('window');
 
-// Datos de muestra para videos - en una implementación real estos vendrían de una API
-const youtubeVideos = [
-  {
-    id: 'video1',
-    title: '#Agronea2025 #revolución',
-    // thumbnail: require('../../../assets/images/videos/video1.jpg'),
-    url: 'https://www.youtube.com/watch?v=example1',
-    duration: '5:24',
-  },
-  {
-    id: 'video2',
-    title: 'Entrevista a John Deere',
-    // thumbnail: require('../../../assets/images/videos/video2.jpg'),
-    url: 'https://www.youtube.com/watch?v=example2',
-    duration: '8:15',
-  },
-  {
-    id: 'video3',
-    title: 'Nuevas tecnologías agrícolas',
-    // thumbnail: require('../../../assets/images/videos/video3.jpg'),
-    url: 'https://www.youtube.com/watch?v=example3',
-    duration: '3:40',
-  },
-  {
-    id: 'video4',
-    title: 'Resumen Agronea 2024',
-    // thumbnail: require('../../../assets/images/videos/video4.jpg'),
-    url: 'https://www.youtube.com/watch?v=example4',
-    duration: '12:07',
-  },
-  {
-    id: 'video5',
-    title: 'Conferencia principal',
-    // thumbnail: require('../../../assets/images/videos/video5.jpg'),
-    url: 'https://www.youtube.com/watch?v=example5',
-    duration: '15:32',
-  },
-];
+const YOUTUBE_CHANNEL_URL = 'https://www.youtube.com/@agroneaproducciones';
 
-const { width } = Dimensions.get('window');
-const videoWidth = width * 0.7;
-const videoMargin = 8;
+// Cuando tengas el video nuevo, cambiá solo esta línea:
+// const VIDEO_SOURCE = require('../../../assets/videos/agronea_tv.mp4');
+const VIDEO_SOURCE = require('../../../assets/videos/agronea2026publi.mp4');
 
-const VideoCard = ({ video, index, scrollX }) => {
-  // Calcular animación basada en la posición de scroll
-  const inputRange = [
-    (index - 1) * (videoWidth + videoMargin * 2),
-    index * (videoWidth + videoMargin * 2),
-    (index + 1) * (videoWidth + videoMargin * 2),
-  ];
-  
-  const scale = scrollX.interpolate({
-    inputRange,
-    outputRange: [0.85, 1, 0.85],
-    extrapolate: 'clamp',
-  });
-  
-  const opacity = scrollX.interpolate({
-    inputRange,
-    outputRange: [0.5, 1, 0.5],
-    extrapolate: 'clamp',
-  });
+const AgroneaTV = () => {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(20)).current;
+  const buttonScale = useRef(new Animated.Value(1)).current;
 
-  // Abrir el video en YouTube
-  const openVideo = () => {
-    Linking.openURL(video.url);
-  };
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 600,
+        delay: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 600,
+        delay: 200,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(buttonScale, { toValue: 1.04, duration: 1100, useNativeDriver: true }),
+        Animated.timing(buttonScale, { toValue: 1, duration: 1100, useNativeDriver: true }),
+      ]),
+    ).start();
+  }, []);
+
+  const openChannel = () => Linking.openURL(YOUTUBE_CHANNEL_URL);
+
+  // Proporción 16:9 para el player
+  const playerWidth = screenWidth - 32;
+  const playerHeight = (playerWidth * 9) / 16;
 
   return (
     <Animated.View
       style={[
-        styles.videoCardContainer,
-        {
-          transform: [{ scale }],
-          opacity,
-        },
+        styles.container,
+        { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
       ]}
     >
-      <TouchableOpacity style={styles.videoCard} onPress={openVideo} activeOpacity={0.9}>
-        <View style={styles.thumbnailContainer}>
-          <Image source={video.thumbnail} style={styles.thumbnail} />
-          <View style={styles.playIconContainer}>
-            <Play size={24} color="white" fill="white" />
-          </View>
-          <View style={styles.durationBadge}>
-            <Text style={styles.durationText}>{video.duration}</Text>
-          </View>
-        </View>
-        <View style={styles.videoInfo}>
-          <Text style={styles.videoTitle} numberOfLines={2}>{video.title}</Text>
-          <Text style={styles.channelName}>Agronea TV</Text>
-        </View>
-      </TouchableOpacity>
-    </Animated.View>
-  );
-};
+      {/* Encabezado de sección */}
+      <View style={styles.sectionHeader}>
+        <View style={styles.accentLine} />
+        <Text style={styles.sectionTitle}>Agronea TV</Text>
+        <View style={styles.accentLine} />
+      </View>
 
-const AgroneaTV = () => {
-  const scrollX = useRef(new Animated.Value(0)).current;
-  const titleOpacity = useRef(new Animated.Value(0)).current;
-  const titleTranslateY = useRef(new Animated.Value(-20)).current;
-  const buttonScale = useRef(new Animated.Value(1)).current;
-  
-  useEffect(() => {
-    // Animaciones de entrada
-    Animated.parallel([
-      Animated.timing(titleOpacity, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      Animated.timing(titleTranslateY, {
-        toValue: 0,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-    ]).start();
-    
-    // Animación pulsante para el botón
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(buttonScale, {
-          toValue: 1.05,
-          duration: 1200,
-          useNativeDriver: true,
-          
-        }),
-        Animated.timing(buttonScale, {
-          toValue: 1,
-          duration: 1200,
-          useNativeDriver: true,
-          
-        }),
-      ])
-    ).start();
-  }, []);
-  
-  // Abrir el canal de YouTube
-  const openYouTubeChannel = () => {
-    Linking.openURL('https://www.youtube.com/@agroneaproducciones');
-  };
+      {/* Card principal */}
+      <View style={styles.card}>
 
-  return (
-    <View style={styles.container}>
-      <Animated.View 
-        style={[
-          styles.header,
-          {
-            opacity: titleOpacity,
-            transform: [{ translateY: titleTranslateY }],
-          }
-        ]}
-      >
-        <View style={styles.titleContainer}>
-          <Youtube size={24} color={COLORS.error} />
-          <Text style={styles.title}>Agronea TV</Text>
-        </View>
-        <Text style={styles.subtitle}>Visitá nuestro canal de YOUTUBE</Text>
-      </Animated.View>
-      
-      <Animated.ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-        snapToInterval={videoWidth + videoMargin * 2}
-        decelerationRate="fast"
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-          { useNativeDriver: false }
-        )}
-        scrollEventThrottle={16}
-      >
-        {youtubeVideos.map((video, index) => (
-          <VideoCard 
-            key={video.id}
-            video={video}
-            index={index}
-            scrollX={scrollX}
+        {/* Player de video local */}
+        <View style={[styles.playerContainer, { height: playerHeight }]}>
+          <Video
+            source={VIDEO_SOURCE}
+            style={styles.video}
+            resizeMode={ResizeMode.COVER}
+            shouldPlay
+            isLooping
+            isMuted
+            // El usuario puede tocar para activar sonido si quiere
           />
-        ))}
-      </Animated.ScrollView>
-      
-      <View style={styles.dotContainer}>
-        {youtubeVideos.map((_, i) => {
-          const inputRange = [
-            (i - 1) * (videoWidth + videoMargin * 2),
-            i * (videoWidth + videoMargin * 2),
-            (i + 1) * (videoWidth + videoMargin * 2),
-          ];
-          
-          const dotWidth = scrollX.interpolate({
-            inputRange,
-            outputRange: [8, 16, 8],
-            extrapolate: 'clamp',
-          });
-          
-          const dotOpacity = scrollX.interpolate({
-            inputRange,
-            outputRange: [0.4, 1, 0.4],
-            extrapolate: 'clamp',
-          });
-          
-          return (
-            <Animated.View
-              key={`dot-${i}`}
-              style={[
-                styles.dot,
-                {
-                  width: dotWidth,
-                  opacity: dotOpacity,
-                  backgroundColor: COLORS.primary,
-                },
-              ]}
-            />
-          );
-        })}
+          {/* Badge "SIN SONIDO" para que el usuario sepa que está muted */}
+          <View style={styles.mutedBadge}>
+            <Ionicons name="volume-mute" size={12} color="white" />
+            <Text style={styles.mutedText}>SIN SONIDO</Text>
+          </View>
+        </View>
+
+        {/* Info */}
+        <View style={styles.infoSection}>
+          <View style={styles.infoRow}>
+            <View style={styles.channelIcon}>
+              <Ionicons name="logo-youtube" size={20} color="#FF0000" />
+            </View>
+            <View style={styles.infoText}>
+              <Text style={styles.channelName}>Agronea TV</Text>
+              <Text style={styles.channelSub}>Canal oficial de AGRONEA</Text>
+            </View>
+          </View>
+
+          <View style={styles.bullets}>
+            {[
+              'Novedades y noticias del sector agroindustrial',
+              'Videos y capacitaciones de ediciones anteriores',
+              'Entrevistas y demostraciones a campo',
+            ].map((item) => (
+              <View key={item} style={styles.bulletRow}>
+                <View style={styles.bulletDot} />
+                <Text style={styles.bulletText}>{item}</Text>
+              </View>
+            ))}
+          </View>
+
+          {/* Botón canal */}
+          <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
+            <TouchableOpacity onPress={openChannel} activeOpacity={0.85} style={styles.buttonWrapper}>
+              <LinearGradient
+                colors={['#FF0000', '#CC0000']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.button}
+              >
+                <Ionicons name="logo-youtube" size={20} color="white" />
+                <Text style={styles.buttonText}>VISITAR CANAL</Text>
+                <Ionicons name="arrow-forward" size={16} color="rgba(255,255,255,0.7)" />
+              </LinearGradient>
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
       </View>
-      
-      <View style={styles.descriptionContainer}>
-        <Text style={styles.descriptionText}>
-          • Notas y videos sobre todas las novedades de AGRONEA.{'\n'}
-          • Noticias y actualidad del sector agroindustrial.{'\n'}
-          • Material, videos y capacitaciones de ediciones anteriores.
-        </Text>
-      </View>
-      
-      <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
-        <TouchableOpacity 
-          style={styles.visitButton} 
-          onPress={openYouTubeChannel}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.visitButtonText}>VISITAR CANAL</Text>
-          <ChevronRight size={18} color="white" />
-        </TouchableOpacity>
-      </Animated.View>
-    </View>
+    </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 24,
-    marginHorizontal: 16,
-    backgroundColor: COLORS.card,
-    borderRadius: 12,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: COLORS.border,
+    marginVertical: 8,
+    zIndex: 0,        // asegura q no flote sobre otros componentes
+  elevation: 0,
   },
-  header: {
-    marginBottom: 16,
-  },
-  titleContainer: {
+  sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
+    paddingHorizontal: 24,
+    marginBottom: 16,
+    gap: 12,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  accentLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: COLORS.primary + '60',
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
     color: COLORS.text,
-    marginLeft: 8,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
   },
-  subtitle: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-  },
-  scrollContent: {
-    paddingVertical: 8,
-    paddingHorizontal: videoMargin,
-  },
-  videoCardContainer: {
-    width: videoWidth,
-    marginHorizontal: videoMargin,
-  },
-  videoCard: {
-    backgroundColor: COLORS.background,
-    borderRadius: 8,
+  card: {
+    marginHorizontal: 16,
+    borderRadius: 20,
     overflow: 'hidden',
+    backgroundColor: COLORS.card,
     borderWidth: 1,
     borderColor: COLORS.border,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
+    shadowColor: '#FF0000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 6,
   },
-  thumbnailContainer: {
-    position: 'relative',
-    height: 120,
-  },
-  thumbnail: {
+  playerContainer: {
+  width: '100%',
+  backgroundColor: '#000',
+  position: 'relative',
+  zIndex: 0,
+},
+  video: {
     width: '100%',
     height: '100%',
   },
-  playIconContainer: {
+  mutedBadge: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center',
+    bottom: 10,
+    right: 10,
+    flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    gap: 4,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 10,
   },
-  durationBadge: {
-    position: 'absolute',
-    bottom: 8,
-    right: 8,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  durationText: {
+  mutedText: {
     color: 'white',
-    fontSize: 12,
-    fontWeight: '500',
+    fontSize: 10,
+    fontWeight: '600',
+    letterSpacing: 0.5,
   },
-  videoInfo: {
-    padding: 12,
+  infoSection: {
+    padding: 16,
+    gap: 14,
   },
-  videoTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: COLORS.text,
-    marginBottom: 4,
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  channelIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,0,0,0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,0,0,0.2)',
+  },
+  infoText: {
+    flex: 1,
   },
   channelName: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.text,
+  },
+  channelSub: {
     fontSize: 12,
     color: COLORS.textSecondary,
+    marginTop: 2,
   },
-  dotContainer: {
+  bullets: {
+    gap: 8,
+  },
+  bulletRow: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 16,
+    alignItems: 'flex-start',
+    gap: 10,
   },
-  dot: {
-    height: 8,
-    borderRadius: 4,
-    marginHorizontal: 4,
-  },
-  descriptionContainer: {
-    marginVertical: 16,
-    paddingHorizontal: 8,
-  },
-  descriptionText: {
-    fontSize: 14,
-    lineHeight: 22,
-    color: COLORS.textSecondary,
-  },
-  visitButton: {
-    flexDirection: 'row',
+  bulletDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
     backgroundColor: COLORS.primary,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
+    marginTop: 6,
+  },
+  bulletText: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    flex: 1,
+    lineHeight: 19,
+  },
+  buttonWrapper: {
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  button: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    alignSelf: 'center',
+    paddingVertical: 13,
+    paddingHorizontal: 20,
+    gap: 10,
   },
-  visitButtonText: {
+  buttonText: {
+    fontSize: 14,
+    fontWeight: '800',
     color: 'white',
-    fontWeight: 'bold',
-    marginRight: 8,
+    flex: 1,
+    textAlign: 'center',
+    letterSpacing: 0.5,
   },
 });
 

@@ -1,155 +1,112 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated, Easing } from 'react-native';
-import { COLORS, SIZES, FONTS, commonStyles } from '../../styles/theme';
+import { COLORS } from '../../styles/theme';
 
-const CountdownTimer = ({ targetDate, eventTitle, eventLocation }) => {
+// useRef evita que los Animated.Value se recreen en cada render
+// En el componente original estaban declarados directo en el cuerpo del componente,
+// lo que es un bug potencial con animaciones
+
+const CountdownTimer = ({ targetDate, eventTitle, eventLocation, eventDates }) => {
   const [timeLeft, setTimeLeft] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0
+    days: 0, hours: 0, minutes: 0, seconds: 0
   });
-  
-  const animatedValues = {
-    days: new Animated.Value(0),
-    hours: new Animated.Value(0),
-    minutes: new Animated.Value(0),
-    seconds: new Animated.Value(0)
-  };
-  
-  // Función para calcular tiempo restante
+
+  // Guardamos los Animated.Value en un ref para que persistan entre renders
+  const animatedValues = useRef({
+    days: new Animated.Value(1),
+    hours: new Animated.Value(1),
+    minutes: new Animated.Value(1),
+    seconds: new Animated.Value(1),
+  }).current;
+
   const calculateTimeLeft = () => {
     const difference = new Date(targetDate) - new Date();
-    let newTimeLeft = { days: 0, hours: 0, minutes: 0, seconds: 0 };
-    
-    if (difference > 0) {
-      newTimeLeft = {
-        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((difference / (1000 * 60)) % 60),
-        seconds: Math.floor((difference / 1000) % 60)
-      };
-    }
-    
-    return newTimeLeft;
+    if (difference <= 0) return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+
+    return {
+      days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+      hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+      minutes: Math.floor((difference / (1000 * 60)) % 60),
+      seconds: Math.floor((difference / 1000) % 60),
+    };
   };
-  
-  // Animar cambios en el contador
-  const animateValue = (key, toValue) => {
-    Animated.timing(animatedValues[key], {
-      toValue,
-      duration: 500,
-      useNativeDriver: true,
-      easing: Easing.elastic(1)
-    }).start();
+
+  // Animación de escala cuando cambia un dígito
+  const animateChange = (key) => {
+    Animated.sequence([
+      Animated.timing(animatedValues[key], {
+        toValue: 1.3,
+        duration: 150,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.ease),
+      }),
+      Animated.timing(animatedValues[key], {
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: true,
+        easing: Easing.in(Easing.ease),
+      }),
+    ]).start();
   };
-  
+
   useEffect(() => {
-    // Inicializar valores
-    const initialTime = calculateTimeLeft();
-    setTimeLeft(initialTime);
-    
-    // Configurar intervalo para actualizar el contador
+    setTimeLeft(calculateTimeLeft());
+
     const timer = setInterval(() => {
-      const newTimeLeft = calculateTimeLeft();
-      
-      // Animar cambios
-      Object.keys(newTimeLeft).forEach(key => {
-        // Usamos una función para comparar con el estado anterior
-        setTimeLeft(prevTimeLeft => {
-          if (newTimeLeft[key] !== prevTimeLeft[key]) {
-            animateValue(key, newTimeLeft[key]);
-          }
-          return newTimeLeft;
+      setTimeLeft(prev => {
+        const next = calculateTimeLeft();
+        // Animamos solo el dígito que cambió
+        Object.keys(next).forEach(key => {
+          if (next[key] !== prev[key]) animateChange(key);
         });
+        return next;
       });
-      
     }, 1000);
-    
+
     return () => clearInterval(timer);
   }, [targetDate]);
-  
-  // Crear animaciones de rotación para cada dígito
-  const createRotateAnimation = (value) => {
-    return value.interpolate({
-      inputRange: [0, 1],
-      outputRange: ['0deg', '360deg']
-    });
-  };
+
+  const Block = ({ value, label, animKey }) => (
+    <View style={styles.block}>
+      <Animated.View
+        style={[
+          styles.digitBox,
+          { transform: [{ scale: animatedValues[animKey] }] }
+        ]}
+      >
+        {/* padStart asegura que el número siempre tenga 2 dígitos: 5 -> "05" */}
+        <Text style={styles.digitText}>
+          {String(value).padStart(2, '0')}
+        </Text>
+      </Animated.View>
+      <Text style={styles.labelText}>{label}</Text>
+    </View>
+  );
+
+  const Separator = () => (
+    <Text style={styles.separator}>:</Text>
+  );
 
   return (
     <View style={styles.container}>
-      <View style={styles.eventInfo}>
+      {/* Título y ubicación */}
+      <View style={styles.header}>
         <Text style={styles.eventTitle}>{eventTitle}</Text>
+        {eventDates && (
+          <Text style={styles.eventDates}>{eventDates}</Text>
+        )}
         <Text style={styles.eventLocation}>{eventLocation}</Text>
       </View>
-      
-      <View style={styles.countdownContainer}>
-        <View style={styles.counterRow}>
-          <View style={styles.counterItem}>
-            <Animated.View
-              style={[
-                styles.counterDigit,
-                {
-                  transform: [
-                    { rotateX: createRotateAnimation(animatedValues.days) }
-                  ]
-                }
-              ]}
-            >
-              <Text style={styles.counterNumber}>{timeLeft.days}</Text>
-            </Animated.View>
-            <Text style={styles.counterLabel}>DÍAS</Text>
-          </View>
-          
-          <View style={styles.counterItem}>
-            <Animated.View
-              style={[
-                styles.counterDigit,
-                {
-                  transform: [
-                    { rotateX: createRotateAnimation(animatedValues.hours) }
-                  ]
-                }
-              ]}
-            >
-              <Text style={styles.counterNumber}>{timeLeft.hours}</Text>
-            </Animated.View>
-            <Text style={styles.counterLabel}>HORAS</Text>
-          </View>
-          
-          <View style={styles.counterItem}>
-            <Animated.View
-              style={[
-                styles.counterDigit,
-                {
-                  transform: [
-                    { rotateX: createRotateAnimation(animatedValues.minutes) }
-                  ]
-                }
-              ]}
-            >
-              <Text style={styles.counterNumber}>{timeLeft.minutes}</Text>
-            </Animated.View>
-            <Text style={styles.counterLabel}>MINUTOS</Text>
-          </View>
-          
-          <View style={styles.counterItem}>
-            <Animated.View
-              style={[
-                styles.counterDigit,
-                {
-                  transform: [
-                    { rotateX: createRotateAnimation(animatedValues.seconds) }
-                  ]
-                }
-              ]}
-            >
-              <Text style={styles.counterNumber}>{timeLeft.seconds}</Text>
-            </Animated.View>
-            <Text style={styles.counterLabel}>SEGUNDOS</Text>
-          </View>
-        </View>
+
+      {/* Contador */}
+      <View style={styles.row}>
+        <Block value={timeLeft.days}    label="DÍAS"     animKey="days"    />
+        <Separator />
+        <Block value={timeLeft.hours}   label="HORAS"    animKey="hours"   />
+        <Separator />
+        <Block value={timeLeft.minutes} label="MIN"      animKey="minutes" />
+        <Separator />
+        <Block value={timeLeft.seconds} label="SEG"      animKey="seconds" />
       </View>
     </View>
   );
@@ -157,69 +114,75 @@ const CountdownTimer = ({ targetDate, eventTitle, eventLocation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    // backgroundColor: COLORS.card,
-    // borderRadius: 10,
-     padding: 16,
-    // marginHorizontal: 16,
-    // marginTop: -20,
-    // shadowColor: '#000',
-    // shadowOffset: { width: 0, height: 4 },
-    // shadowOpacity: 0.2,
-    // shadowRadius: 8,
-    // elevation: 5,
-    // borderWidth: 1,
-    // borderColor: COLORS.border,
+    paddingHorizontal: 20,
+    paddingVertical: 24,
   },
-  eventInfo: {
+  header: {
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 24,
   },
   eventTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     color: COLORS.text,
+    textAlign: 'center',
+    marginBottom: 6,
+    letterSpacing: 1,
+  },
+  eventDates: {
+    fontSize: 15,
+    color: COLORS.secondary,
+    fontWeight: '600',
     marginBottom: 4,
+    textAlign: 'center',
   },
   eventLocation: {
-    fontSize: 14,
+    fontSize: 13,
     color: COLORS.textSecondary,
+    textAlign: 'center',
   },
-  countdownContainer: {
-    backgroundColor: COLORS.background,
-    borderRadius: 8,
-    padding: 12,
-  },
-  counterRow: {
+  row: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  counterItem: {
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  counterDigit: {
+  block: {
+    alignItems: 'center',
+    marginHorizontal: 4,
+  },
+  digitBox: {
     backgroundColor: COLORS.primary,
-    borderRadius: 8,
-    width: 50,
-    height: 50,
+    borderRadius: 12,
+    width: 68,
+    height: 68,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 3,
-    backfaceVisibility: 'hidden',
+    marginBottom: 8,
+    // Sombra — elevation es Android, shadow* es iOS
+    elevation: 6,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
   },
-  counterNumber: {
-    fontSize: 22,
+  digitText: {
+    fontSize: 28,
     fontWeight: 'bold',
     color: COLORS.text,
+    fontVariant: ['tabular-nums'], // alinea los números para que no salten
   },
-  counterLabel: {
+  labelText: {
     fontSize: 10,
     color: COLORS.textSecondary,
     fontWeight: '600',
+    letterSpacing: 0.5,
+  },
+  separator: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+    marginBottom: 20,
+    marginHorizontal: 2,
   },
 });
 

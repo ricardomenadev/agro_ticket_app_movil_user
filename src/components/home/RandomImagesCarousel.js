@@ -1,222 +1,254 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, Animated, Dimensions } from 'react-native';
+import React, { useRef, useEffect, useState, useMemo } from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  Image,
+  StyleSheet,
+  Animated,
+  Dimensions,
+} from 'react-native';
 import { COLORS } from '../../styles/theme';
 
 const { width: screenWidth } = Dimensions.get('window');
 
-// Array de imágenes - agrega aquí las tuyas
-const galleryImages = [
-  { id: '1', source: require('../../../assets/images/sponsors/DONNET.png') },
-  { id: '2', source: require('../../../assets/images/sponsors/GOBIERNO.png') },
-  { id: '3', source: require('../../../assets/images/sponsors/COMBUSTIBLE.png') },
-  { id: '4', source: require('../../../assets/images/sponsors/GRUPOABS.png') },
-  { id: '5', source: require('../../../assets/images/sponsors/LOGTRANS.png') },
-  { id: '6', source: require('../../../assets/images/sponsors/MUNICIPALIDAD.png') },
-  { id: '7', source: require('../../../assets/images/sponsors/PARRA-SPONSOR.png') },
+// --- SPONSORS ---
+// Para agregar un sponsor nuevo:
+//   1. Copiar la imagen a assets/images/sponsors/
+//   2. Agregar una línea acá
+const posterImages = [
+  { id: 'akron',         source: require('../../../assets/images/sponsors/akron.png') },
+  { id: 'case',          source: require('../../../assets/images/sponsors/case.png') },
+  { id: 'forddonnet',    source: require('../../../assets/images/sponsors/forddonnet.png') },
+  { id: 'gonar',         source: require('../../../assets/images/sponsors/gonar.png') },
+  { id: 'iveco',         source: require('../../../assets/images/sponsors/iveco.png') },
+  { id: 'lovol',         source: require('../../../assets/images/sponsors/lovol.png') },
+  { id: 'nbch',        source: require('../../../assets/images/sponsors/nbch.jpg') },
+  { id: 'maquinagro',    source: require('../../../assets/images/sponsors/maquinagro.png') },
+  { id: 'nordemaq',      source: require('../../../assets/images/sponsors/nordemaq.png') },
+  { id: 'nortesemillas', source: require('../../../assets/images/sponsors/nortesemillas.png') },
+  { id: 'ombu',          source: require('../../../assets/images/sponsors/ombu.png') },
+  { id: 'ryl',           source: require('../../../assets/images/sponsors/ryl.png') },
+  { id: 'super',         source: require('../../../assets/images/sponsors/super.png') },
+  
+  { id: 'sartor',       source: require('../../../assets/images/sponsors/sartor.jpg') },
+  { id: 'morelli',        source: require('../../../assets/images/sponsors/morelli.jpg') },
+  { id: 'demagro',        source: require('../../../assets/images/sponsors/demagro.jpg') },
 ];
 
+// Proporción del poster: 4:5 (ancho x alto)
+const CARD_WIDTH = screenWidth * 0.62;
+const CARD_HEIGHT = CARD_WIDTH * 1.25;
+const CARD_MARGIN = 10;
+const SNAP_INTERVAL = CARD_WIDTH + CARD_MARGIN * 2;
+
 const RandomImagesCarousel = () => {
-  const scrollX = useRef(new Animated.Value(0)).current;
   const flatListRef = useRef(null);
+  const scrollX = useRef(new Animated.Value(0)).current;
   const [currentIndex, setCurrentIndex] = useState(0);
-  
-  // Duplicamos el array 3 veces para efecto infinito
-  const infiniteImages = [...galleryImages, ...galleryImages, ...galleryImages];
-  const itemWidth = screenWidth * 0.8;
-  const itemSpacing = 16; // marginHorizontal * 2
-  const snapInterval = itemWidth + itemSpacing;
+
+  // Inicio aleatorio calculado una sola vez — useMemo evita recalcular en cada render
+  const randomStart = useMemo(
+    () => posterImages.length + Math.floor(Math.random() * posterImages.length),
+    [],
+  );
+
+  const infinitePosters = useMemo(
+    () => [...posterImages, ...posterImages, ...posterImages],
+    [],
+  );
+
+  const START_INDEX = posterImages.length;
 
   useEffect(() => {
-    // Comenzar desde una posición aleatoria
-    const randomStartIndex = Math.floor(Math.random() * galleryImages.length) + galleryImages.length;
-    setCurrentIndex(randomStartIndex);
-    
-    // Scroll inicial a posición aleatoria
     setTimeout(() => {
-      if (flatListRef.current) {
-        flatListRef.current.scrollToIndex({
-          index: randomStartIndex,
-          animated: false
-        });
+      if (flatListRef.current && posterImages.length > 1) {
+        flatListRef.current.scrollToIndex({ index: randomStart, animated: false });
       }
     }, 100);
+    setCurrentIndex(randomStart);
 
-    // Auto-scroll infinito
+    if (posterImages.length <= 1) return;
+
     const timer = setInterval(() => {
-      setCurrentIndex(prevIndex => {
-        const nextIndex = prevIndex + 1;
-        
+      setCurrentIndex((prev) => {
+        const next = prev + 1;
+
         if (flatListRef.current) {
-          flatListRef.current.scrollToIndex({
-            index: nextIndex,
-            animated: true
-          });
+          flatListRef.current.scrollToIndex({ index: next, animated: true });
         }
-        
-        // Reset al centro cuando llegue al final
-        if (nextIndex >= infiniteImages.length - galleryImages.length) {
+
+        if (next >= infinitePosters.length - posterImages.length) {
           setTimeout(() => {
             if (flatListRef.current) {
               flatListRef.current.scrollToIndex({
-                index: galleryImages.length,
-                animated: false
+                index: START_INDEX,
+                animated: false,
               });
             }
-            setCurrentIndex(galleryImages.length);
-          }, 500);
+            setCurrentIndex(START_INDEX);
+          }, 450);
         }
-        
-        return nextIndex;
+
+        return next;
       });
-    }, 3500); // Cambia cada 3.5 segundos
+    }, 3000);
 
     return () => clearInterval(timer);
   }, []);
 
-  const renderImage = ({ item, index }) => {
+  const renderPoster = ({ item, index }) => {
     const inputRange = [
-      (index - 1) * snapInterval,
-      index * snapInterval,
-      (index + 1) * snapInterval
+      (index - 1) * SNAP_INTERVAL,
+      index * SNAP_INTERVAL,
+      (index + 1) * SNAP_INTERVAL,
     ];
 
     const scale = scrollX.interpolate({
       inputRange,
-      outputRange: [0.9, 1, 0.9],
-      extrapolate: 'clamp'
+      outputRange: [0.88, 1, 0.88],
+      extrapolate: 'clamp',
     });
 
-    // const opacity = scrollX.interpolate({
-    //   inputRange,
-    //   outputRange: [0.7, 1, 0.7],
-    //   extrapolate: 'clamp'
-    // });
+    const opacity = scrollX.interpolate({
+      inputRange,
+      outputRange: [0.55, 1, 0.55],
+      extrapolate: 'clamp',
+    });
 
     return (
-      <Animated.View style={[styles.imageContainer, { transform: [{ scale }] }]}>
+      <Animated.View
+        style={[
+          styles.cardWrapper,
+          { transform: [{ scale }], opacity },
+        ]}
+      >
         <Image
           source={item.source}
-          style={styles.carouselImage}
-          resizeMode="contain"
+          style={styles.posterImage}
+          resizeMode="cover"
         />
       </Animated.View>
     );
   };
 
-  const getItemLayout = (data, index) => ({
-    length: snapInterval,
-    offset: snapInterval * index,
+  const getItemLayout = (_, index) => ({
+    length: SNAP_INTERVAL,
+    offset: SNAP_INTERVAL * index,
     index,
   });
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Sponsors AGRONEA</Text>
+      <View style={styles.sectionHeader}>
+        <View style={styles.accentLine} />
+        <Text style={styles.sectionTitle}>Sponsors 2026</Text>
+        <View style={styles.accentLine} />
       </View>
 
       <FlatList
         ref={flatListRef}
-        data={infiniteImages}
+        data={infinitePosters}
         keyExtractor={(item, index) => `${item.id}-${index}`}
-        renderItem={renderImage}
+        renderItem={renderPoster}
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.listContent}
-        snapToInterval={snapInterval}
+        snapToInterval={SNAP_INTERVAL}
         snapToAlignment="center"
         decelerationRate="fast"
         getItemLayout={getItemLayout}
+        contentContainerStyle={styles.listContent}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-          { useNativeDriver: false }
+          { useNativeDriver: false },
         )}
-        onScrollEndDrag={(event) => {
-          const contentOffsetX = event.nativeEvent.contentOffset.x;
-          const newIndex = Math.round(contentOffsetX / snapInterval);
-          setCurrentIndex(newIndex);
+        scrollEventThrottle={16}
+        onScrollEndDrag={(e) => {
+          const x = e.nativeEvent.contentOffset.x;
+          setCurrentIndex(Math.round(x / SNAP_INTERVAL));
         }}
       />
 
-      {/* Indicadores de puntos */}
-      <View style={styles.dotsContainer}>
-        {galleryImages.map((_, index) => {
-          const dotOpacity = scrollX.interpolate({
-            inputRange: [
-              (index - 1) * snapInterval,
-              index * snapInterval,
-              (index + 1) * snapInterval
-            ],
-            outputRange: [0.3, 1, 0.3],
-            extrapolate: 'clamp'
-          });
-
-          return (
-            <Animated.View
-              key={index}
-              style={[styles.dot, { opacity: dotOpacity }]}
-            />
-          );
-        })}
-      </View>
+      {posterImages.length > 1 && (
+        <View style={styles.dotsRow}>
+          {posterImages.map((_, i) => {
+            const realIndex = currentIndex % posterImages.length;
+            return (
+              <View
+                key={i}
+                style={[
+                  styles.dot,
+                  realIndex === i && styles.dotActive,
+                ]}
+              />
+            );
+          })}
+        </View>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 24,
+    marginVertical: 28,
   },
-  header: {
-    paddingHorizontal: 16,
-    marginBottom: 16,
+  sectionHeader: {
+    flexDirection: 'row',
     alignItems: 'center',
+    paddingHorizontal: 24,
+    marginBottom: 20,
+    gap: 12,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  accentLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: COLORS.primary + '60',
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
     color: COLORS.text,
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
   },
   listContent: {
-  paddingLeft: (screenWidth - screenWidth * 0.8) / 2 - 10, // Menos margen izquierdo
-  paddingRight: (screenWidth - screenWidth * 0.8) / 2 + 20, // Más margen derecho
-},
-  imageContainer: {
-    width: screenWidth * 0.8,
-    height: 200,
-    marginHorizontal: 8,
-    borderRadius: 12,
-    overflow: 'hidden',
-    shadowColor: '#FFFFFF',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 8,
-    backgroundColor: '#FFFFFF',
+    paddingHorizontal: (screenWidth - CARD_WIDTH) / 2 - CARD_MARGIN,
   },
-  carouselImage: {
+  cardWrapper: {
+    width: CARD_WIDTH,
+    height: CARD_HEIGHT,
+    marginHorizontal: CARD_MARGIN,
+    borderRadius: 16,
+    overflow: 'hidden',
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 10,
+  },
+  posterImage: {
     width: '100%',
     height: '100%',
-    borderRadius: 12,
   },
-  dotsContainer: {
+  dotsRow: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 16,
+    gap: 6,
   },
   dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: COLORS.border,
+  },
+  dotActive: {
+    width: 18,
+    height: 6,
+    borderRadius: 3,
     backgroundColor: COLORS.primary,
-    marginHorizontal: 4,
   },
 });
 

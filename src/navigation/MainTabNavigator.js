@@ -26,6 +26,7 @@ import TermsConditionsScreen from "../screens/more/TermsConditionsScreen";
 import AccommodationScreen from "../screens/more/AccommodationScreen";
 import ProvidersScreen from "../screens/more/ProvidersScreen";
 import EmergencyScreen from "../screens/more/EmergencyScreen";
+import ChatFAB from '../components/common/ChatFAB';
 
 // Importamos el tema y colores
 import { COLORS } from "../constants/colors";
@@ -143,6 +144,7 @@ const MainTabNavigator = () => {
   const insets = useSafeAreaInsets();
 
   return (
+    <>
     <Tab.Navigator
       initialRouteName="Home"
       screenOptions={{
@@ -150,8 +152,12 @@ const MainTabNavigator = () => {
         tabBarStyle: [
           styles.tabBar,
           {
-            paddingBottom: Platform.OS === "android" ? insets.bottom + 5 : 5,
-            height: Platform.OS === "android" ? 60 + insets.bottom : 60,
+            paddingBottom:
+              Platform.OS === "android" ? insets.bottom + 5 : insets.bottom + 5,
+            height:
+              Platform.OS === "android"
+                ? 60 + insets.bottom
+                : 60 + insets.bottom,
           },
         ],
         tabBarActiveTintColor: COLORS.primary,
@@ -159,6 +165,7 @@ const MainTabNavigator = () => {
         tabBarLabelStyle: styles.tabBarLabel,
       }}
     >
+      
       <Tab.Screen
         name="Home"
         component={HomeScreen}
@@ -214,6 +221,8 @@ const MainTabNavigator = () => {
         }}
       />
     </Tab.Navigator>
+    <ChatFAB /> 
+    </>
   );
 };
 

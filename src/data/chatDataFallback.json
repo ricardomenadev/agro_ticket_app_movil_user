@@ -1,0 +1,3675 @@
+{
+  "version": "1.2.0",
+  "updatedAt": "2026-06-24",
+  "aiLimit": 10,
+  "evento": {
+    "nombre": "Agronea 2026",
+    "edicion": "Ecosistema de Oportunidades (Edición 23°)",
+    "fechas": "3 al 5 de julio de 2026",
+    "horario": "9:00 a 18:00",
+    "ubicacion": "Predio de AGRONEA - Km 72.5 de la ruta 89, a unos 5 km de Charata, Chaco",
+    "actoInaugural": "Viernes 3 de julio a las 11:00 hs",
+    "contacto": {
+      "whatsapp1": "3794 222011",
+      "email": "agroneacharata@gmail.com",
+      "direccion": "Caseros 539, Charata, Chaco",
+      "horarioOficina": "Lunes a viernes 8 a 12hs y 16 a 20hs. Sábados 8 a 12hs.",
+      "web": "expoagronea.com"
+    },
+    "redes": {
+      "instagram": "agronea_oficial",
+      "facebook": "AgroneaOficial"
+    },
+    "tienda": "https://agronea.store"
+  },
+  "menu": [
+    {
+      "id": "saludo",
+      "label": "Información general"
+    },
+    {
+      "id": "fechas",
+      "label": "Fechas y horarios"
+    },
+    {
+      "id": "entradas",
+      "label": "Entradas y precios"
+    },
+    {
+      "id": "como_llegar",
+      "label": "Cómo llegar al predio"
+    },
+    {
+      "id": "programa",
+      "label": "Programa y charlas"
+    },
+    {
+      "id": "comida",
+      "label": "Dónde comer"
+    },
+    {
+      "id": "alojamiento",
+      "label": "Alojamientos"
+    },
+    {
+      "id": "expositores_general",
+      "label": "Expositores"
+    },
+    {
+      "id": "maquinarias",
+      "label": "Maquinarias y demostraciones"
+    },
+    {
+      "id": "primeros_auxilios",
+      "label": "Emergencias"
+    }
+  ],
+  "sectores": [
+    {
+      "id": "ingreso_principal",
+      "nombre": "Ingreso Principal",
+      "descripcion": "Acceso principal al predio",
+      "referencia": "Sector este, de cara a la ruta 89"
+    },
+    {
+      "id": "gastro1",
+      "nombre": "Gastronomía",
+      "descripcion": "Zona de puestos de comida",
+      "referencia": "Sector gastronómico"
+    },
+    {
+      "id": "food_trucks",
+      "nombre": "Food Trucks",
+      "descripcion": "Zona de food trucks",
+      "referencia": "Sector gastronómico"
+    },
+    {
+      "id": "comedor_adaka",
+      "nombre": "Comedor Adaka",
+      "descripcion": "Comedor principal",
+      "referencia": "Sector oeste"
+    },
+    {
+      "id": "comedor_cooperativa",
+      "nombre": "Comedor Cooperativa",
+      "descripcion": "Comedor de la cooperativa",
+      "referencia": "Sector suroeste"
+    },
+    {
+      "id": "parque_atracciones",
+      "nombre": "Parque de Atracciones",
+      "descripcion": "Juegos para niños",
+      "referencia": "Sector suroeste"
+    },
+    {
+      "id": "pista_ford",
+      "nombre": "Pista de Manejo Ford-Donnet",
+      "descripcion": "Prueba de vehículos Ford",
+      "referencia": "Punto 4, noroeste"
+    },
+    {
+      "id": "pista_toyota",
+      "nombre": "Pista de Manejo Toyota",
+      "descripcion": "Prueba de vehículos Toyota",
+      "referencia": "Punto 18, sur"
+    },
+    {
+      "id": "escenario",
+      "nombre": "Escenario",
+      "descripcion": "Shows y sorteo",
+      "referencia": "Punto 7, central-norte"
+    },
+    {
+      "id": "agronea_vuela",
+      "nombre": "Agronea Vuela",
+      "descripcion": "Drones y tecnología aérea",
+      "referencia": "Punto 8, central"
+    },
+    {
+      "id": "corrales",
+      "nombre": "Corrales",
+      "descripcion": "Hacienda y remate",
+      "referencia": "Punto 9, este"
+    },
+    {
+      "id": "drive_experience",
+      "nombre": "Agronea Drive Experience",
+      "descripcion": "Manejo de maquinaria",
+      "referencia": "Sector Dinámica"
+    },
+    {
+      "id": "emergencias",
+      "nombre": "Emergencias — Alerta Roja",
+      "descripcion": "Atención médica permanente",
+      "referencia": "Punto 11, este"
+    },
+    {
+      "id": "centro_operativo",
+      "nombre": "Centro Operativo",
+      "descripcion": "Coordinación general",
+      "referencia": "Punto 12, este"
+    },
+    {
+      "id": "prensa",
+      "nombre": "Prensa",
+      "descripcion": "Carpa de prensa",
+      "referencia": "Punto 13, noreste"
+    },
+    {
+      "id": "jovenes_profesionales",
+      "nombre": "Sector Jóvenes Profesionales",
+      "descripcion": "Espacio para jóvenes del agro",
+      "referencia": "Punto 15, noreste"
+    },
+    {
+      "id": "auditorio",
+      "nombre": "Auditorio",
+      "descripcion": "Charlas y conferencias",
+      "referencia": "Punto 14, este"
+    },
+    {
+      "id": "ag_tech",
+      "nombre": "Sector Servicios AG Tech 2026",
+      "descripcion": "Tecnología y servicios",
+      "referencia": "Franja inferior del plano"
+    },
+    {
+      "id": "tienda_oficial",
+      "nombre": "Tienda Oficial / Cuponera",
+      "descripcion": "Tienda y cupones",
+      "referencia": "Punto 20, sur"
+    },
+    {
+      "id": "parque_maquinarias",
+      "nombre": "Parque Cerrado de Maquinarias",
+      "descripcion": "Maquinaria de gran porte",
+      "referencia": "Sector oeste"
+    },
+    {
+      "id": "dinamicas_campo",
+      "nombre": "Dinámicas a Campo",
+      "descripcion": "Demostraciones en campo",
+      "referencia": "Sector este exterior"
+    }
+  ],
+  "programa": [
+    {
+      "dia": "Viernes 3 de julio",
+      "items": [
+        {
+          "hora": "9:00",
+          "tipo": "Apertura",
+          "titulo": "Apertura de la muestra",
+          "lugar": null,
+          "organiza": null
+        },
+        {
+          "hora": "9:30",
+          "tipo": "Evento",
+          "titulo": "Drive Experience",
+          "lugar": "Sector Dinámica",
+          "organiza": null
+        },
+        {
+          "hora": "10:00 a 11:00",
+          "tipo": "Charla",
+          "titulo": "Jóvenes Emprendedores",
+          "lugar": "Salón Jóvenes Emprendedores",
+          "organiza": "Banco Chaco / Unicobros"
+        },
+        {
+          "hora": "11:00",
+          "tipo": "Evento",
+          "titulo": "Acto de Inauguración Expo Agronea (Edición 23°)",
+          "lugar": "Entrada Pórtico Principal",
+          "organiza": null
+        },
+        {
+          "hora": "11:00",
+          "tipo": "Evento",
+          "titulo": "Presentación de tecnologías LIGIER y demostración a escala",
+          "lugar": "Stand BAHNSA S.A.",
+          "organiza": null
+        },
+        {
+          "hora": "12:00 a 15:00",
+          "tipo": "Charla",
+          "titulo": "CONINAGRO y Ateneo CRA",
+          "lugar": "Salón Jóvenes Emprendedores",
+          "organiza": "CONINAGRO / CRA"
+        },
+        {
+          "hora": "14:00 a 15:00",
+          "tipo": "Charla",
+          "titulo": "¿En el Congreso se habla de Agro?",
+          "lugar": "Auditorio General",
+          "organiza": "Barbechando"
+        },
+        {
+          "hora": "15:00",
+          "tipo": "Evento",
+          "titulo": "Demostración a campo",
+          "lugar": "Sector Dinámica",
+          "organiza": null
+        },
+        {
+          "hora": "15:00 a 16:00",
+          "tipo": "Charla",
+          "titulo": "Tu Voz, Tu Poder: El Arte de Hablar y Liderar",
+          "lugar": "Auditorio General",
+          "organiza": "Universidad Nacional del Nordeste"
+        },
+        {
+          "hora": "16:00 a 17:00",
+          "tipo": "Charla",
+          "titulo": "UTN FRRe y el desarrollo tecnológico del agro chaqueño",
+          "lugar": "Auditorio General",
+          "organiza": "UTN Regional Resistencia"
+        },
+        {
+          "hora": "16:00",
+          "tipo": "Charla",
+          "titulo": "Taller de acondicionamiento de agua para una aplicación de calidad",
+          "lugar": "Stand BAHNSA S.A.",
+          "organiza": null
+        },
+        {
+          "hora": "18:00",
+          "tipo": "Cierre",
+          "titulo": "Cierre de la muestra",
+          "lugar": null,
+          "organiza": null
+        }
+      ]
+    },
+    {
+      "dia": "Sábado 4 de julio",
+      "items": [
+        {
+          "hora": "9:00",
+          "tipo": "Apertura",
+          "titulo": "Apertura de la muestra",
+          "lugar": null,
+          "organiza": null
+        },
+        {
+          "hora": "9:00 a 15:00",
+          "tipo": "Evento",
+          "titulo": "Drive Experience",
+          "lugar": "Sector Dinámica",
+          "organiza": null
+        },
+        {
+          "hora": "10:00 a 11:00",
+          "tipo": "Charla",
+          "titulo": "Innovación, Gestión y Tecnología para la Ganadería del Futuro",
+          "lugar": "Salón Jóvenes Emprendedores",
+          "organiza": "UTN Regional Resistencia"
+        },
+        {
+          "hora": "11:00",
+          "tipo": "Evento",
+          "titulo": "Presentación portfolio LIGIER + Buenas prácticas de aplicación",
+          "lugar": "Stand BAHNSA S.A.",
+          "organiza": null
+        },
+        {
+          "hora": "11:00 a 12:30",
+          "tipo": "Charla",
+          "titulo": "Ecosistema New Holland (Agricultura digital y de precisión)",
+          "lugar": "Auditorio General",
+          "organiza": null
+        },
+        {
+          "hora": "11:00 a 12:00",
+          "tipo": "Charla",
+          "titulo": "John Deere en Acción Siembra",
+          "lugar": "Salón Jóvenes Emprendedores",
+          "organiza": "David Sartor e Hijos S.A."
+        },
+        {
+          "hora": "14:00",
+          "tipo": "Evento",
+          "titulo": "14° Remate de reproductores",
+          "lugar": "Sector Ganadería",
+          "organiza": "Consignataria Colombo y Colombo"
+        },
+        {
+          "hora": "14:00 a 15:00",
+          "tipo": "Charla",
+          "titulo": "SprayXperience: Capacitación en pulverización",
+          "lugar": "Auditorio General",
+          "organiza": "David Sartor e Hijos S.A."
+        },
+        {
+          "hora": "15:00",
+          "tipo": "Evento",
+          "titulo": "Demostración a campo",
+          "lugar": "Sector Dinámica",
+          "organiza": null
+        },
+        {
+          "hora": "15:00 a 16:00",
+          "tipo": "Charla",
+          "titulo": "Economista",
+          "lugar": "Auditorio General",
+          "organiza": "FECHACO / Banco Chaco"
+        },
+        {
+          "hora": "16:00 a 17:00",
+          "tipo": "Charla",
+          "titulo": "Cáñamo industrial en Argentina: oportunidades agroindustriales para Chaco",
+          "lugar": "Auditorio General",
+          "organiza": "Fundación Cannabis y Salud del NEA"
+        },
+        {
+          "hora": "18:00",
+          "tipo": "Cierre",
+          "titulo": "Cierre de la muestra",
+          "lugar": null,
+          "organiza": null
+        }
+      ]
+    },
+    {
+      "dia": "Domingo 5 de julio",
+      "items": [
+        {
+          "hora": "9:00",
+          "tipo": "Apertura",
+          "titulo": "Apertura de la muestra",
+          "lugar": null,
+          "organiza": null
+        },
+        {
+          "hora": "9:00 a 15:00",
+          "tipo": "Evento",
+          "titulo": "Drive Experience",
+          "lugar": "Sector Dinámica",
+          "organiza": null
+        },
+        {
+          "hora": "11:00",
+          "tipo": "Evento",
+          "titulo": "Presentación portfolio LIGIER + técnicas en reducción de deriva",
+          "lugar": "Stand BAHNSA S.A.",
+          "organiza": null
+        },
+        {
+          "hora": "15:00",
+          "tipo": "Evento",
+          "titulo": "Demostración a campo",
+          "lugar": "Sector Dinámica",
+          "organiza": null
+        },
+        {
+          "hora": "15:00",
+          "tipo": "Evento",
+          "titulo": "Inicio de espectáculos Expo Agronea 2026",
+          "lugar": "Escenario Principal",
+          "organiza": null
+        },
+        {
+          "hora": "18:00",
+          "tipo": "Evento",
+          "titulo": "Sorteo Veinte Millones",
+          "lugar": "Escenario Principal",
+          "organiza": null
+        },
+        {
+          "hora": "18:30",
+          "tipo": "Cierre",
+          "titulo": "Cierre de la muestra",
+          "lugar": null,
+          "organiza": null
+        }
+      ]
+    }
+  ],
+  "alojamientos": [
+    {
+      "nombre": "Hotel Catange",
+      "direccion": "Ruta 94, km 71,200",
+      "tel": "03731-422090 / 3731 451188",
+      "web": "catangehotel.com"
+    },
+    {
+      "nombre": "Hotel Mocovi",
+      "direccion": "Güemes 1231",
+      "tel": "03731-420157 / 420735 / 3731455506",
+      "web": null
+    },
+    {
+      "nombre": "Hotel Platinium",
+      "direccion": "Güemes 1563",
+      "tel": "03731 15-40-9663 / 3731 445099",
+      "web": null
+    },
+    {
+      "nombre": "Hotel Hnos. Ferronato",
+      "direccion": "Ruta 89 km 245",
+      "tel": "3731-623603 / 494904",
+      "web": null
+    },
+    {
+      "nombre": "Apart Hotel Malocas",
+      "direccion": "Liniers 1978",
+      "tel": "03731-15627356",
+      "web": null
+    },
+    {
+      "nombre": "Residencial Marilú",
+      "direccion": "Perú 273, Charata",
+      "tel": "03731-421764",
+      "web": null
+    },
+    {
+      "nombre": "Hotel Alejandro",
+      "direccion": "Liniers 703",
+      "tel": "03731-15625695 / 422650",
+      "web": null
+    },
+    {
+      "nombre": "Hotel Mi Dios",
+      "direccion": "Pringles 545",
+      "tel": "03731-422382",
+      "web": null
+    },
+    {
+      "nombre": "Residencial Mir-Mar",
+      "direccion": "Pringles 866",
+      "tel": "03731 420354",
+      "web": null
+    },
+    {
+      "nombre": "Hotel Hospedaje Norte",
+      "direccion": "Lavalle 232",
+      "tel": "3731-661576 / 553398",
+      "web": null
+    },
+    {
+      "nombre": "Edificio Tomy (temporario)",
+      "direccion": "Monseñor de Carlo 620, Charata",
+      "tel": "3731-492893",
+      "web": null
+    },
+    {
+      "nombre": "Junín Apart (temporario)",
+      "direccion": "Junín 410, Charata",
+      "tel": "3731-620493",
+      "web": null
+    },
+    {
+      "nombre": "C&C (temporario)",
+      "direccion": "Caseros 675, Charata",
+      "tel": "3731-664050",
+      "web": null
+    },
+    {
+      "nombre": "Temporario J&B",
+      "direccion": "Junín 693, Charata",
+      "tel": "3731-550898",
+      "web": null
+    },
+    {
+      "nombre": "Luana Gurman (temporario)",
+      "direccion": "Charata",
+      "tel": "3731-642328",
+      "web": null
+    },
+    {
+      "nombre": "Temporario El Bálsamo",
+      "direccion": "Av. Pringles 668, Charata",
+      "tel": "3731-642328",
+      "web": null
+    },
+    {
+      "nombre": "Temporario Santa Inés",
+      "direccion": "Av. Pringles y Belgrano, Charata",
+      "tel": "3731-404930",
+      "web": null
+    }
+  ],
+  "proveedores": [
+    {
+      "rubro": "Alquiler de carpas",
+      "items": [
+        {
+          "nombre": "Alquileres Iberá",
+          "contacto": "Cel: 03644-351531 / 03644-625927",
+          "email": "alquileresibera@gmail.com",
+          "zona": "Ruta 16 km 177, Sáenz Peña, Chaco"
+        },
+        {
+          "nombre": "Carpas Joselito",
+          "contacto": "Tel: 03483-498523 / Cel: 03483-15490054",
+          "email": "servicios_joselito@yahoo.com.ar",
+          "zona": "Margarita, Sta. Fe"
+        },
+        {
+          "nombre": "JC Eventos Carpas",
+          "contacto": "Tel: 3865 22-3260",
+          "email": "josecardozo423.jc@gmail.com",
+          "zona": "Tucumán"
+        },
+        {
+          "nombre": "Pastori Producciones",
+          "contacto": "Tel: 362 4256256",
+          "email": null,
+          "zona": "Resistencia, Chaco"
+        }
+      ]
+    },
+    {
+      "rubro": "Alquiler de mástiles",
+      "items": [
+        {
+          "nombre": "Eladio Juárez",
+          "contacto": "Tel: 3564 571539",
+          "email": null,
+          "zona": null
+        }
+      ]
+    },
+    {
+      "rubro": "Armado de stands",
+      "items": [
+        {
+          "nombre": "CDF Constructiva",
+          "contacto": "362 421-3602",
+          "email": null,
+          "zona": "Resistencia, Chaco"
+        },
+        {
+          "nombre": "Oersted Muebles",
+          "contacto": "Cel: 3624644662",
+          "email": "willysreco@hotmail.com",
+          "zona": "Ruta 11 km 1001, Resistencia, Chaco"
+        },
+        {
+          "nombre": "PSG Productora",
+          "contacto": "Cel: 3624242253",
+          "email": null,
+          "zona": "Av. Alberdi 615, Resistencia, Chaco"
+        },
+        {
+          "nombre": "Intermedios Diseños y Cartelería",
+          "contacto": "3731-629096",
+          "email": "intermediosdg@gmail.com",
+          "zona": null
+        },
+        {
+          "nombre": "AP Arquitecta",
+          "contacto": "Cel: 36248 66086",
+          "email": "instagram.com/arquitectaap",
+          "zona": "Resistencia, Chaco"
+        }
+      ]
+    },
+    {
+      "rubro": "Sonido e iluminación",
+      "items": [
+        {
+          "nombre": "Sky Producciones (pantallas y TV LED)",
+          "contacto": "Cel: 364-44630977",
+          "email": null,
+          "zona": null
+        },
+        {
+          "nombre": "Servicios Juliana",
+          "contacto": "Cel: 3735-453963",
+          "email": "serviciosjuliana@yahoo.com",
+          "zona": null
+        },
+        {
+          "nombre": "FG Sonido e Iluminación y Pantalla",
+          "contacto": "Cel: 3731-536252",
+          "email": "francimis2011@hotmail.com",
+          "zona": null
+        },
+        {
+          "nombre": "Mariano Gómez",
+          "contacto": "Cel: 3731-625250",
+          "email": null,
+          "zona": "Charata, Chaco"
+        }
+      ]
+    },
+    {
+      "rubro": "Alquileres mobiliarios",
+      "items": [
+        {
+          "nombre": "CDF Constructiva",
+          "contacto": "362 421-3602",
+          "email": null,
+          "zona": "Resistencia, Chaco"
+        },
+        {
+          "nombre": "PSG Productora Servicios Gráficos",
+          "contacto": "362 424-2253",
+          "email": null,
+          "zona": "Resistencia, Chaco"
+        },
+        {
+          "nombre": "Intermedios Diseños y Cartelería",
+          "contacto": "3731-629096",
+          "email": "intermediosdg@gmail.com",
+          "zona": null
+        },
+        {
+          "nombre": "Servicios Juliana",
+          "contacto": "Cel: 3735-453963",
+          "email": "serviciosjuliana@yahoo.com",
+          "zona": null
+        }
+      ]
+    },
+    {
+      "rubro": "Seguridad privada",
+      "items": [
+        {
+          "nombre": "Vigilancia y Seguridad Privada Charata (Carlos Díaz)",
+          "contacto": "Cel: 3731 51-2964",
+          "email": null,
+          "zona": "Charata"
+        }
+      ]
+    },
+    {
+      "rubro": "Plantas ornamentales",
+      "items": [
+        {
+          "nombre": "Vivero Doña Irene",
+          "contacto": "Cel: 3731-621769",
+          "email": null,
+          "zona": "Charata, Chaco"
+        },
+        {
+          "nombre": "Vivero La Ruta",
+          "contacto": "Cel: 3731-440051",
+          "email": null,
+          "zona": "Charata, Chaco"
+        }
+      ]
+    },
+    {
+      "rubro": "Fotografía y filmaciones",
+      "items": [
+        {
+          "nombre": "Sky Producciones",
+          "contacto": "Cel: 364-44630977",
+          "email": null,
+          "zona": null
+        },
+        {
+          "nombre": "Ulises Ferruchi",
+          "contacto": "Cel: 3731-515386",
+          "email": null,
+          "zona": null
+        },
+        {
+          "nombre": "Videógrafo",
+          "contacto": "Cel: 3731-540511",
+          "email": null,
+          "zona": null
+        },
+        {
+          "nombre": "NEIM Estudio Creativo Digital",
+          "contacto": "3731535835 / 3644344299",
+          "email": "estudioneim@gmail.com",
+          "zona": null
+        }
+      ]
+    },
+    {
+      "rubro": "Servicio de promotoras",
+      "items": [
+        {
+          "nombre": "Esther Ramírez",
+          "contacto": "Cel: 3731-405224",
+          "email": "esty_ramirez@hotmail.com",
+          "zona": "Charata, Chaco"
+        }
+      ]
+    },
+    {
+      "rubro": "Bidones y dispenser de agua",
+      "items": [
+        {
+          "nombre": "Aguas Ada",
+          "contacto": "Tel: 3731-430445",
+          "email": null,
+          "zona": "Charata, Chaco"
+        },
+        {
+          "nombre": "Aguas Premier",
+          "contacto": "Tel: 3731-411515",
+          "email": null,
+          "zona": "Charata, Chaco"
+        }
+      ]
+    },
+    {
+      "rubro": "Indumentaria y merchandising",
+      "items": [
+        {
+          "nombre": "Prowork",
+          "contacto": "Cel: 3815 04-4333",
+          "email": null,
+          "zona": "San Miguel de Tucumán"
+        },
+        {
+          "nombre": "Bordafax",
+          "contacto": "Cel: 341 3107067",
+          "email": null,
+          "zona": "Rosario, Sta. Fe"
+        },
+        {
+          "nombre": "3DL Impresiones",
+          "contacto": "Cel: 3731 515612",
+          "email": null,
+          "zona": null
+        }
+      ]
+    },
+    {
+      "rubro": "Baños químicos",
+      "items": [
+        {
+          "nombre": "Alquileres Iberá",
+          "contacto": "Cel: 03644-351531 / 03644-625927",
+          "email": "alquileresibera@gmail.com",
+          "zona": "Ruta 16 km 177, Sáenz Peña"
+        },
+        {
+          "nombre": "Carpas Joselito",
+          "contacto": "Tel: 03483-498523",
+          "email": "servicios_joselito@yahoo.com.ar",
+          "zona": "Margarita, Sta. Fe"
+        },
+        {
+          "nombre": "Marisa",
+          "contacto": "Cel: 3735-540753",
+          "email": null,
+          "zona": null
+        }
+      ]
+    }
+  ],
+  "expositores": [
+    {
+      "id": "abelardo_cuffia",
+      "nombre": "ABELARDO CUFFIA S.A.",
+      "rubro": "insumos",
+      "stand": "H6",
+      "keywords": ["cuffia", "abelardo cuffia", "agrotax", "fgs", "savefarm"],
+      "descripcion": "FGS pro Agrotax, FGS black Agrotax, Fusion pro Agrotax, Aplicación Selectiva Savefarm.",
+      "ubicacionReferencia": "Stand H6"
+    },
+    {
+      "id": "aceitera_general_deheza",
+      "nombre": "ACEITERA GENERAL DEHEZA S.A.",
+      "rubro": "insumos",
+      "stand": "H4",
+      "keywords": [
+        "general deheza",
+        "aceitera",
+        "aceitera general deheza",
+        "agd",
+        "deheza"
+      ],
+      "descripcion": "Aceitera General Deheza S.A. (AGD).",
+      "ubicacionReferencia": "Stand H4"
+    },
+    {
+      "id": "acogra",
+      "nombre": "ACOGRA S.A.",
+      "rubro": "insumos",
+      "stand": "H7",
+      "keywords": [
+        "acogra",
+        "fertilizante",
+        "fertilizantes",
+        "nutricion vegetal"
+      ],
+      "descripcion": "Nutrición vegetal. Fertilizantes líquidos ecoprotectores.",
+      "ubicacionReferencia": "Stand H7"
+    },
+    {
+      "id": "adaka_s_a",
+      "nombre": "ADAKA S.A.",
+      "rubro": "otros",
+      "stand": "1",
+      "keywords": ["adaka s a"],
+      "descripcion": "",
+      "ubicacionReferencia": "Stand 1"
+    },
+    {
+      "id": "aero_club_charata",
+      "nombre": "AERO CLUB CHARATA",
+      "rubro": "institucional",
+      "stand": "G30",
+      "keywords": ["aero", "club", "charata", "avion"],
+      "descripcion": "Aero Club Charata.",
+      "ubicacionReferencia": "Stand G30"
+    },
+    {
+      "id": "aerotec",
+      "nombre": "AEROTEC ARGENTINA S.A.",
+      "rubro": "servicios",
+      "stand": "F16",
+      "keywords": [
+        "aerotec",
+        "avion",
+        "thrush",
+        "tecnam",
+        "aplicacion",
+        "aerea"
+      ],
+      "descripcion": "Soluciones aéreas para el agro, seguridad y gestión territorial: aplicación agrícola, vigilancia, monitoreo y transporte.",
+      "ubicacionReferencia": "Stand F16"
+    },
+    {
+      "id": "ag_maquinarias",
+      "nombre": "AG MÁQUINAS Y COMPONENTES AGRÍCOLAS (GALLINGER)",
+      "rubro": "maquinaria",
+      "stand": "C1",
+      "keywords": [
+        "gallinger",
+        "ag maquinas",
+        "ag componentes",
+        "agcomponentes",
+        "repuestos pulverizacion"
+      ],
+      "descripcion": "Máquinas para el agro, repuestos de pulverización, tecnología, tractores y drones.",
+      "ubicacionReferencia": "Stand C1"
+    },
+    {
+      "id": "agco_argentina_valtra",
+      "nombre": "AGCO ARGENTINA (VALTRA)",
+      "rubro": "maquinaria",
+      "stand": "E5",
+      "keywords": ["agco", "tractor valtra", "tractor", "valtra"],
+      "descripcion": "AGCO Argentina. Tractores Valtra de baja a alta potencia.",
+      "ubicacionReferencia": "Stand E5"
+    },
+    {
+      "id": "agricoltures_federados_argentinos",
+      "nombre": "AGRICULTORES FEDERADOS ARGENTINOS (AFA)",
+      "rubro": "otros",
+      "stand": "G9",
+      "keywords": ["agricoltures federados argentinos"],
+      "descripcion": "",
+      "ubicacionReferencia": "Stand G9"
+    },
+    {
+      "id": "agrobiciuffa",
+      "nombre": "AGRO BICIUFFA S.R.L.",
+      "rubro": "maquinaria",
+      "stand": "A1",
+      "keywords": ["biciuffa", "agrobiciuffa", "agro biciuffa"],
+      "descripcion": "Maquinaria agrícola.",
+      "ubicacionReferencia": "Stand A1"
+    },
+    {
+      "id": "agrocor",
+      "nombre": "AGROCOR S.A.S.",
+      "rubro": "maquinaria",
+      "stand": "E7",
+      "keywords": ["agrocor", "pala cargadora", "autoelevador", "cisterna"],
+      "descripcion": "Palas cargadoras, tractores, autoelevadores, cisternas y trailers.",
+      "ubicacionReferencia": "Stand E7"
+    },
+    {
+      "id": "agroservicios_san_francisco_s_a",
+      "nombre": "AGROSERVICIOS SAN FRANCISCO SA",
+      "rubro": "insumos",
+      "stand": "G18",
+      "keywords": ["agroservicios", "san francisco", "expeller", "gomas"],
+      "descripcion": "Expeller, rolo y gomas.",
+      "ubicacionReferencia": "Stand G18"
+    },
+    {
+      "id": "agrospray",
+      "nombre": "ARROWWS ARGENTINA SRL (AGROSPRAY)",
+      "rubro": "insumos",
+      "stand": "H1",
+      "keywords": ["agrospray", "arrowws", "coadyuvante", "pulverizacion"],
+      "descripcion": "Coadyuvantes y servicios complementarios en pulverizaciones agrícolas.",
+      "ubicacionReferencia": "Stand H1"
+    },
+    {
+      "id": "akron",
+      "nombre": "AKRON S.A.",
+      "rubro": "maquinaria",
+      "stand": "D3",
+      "keywords": [
+        "akron",
+        "kubota",
+        "dji",
+        "terraplane",
+        "tolva",
+        "embolsadora"
+      ],
+      "descripcion": "Tolvas autodescargables, embolsadoras, extractoras, esparcidores, tractores Kubota, drones DJI y palas Terraplane.",
+      "ubicacionReferencia": "Stand D3"
+    },
+    {
+      "id": "al_mundo",
+      "nombre": "AL MUNDO",
+      "rubro": "otros",
+      "stand": "3C",
+      "keywords": ["al mundo"],
+      "descripcion": "",
+      "ubicacionReferencia": "Stand 3C"
+    },
+    {
+      "id": "alerta_roja",
+      "nombre": "ALERTA ROJA",
+      "rubro": "servicios",
+      "stand": "G28",
+      "keywords": [
+        "alerta roja",
+        "ambulancia",
+        "emergencia medica",
+        "emergencias medicas"
+      ],
+      "descripcion": "Equipos y ambulancias de emergencias médicas.",
+      "ubicacionReferencia": "Stand G28"
+    },
+    {
+      "id": "antonella_d_arpa",
+      "nombre": "ANTONELLA D. ARPA",
+      "rubro": "otros",
+      "stand": "K1",
+      "keywords": ["antonella", "arpa"],
+      "descripcion": "Expositor.",
+      "ubicacionReferencia": "Stand K1"
+    },
+    {
+      "id": "aserradero_yimmy",
+      "nombre": "ASERRADERO YIMMY SRL",
+      "rubro": "otros",
+      "stand": "F15",
+      "keywords": ["yimmy", "aserradero", "aserradero yimmy"],
+      "descripcion": "Artículos rurales.",
+      "ubicacionReferencia": "Stand F15"
+    },
+    {
+      "id": "autopartes_kennedy",
+      "nombre": "KENNEDY AUTOPARTES",
+      "rubro": "vehiculos",
+      "stand": "H2",
+      "keywords": [
+        "kennedy",
+        "autopartes",
+        "repuestos",
+        "cristales",
+        "baterias"
+      ],
+      "descripcion": "Autopartes, cristales, baterías y accesorios.",
+      "ubicacionReferencia": "Stand H2"
+    },
+    {
+      "id": "balanzas_misiones",
+      "nombre": "S.P.I S.R.L. (BALANZAS MISIONES)",
+      "rubro": "servicios",
+      "stand": "H10",
+      "keywords": [
+        "balanzas",
+        "balanza",
+        "misiones",
+        "spi",
+        "bascula",
+        "basculas"
+      ],
+      "descripcion": "Balanzas de plataforma, laboratorio y básculas camioneras para pesaje industrial.",
+      "ubicacionReferencia": "Stand H10"
+    },
+    {
+      "id": "banco_credicoop",
+      "nombre": "BANCO CREDICOOP C.L.",
+      "rubro": "financiero",
+      "stand": "G15",
+      "keywords": ["credicoop", "banco credicoop", "servicios bancarios"],
+      "descripcion": "Servicios financieros bancarios.",
+      "ubicacionReferencia": "Stand G15"
+    },
+    {
+      "id": "banco_de_inversion_y_comercio_exterior",
+      "nombre": "BANCO DE INVERSIÓN Y COMERCIO EXTERIOR (BICE)",
+      "rubro": "financiero",
+      "stand": "G20",
+      "keywords": ["bice", "banco", "inversion", "comercio", "exterior"],
+      "descripcion": "Banco de Inversión y Comercio Exterior (BICE).",
+      "ubicacionReferencia": "Stand G20"
+    },
+    {
+      "id": "banco_nacion",
+      "nombre": "BANCO NACIÓN",
+      "rubro": "financiero",
+      "stand": "G1",
+      "keywords": ["banco", "nacion", "bna"],
+      "descripcion": "Banco de la Nación Argentina.",
+      "ubicacionReferencia": "Stand G1"
+    },
+    {
+      "id": "bazyluk_camiones",
+      "nombre": "BAZYLUK SA",
+      "rubro": "otros",
+      "stand": "F11",
+      "keywords": ["bazyluk camiones"],
+      "descripcion": "",
+      "ubicacionReferencia": "Stand F11"
+    },
+    {
+      "id": "berplast",
+      "nombre": "BERPLAST SRL",
+      "rubro": "servicios",
+      "stand": "H5",
+      "keywords": [
+        "berplast",
+        "geofunda",
+        "tanque australiano",
+        "comedero",
+        "biodigestor",
+        "geotanque"
+      ],
+      "descripcion": "Geofunda con tanque australiano, comederos, biodigestor, geotanques, gazebos.",
+      "ubicacionReferencia": "Stand H5"
+    },
+    {
+      "id": "betra",
+      "nombre": "BETRA",
+      "rubro": "servicios",
+      "stand": "P3",
+      "keywords": ["betra", "betra estudio", "diseño"],
+      "descripcion": "Estudio de diseño.",
+      "ubicacionReferencia": "Stand P3"
+    },
+    {
+      "id": "bremen",
+      "nombre": "BREMEN TOOLS ARGENTINA SA",
+      "rubro": "servicios",
+      "stand": "G8",
+      "keywords": ["bremen", "herramientas", "tools"],
+      "descripcion": "Herramientas manuales.",
+      "ubicacionReferencia": "Stand G8"
+    },
+    {
+      "id": "bricher",
+      "nombre": "BRICHER S.A.",
+      "rubro": "maquinaria",
+      "stand": "H16",
+      "keywords": ["bricher", "tanque", "liquidos"],
+      "descripcion": "Tanques para almacenamiento de líquidos.",
+      "ubicacionReferencia": "Stand H16"
+    },
+    {
+      "id": "brique_s_r_l",
+      "nombre": "BRIQUE SRL",
+      "rubro": "servicios",
+      "stand": "3A",
+      "keywords": [
+        "brique",
+        "inmobiliaria brique",
+        "desarrollos inmobiliarios"
+      ],
+      "descripcion": "Desarrollos inmobiliarios.",
+      "ubicacionReferencia": "Stand 3A"
+    },
+    {
+      "id": "cabana_don_carlos",
+      "nombre": "CABAÑA DON CARLOS",
+      "rubro": "otros",
+      "stand": "CORRALES",
+      "keywords": ["cabana don carlos"],
+      "descripcion": "",
+      "ubicacionReferencia": "Stand CORRALES"
+    },
+    {
+      "id": "cabana_don_felipe",
+      "nombre": "CABAÑA DON FELIPE",
+      "rubro": "otros",
+      "stand": "CORRALES",
+      "keywords": ["cabana don felipe"],
+      "descripcion": "",
+      "ubicacionReferencia": "Stand CORRALES"
+    },
+    {
+      "id": "cabana_don_lito",
+      "nombre": "CABAÑA DON LITO",
+      "rubro": "otros",
+      "stand": "CORRALES",
+      "keywords": ["cabana don lito"],
+      "descripcion": "",
+      "ubicacionReferencia": "Stand CORRALES"
+    },
+    {
+      "id": "cabana_don_carolina",
+      "nombre": "CABAÑA DON CAROLINA",
+      "rubro": "otros",
+      "stand": "CORRALES",
+      "keywords": ["cabana don carolina"],
+      "descripcion": "",
+      "ubicacionReferencia": "Stand CORRALES"
+    },
+    {
+      "id": "cabana_los_vicentes",
+      "nombre": "CABAÑA LOS VICENTES",
+      "rubro": "otros",
+      "stand": "CORRALES",
+      "keywords": ["cabana los vicentes"],
+      "descripcion": "",
+      "ubicacionReferencia": "Stand CORRALES"
+    },
+    {
+      "id": "carpinteria_serra",
+      "nombre": "CARPINTERÍA SERRA",
+      "rubro": "otros",
+      "stand": "G3",
+      "keywords": ["serra", "carpinteria serra", "carpintería"],
+      "descripcion": "Carpintería.",
+      "ubicacionReferencia": "Stand G3"
+    },
+    {
+      "id": "central_shop",
+      "nombre": "CENTRAL SHOP",
+      "rubro": "otros",
+      "stand": "K17",
+      "keywords": ["central", "shop"],
+      "descripcion": "Expositor.",
+      "ubicacionReferencia": "Stand K17"
+    },
+    {
+      "id": "centro_de_servicios_norte",
+      "nombre": "CENTRO DE SERVICIOS NORTE SRL",
+      "rubro": "servicios",
+      "stand": "F1",
+      "keywords": [
+        "csn",
+        "centro servicios norte",
+        "ocuweed",
+        "ecurow",
+        "geronzi",
+        "piloto automatico"
+      ],
+      "descripcion": "ocuWeed, ecuRow, GERONZI, pilotos automáticos, fertilizadora VERION.",
+      "ubicacionReferencia": "Stand F1"
+    },
+    {
+      "id": "ceta_capital_humano",
+      "nombre": "CETA CAPITAL HUMANO",
+      "rubro": "servicios",
+      "stand": "1C",
+      "keywords": ["ceta", "capital humano", "rrhh", "recursos humanos"],
+      "descripcion": "Consultoría en recursos humanos.",
+      "ubicacionReferencia": "Stand 1C"
+    },
+    {
+      "id": "chaco_servicios",
+      "nombre": "CHACO SERVICIOS SA",
+      "rubro": "vehiculos",
+      "stand": "F14",
+      "keywords": ["chaco servicios", "iveco", "camion iveco"],
+      "descripcion": "Camiones Iveco.",
+      "ubicacionReferencia": "Stand F14"
+    },
+    {
+      "id": "chipaceria_lovato",
+      "nombre": "CHIPACERÍA LOVATO",
+      "rubro": "gastronomia",
+      "stand": "K12",
+      "keywords": ["lovato", "chipaceria", "chipa", "chipas"],
+      "descripcion": "Chipas y bebidas.",
+      "ubicacionReferencia": "Stand K12"
+    },
+    {
+      "id": "chipaceria_lovato_2",
+      "nombre": "CHIPACERÍA LOVATO",
+      "rubro": "otros",
+      "stand": "K15",
+      "keywords": ["chipaceria lovato 2"],
+      "descripcion": "",
+      "ubicacionReferencia": "Stand K15"
+    },
+    {
+      "id": "ciabatta_serrana",
+      "nombre": "CIABATTA SERRANA",
+      "rubro": "gastronomia",
+      "stand": "K7",
+      "keywords": ["ciabatta", "serrana", "ciabatta serrana", "masa madre"],
+      "descripcion": "Pan ciabatta de masa madre con opciones de ternera, cerdo, vegetariano y vegano.",
+      "ubicacionReferencia": "Stand K7"
+    },
+    {
+      "id": "claudio_galeano",
+      "nombre": "CLAUDIO GALEANO",
+      "rubro": "otros",
+      "stand": "K20",
+      "keywords": ["claudio", "galeano"],
+      "descripcion": "Expositor.",
+      "ubicacionReferencia": "Stand K20"
+    },
+    {
+      "id": "club_comercio_santa_sylvina",
+      "nombre": "CLUB COMERCIO SANTA SYLVINA",
+      "rubro": "institucional",
+      "stand": "F2",
+      "keywords": ["club", "comercio", "santa", "sylvina"],
+      "descripcion": "Asociación Civil Club Deportivo Comercio. Camión con acoplado, pickup y autos.",
+      "ubicacionReferencia": "Stand F2"
+    },
+    {
+      "id": "club_house",
+      "nombre": "CLUB HOUSE",
+      "rubro": "gastronomia",
+      "stand": "K18",
+      "keywords": ["club", "house"],
+      "descripcion": "Club House.",
+      "ubicacionReferencia": "Stand K18"
+    },
+    {
+      "id": "coinautos",
+      "nombre": "COINAUTOS",
+      "rubro": "vehiculos",
+      "stand": "H14",
+      "keywords": ["coinauto", "autos"],
+      "descripcion": "Autos.",
+      "ubicacionReferencia": "Stand H14"
+    },
+    {
+      "id": "cooperativa",
+      "nombre": "COOPERATIVA",
+      "rubro": "institucional",
+      "stand": "2",
+      "keywords": ["cooperativa"],
+      "descripcion": "Cooperativa.",
+      "ubicacionReferencia": "Stand 2"
+    },
+    {
+      "id": "crg",
+      "nombre": "CRG PREMOLDEADOS",
+      "rubro": "maquinaria",
+      "stand": "G29",
+      "keywords": [
+        "crg",
+        "premoldeados",
+        "tanque",
+        "australiano",
+        "bebedero",
+        "molino"
+      ],
+      "descripcion": "CRG Premoldeados. Tanques australianos, bebederos, piletas, comederos, tapiales, molinos, tubos y materiales para la construcción.",
+      "ubicacionReferencia": "Stand G29"
+    },
+    {
+      "id": "crimag",
+      "nombre": "CRI-MAG S.A.",
+      "rubro": "maquinaria",
+      "stand": "A2",
+      "keywords": ["crimag", "cri-mag", "lovol", "crucianelli", "sembradora"],
+      "descripcion": "Maquinarias Lovol y sembradoras Crucianelli.",
+      "ubicacionReferencia": "Stand A2"
+    },
+    {
+      "id": "cristian_lualdi_helados",
+      "nombre": "CRISTIAN LUALDI (HELADOS)",
+      "rubro": "gastronomia",
+      "stand": "K4",
+      "keywords": ["cristian", "lualdi", "helados", "helado"],
+      "descripcion": "Helados.",
+      "ubicacionReferencia": "Stand K4"
+    },
+    {
+      "id": "david_sartor_e_hijos",
+      "nombre": "DAVID SARTOR E HIJOS SA",
+      "rubro": "maquinaria",
+      "stand": "D14",
+      "keywords": [
+        "david",
+        "sartor",
+        "john",
+        "deere",
+        "tractor",
+        "cosechadora"
+      ],
+      "descripcion": "Tractores, cosechadoras, pulverizadoras. Concesionario John Deere.",
+      "ubicacionReferencia": "Stand D14"
+    },
+    {
+      "id": "de_todito",
+      "nombre": "DE TODITO",
+      "rubro": "gastronomia",
+      "stand": "K8",
+      "keywords": ["de todito", "todito"],
+      "descripcion": "Gastronomía variada.",
+      "ubicacionReferencia": "Stand K8"
+    },
+    {
+      "id": "demagro",
+      "nombre": "DEMAGRO SRL",
+      "rubro": "maquinaria",
+      "stand": "D1",
+      "keywords": ["demagro", "tanzi", "sembradora"],
+      "descripcion": "Sembradora Tanzi Special 5.",
+      "ubicacionReferencia": "Stand D1"
+    },
+    {
+      "id": "derka_y_vargas",
+      "nombre": "DERKA Y VARGAS S.A.",
+      "rubro": "vehiculos",
+      "stand": "E2",
+      "keywords": ["derka", "vargas", "derka vargas", "toyota"],
+      "descripcion": "Vehículos Toyota.",
+      "ubicacionReferencia": "Stand E2"
+    },
+    {
+      "id": "difamaq",
+      "nombre": "DIFAMAQ S.R.L.",
+      "rubro": "maquinaria",
+      "stand": "F8",
+      "keywords": ["difamaq", "case", "maquinaria vial", "construccion"],
+      "descripcion": "Maquinaria vial y de construcción. Concesionario Case.",
+      "ubicacionReferencia": "Stand F8"
+    },
+    {
+      "id": "digital_store_charata",
+      "nombre": "DIGITAL STORE CHARATA",
+      "rubro": "otros",
+      "stand": "JOVENES PROFESIONALES",
+      "keywords": ["digital store charata"],
+      "descripcion": "",
+      "ubicacionReferencia": "Stand JOVENES PROFESIONALES"
+    },
+    {
+      "id": "dolbi",
+      "nombre": "DOLBI",
+      "rubro": "otros",
+      "stand": "D2",
+      "keywords": ["dolbi"],
+      "descripcion": "Expositor.",
+      "ubicacionReferencia": "Stand D2"
+    },
+    {
+      "id": "donnet",
+      "nombre": "PABLO ELOY DONNET S.A.",
+      "rubro": "vehiculos",
+      "stand": "F12",
+      "keywords": [
+        "donnet",
+        "donet",
+        "donett",
+        "pablo donnet",
+        "0km",
+        "cero km"
+      ],
+      "descripcion": "Vehículos 0km.",
+      "ubicacionReferencia": "Stand F12"
+    },
+    {
+      "id": "dye",
+      "nombre": "DYE SA",
+      "rubro": "servicios",
+      "stand": "H12",
+      "keywords": ["dye", "dye sa", "ws2", "simphony", "piloto automatico dye"],
+      "descripcion": "WS2, SIMPHONY, pantallas, pilotos, antenas.",
+      "ubicacionReferencia": "Stand H12"
+    },
+    {
+      "id": "ecoline",
+      "nombre": "ECOLINE",
+      "rubro": "servicios",
+      "stand": "G6",
+      "keywords": ["ecoline", "tuberia", "pead"],
+      "descripcion": "Tuberías y accesorios de PEAD.",
+      "ubicacionReferencia": "Stand G6"
+    },
+    {
+      "id": "el_boro",
+      "nombre": "EL BORO. TODO PARA EL CAMPO",
+      "rubro": "insumos",
+      "stand": "P1",
+      "keywords": ["el boro", "boro", "indumentaria campo"],
+      "descripcion": "Indumentaria e insumos agrícolas.",
+      "ubicacionReferencia": "Stand P1"
+    },
+    {
+      "id": "el_capullo",
+      "nombre": "EL CAPULLO SRL",
+      "rubro": "maquinaria",
+      "stand": "G7",
+      "keywords": ["el capullo", "capullo", "tanque agua", "cisterna acoplado"],
+      "descripcion": "Tanques para agua, cisternas, acoplados semilleros.",
+      "ubicacionReferencia": "Stand G7"
+    },
+    {
+      "id": "escuela_agropecuaria_maria_auxiliadora",
+      "nombre": "ESCUELA AGROPECUARIA MARÍA AUXILIADORA",
+      "rubro": "institucional",
+      "stand": "C4",
+      "keywords": ["escuela", "agropecuaria", "maria", "auxiliadora"],
+      "descripcion": "Escuela Agropecuaria María Auxiliadora.",
+      "ubicacionReferencia": "Stand C4"
+    },
+    {
+      "id": "facyt",
+      "nombre": "FACYT",
+      "rubro": "institucional",
+      "stand": "H15",
+      "keywords": ["facyt", "investigacion desarrollo"],
+      "descripcion": "Investigación y desarrollo.",
+      "ubicacionReferencia": "Stand H15"
+    },
+    {
+      "id": "familia_pochoclos",
+      "nombre": "FAMILIA POCHOCLOS",
+      "rubro": "gastronomia",
+      "stand": "K22",
+      "keywords": ["familia", "pochoclos", "pochoclo"],
+      "descripcion": "Pochoclos.",
+      "ubicacionReferencia": "Stand K22"
+    },
+    {
+      "id": "fechaco",
+      "nombre": "FEDERACIÓN ECONÓMICA DEL CHACO",
+      "rubro": "institucional",
+      "stand": "G19",
+      "keywords": ["fechaco", "federacion economica", "federacion chaco"],
+      "descripcion": "Federación económica provincial.",
+      "ubicacionReferencia": "Stand G19"
+    },
+    {
+      "id": "ferraro_maquinarias",
+      "nombre": "FERRARO Y CIA SRL",
+      "rubro": "otros",
+      "stand": "E9",
+      "keywords": ["ferraro", "ferraro cia"],
+      "descripcion": "Implementos agrícolas Hanomag, Michigan, Kuhn, Ascanelli.",
+      "ubicacionReferencia": "Stand E9"
+    },
+    {
+      "id": "fikas_house_cafe",
+      "nombre": "FIKAS HOUSE CAFE",
+      "rubro": "gastronomia",
+      "stand": "K23",
+      "keywords": ["fikas", "house", "cafe"],
+      "descripcion": "Café.",
+      "ubicacionReferencia": "Stand K23"
+    },
+    {
+      "id": "fondo_fiduciario_de_desarro_ind",
+      "nombre": "FONDO FIDUCIARIO DE DESARROLLO INDUSTRIAL",
+      "rubro": "financiero",
+      "stand": "D17",
+      "keywords": ["fondo", "fiduciario", "desarrollo", "industrial"],
+      "descripcion": "Fondo Fiduciario de Desarrollo Industrial.",
+      "ubicacionReferencia": "Stand D17"
+    },
+    {
+      "id": "fortezza_solar",
+      "nombre": "FORTEZZA SOLAR",
+      "rubro": "servicios",
+      "stand": "4B",
+      "keywords": [
+        "fortezza",
+        "solar",
+        "fortezza solar",
+        "sistema solar",
+        "energia solar",
+        "panel solar"
+      ],
+      "descripcion": "Instalación de sistemas solares y bombas de agua.",
+      "ubicacionReferencia": "Stand 4B"
+    },
+    {
+      "id": "franco_fabril",
+      "nombre": "FRANCO FABRIL SA (AGRO SCHEIDEGGER)",
+      "rubro": "maquinaria",
+      "stand": "D8",
+      "keywords": ["franco fabril", "scheidegger", "agro scheidegger"],
+      "descripcion": "Maquinarias agrícolas.",
+      "ubicacionReferencia": "Stand D8"
+    },
+    {
+      "id": "frigopork",
+      "nombre": "FRIGOPORK",
+      "rubro": "gastronomia",
+      "stand": "K6",
+      "keywords": ["frigopork", "cerdo"],
+      "descripcion": "Productos de cerdo.",
+      "ubicacionReferencia": "Stand K6"
+    },
+    {
+      "id": "fundacion_cannabis_y_salud_del_nea",
+      "nombre": "FUNDACIÓN CANNABIS Y SALUD DEL NEA",
+      "rubro": "otros",
+      "stand": "P4",
+      "keywords": ["cannabis", "cañamo", "cáñamo", "cannabis salud", "hemp"],
+      "descripcion": "Derivados del cáñamo industrial: textil, construcción, fibra, productos alimenticios.",
+      "ubicacionReferencia": "Stand P4"
+    },
+    {
+      "id": "gema_maquinarias",
+      "nombre": "GEMA MAQUINARIAS",
+      "rubro": "maquinaria",
+      "stand": "G26",
+      "keywords": ["gema", "maquinaria", "vial"],
+      "descripcion": "Maquinaria agrícola y vial.",
+      "ubicacionReferencia": "Stand G26"
+    },
+    {
+      "id": "genersol",
+      "nombre": "GENERSOL",
+      "rubro": "servicios",
+      "stand": "G23",
+      "keywords": ["genersol", "energia solar campo", "generacion solar"],
+      "descripcion": "Sistemas de generación de energía solar para campo, ciudades y comercios.",
+      "ubicacionReferencia": "Stand G23"
+    },
+    {
+      "id": "geosistemas",
+      "nombre": "GEOSISTEMAS",
+      "rubro": "servicios",
+      "stand": "G12",
+      "keywords": [
+        "geosistemas",
+        "weed it",
+        "topxgun",
+        "chcnav",
+        "drone agricola",
+        "piloto automatico"
+      ],
+      "descripcion": "WEED IT, Drone agrícola TOPXGUN, pilotos automáticos CHCNAV.",
+      "ubicacionReferencia": "Stand G12"
+    },
+    {
+      "id": "glazen_camiones",
+      "nombre": "GLAZEN (VOLKSCAM)",
+      "rubro": "vehiculos",
+      "stand": "G14",
+      "keywords": ["glazen", "volkswagen", "camion volkswagen", "vw camion"],
+      "descripcion": "Camiones 0km Volkswagen.",
+      "ubicacionReferencia": "Stand G14"
+    },
+    {
+      "id": "gobierno_del_chaco",
+      "nombre": "GOBIERNO DEL CHACO",
+      "rubro": "institucional",
+      "stand": "C2",
+      "keywords": ["gobierno", "chaco", "provincia"],
+      "descripcion": "Gobierno de la Provincia del Chaco.",
+      "ubicacionReferencia": "Stand C2"
+    },
+    {
+      "id": "gonar_scania",
+      "nombre": "GONAR AUTOMOTORES SA",
+      "rubro": "vehiculos",
+      "stand": "D9",
+      "keywords": ["gonar", "scania", "camion scania", "camiones scania"],
+      "descripcion": "Camiones Scania.",
+      "ubicacionReferencia": "Stand D9"
+    },
+    {
+      "id": "grow_capital_s_a",
+      "nombre": "GROW CAPITAL S.A.",
+      "rubro": "financiero",
+      "stand": "1A",
+      "keywords": ["grow capital", "grow", "bursatil", "financiero", "bolsa"],
+      "descripcion": "Agenciamiento bursátil y asesoramiento financiero.",
+      "ubicacionReferencia": "Stand 1A"
+    },
+    {
+      "id": "grupo_worked",
+      "nombre": "GRUPO WORKED",
+      "rubro": "servicios",
+      "stand": "G5",
+      "keywords": ["worked", "grupo worked", "casilla rural worked"],
+      "descripcion": "Casillas rurales.",
+      "ubicacionReferencia": "Stand G5"
+    },
+    {
+      "id": "hojas_del_sur_chaco",
+      "nombre": "HOJAS DEL SUR CHACO",
+      "rubro": "otros",
+      "stand": "JOVENES PROFESIONALES",
+      "keywords": ["hojas del sur chaco"],
+      "descripcion": "",
+      "ubicacionReferencia": "Stand JOVENES PROFESIONALES"
+    },
+    {
+      "id": "immer",
+      "nombre": "IMMER",
+      "rubro": "otros",
+      "stand": "K14",
+      "keywords": ["immer"],
+      "descripcion": "Expositor.",
+      "ubicacionReferencia": "Stand K14"
+    },
+    {
+      "id": "import_chaco",
+      "nombre": "IMPORT CHACO",
+      "rubro": "maquinaria",
+      "stand": "5B",
+      "keywords": ["import", "chaco", "maquinaria"],
+      "descripcion": "Maquinaria agrícola, vial e industrial.",
+      "ubicacionReferencia": "Stand 5B"
+    },
+    {
+      "id": "inducar",
+      "nombre": "INDUCAR",
+      "rubro": "maquinaria",
+      "stand": "E10",
+      "keywords": ["inducar", "metalurgica inducar", "carro cisterna"],
+      "descripcion": "Implementos agrícolas, carros cisternas.",
+      "ubicacionReferencia": "Stand E10"
+    },
+    {
+      "id": "industrias_cas",
+      "nombre": "INDUSTRIAS CAS SRL",
+      "rubro": "maquinaria",
+      "stand": "H13",
+      "keywords": ["cas", "rotomoldeo", "tanque", "bebedero"],
+      "descripcion": "Tanques, cajas de herramientas, bebederos para ganado en plástico por rotomoldeo. Implementos agrícolas.",
+      "ubicacionReferencia": "Stand H13"
+    },
+    {
+      "id": "inta",
+      "nombre": "INTA",
+      "rubro": "institucional",
+      "stand": "E12",
+      "keywords": ["inta", "tecnologia", "agropecuaria"],
+      "descripcion": "Instituto Nacional de Tecnología Agropecuaria (INTA).",
+      "ubicacionReferencia": "Stand E12"
+    },
+    {
+      "id": "jano_diaz",
+      "nombre": "JANO DIAZ",
+      "rubro": "gastronomia",
+      "stand": "H17",
+      "keywords": ["jano", "diaz"],
+      "descripcion": "Expositor gastronómico.",
+      "ubicacionReferencia": "Stand K9"
+    },
+    {
+      "id": "juan_jose_pignata",
+      "nombre": "JUAN JOSE PIGNATA",
+      "rubro": "gastronomia",
+      "stand": "K9",
+      "keywords": ["juan", "jose", "pignata"],
+      "descripcion": "Expositor.",
+      "ubicacionReferencia": "Stand K9"
+    },
+    {
+      "id": "julio_duarte",
+      "nombre": "JULIO DUARTE",
+      "rubro": "otros",
+      "stand": null,
+      "keywords": ["julio", "duarte"],
+      "descripcion": "Expositor.",
+      "ubicacionReferencia": ""
+    },
+    {
+      "id": "kalim_competicion",
+      "nombre": "KALIM COMPETICIÓN",
+      "rubro": "otros",
+      "stand": "F18",
+      "keywords": ["kalim", "competicion", "auto", "rally"],
+      "descripcion": "Auto de competición y deporte motor.",
+      "ubicacionReferencia": "Stand F18"
+    },
+    {
+      "id": "la_chacra_picadas",
+      "nombre": "LA CHACRA PICADAS",
+      "rubro": "gastronomia",
+      "stand": "K16",
+      "keywords": ["la chacra", "chacra picadas", "salame", "queso", "miel"],
+      "descripcion": "Salames, bondiolas, quesos, miel, vino y accesorios para asador.",
+      "ubicacionReferencia": "Stand K16"
+    },
+    {
+      "id": "lazar_agroventas",
+      "nombre": "LAZAR AGROVENTAS",
+      "rubro": "maquinaria",
+      "stand": "B1",
+      "keywords": ["lazar", "agroventas"],
+      "descripcion": "Agroventas.",
+      "ubicacionReferencia": "Stand B1"
+    },
+    {
+      "id": "maderas_plasticas_charata",
+      "nombre": "MADERAS PLÁSTICAS CHARATA",
+      "rubro": "servicios",
+      "stand": "G25",
+      "keywords": ["maderas", "plasticas", "charata"],
+      "descripcion": "Maderas plásticas.",
+      "ubicacionReferencia": "Stand G25"
+    },
+    {
+      "id": "magal",
+      "nombre": "MAGAL SRL",
+      "rubro": "maquinaria",
+      "stand": "H11",
+      "keywords": ["magal", "picadora alfalfa", "alfalfa"],
+      "descripcion": "Picadora de alfalfa.",
+      "ubicacionReferencia": "Stand H11"
+    },
+    {
+      "id": "mainero",
+      "nombre": "CARLOS MAINERO Y CIA",
+      "rubro": "maquinaria",
+      "stand": "E3",
+      "keywords": ["mainero", "mixer", "girasolero", "rotoenfardadora mainero"],
+      "descripcion": "Mixers, rotoenfardadoras, cabezales, girasoleros, rastrillo.",
+      "ubicacionReferencia": "Stand E3"
+    },
+    {
+      "id": "manapri",
+      "nombre": "MANAPRI",
+      "rubro": "servicios",
+      "stand": "G22",
+      "keywords": ["manapri", "drones dji", "drone dji"],
+      "descripcion": "Drones DJI.",
+      "ubicacionReferencia": "Stand G22"
+    },
+    {
+      "id": "maniagro",
+      "nombre": "MANIAGRO ARGENTINA",
+      "rubro": "insumos",
+      "stand": "2C",
+      "keywords": ["maniagro", "mani", "maní", "semillas mani"],
+      "descripcion": "Semillas de maní.",
+      "ubicacionReferencia": "Stand 2C"
+    },
+    {
+      "id": "maquinagro",
+      "nombre": "MAQUINAGRO SA",
+      "rubro": "maquinaria",
+      "stand": "D7",
+      "keywords": ["maquinagro", "massey", "massey ferguson", "ferguson"],
+      "descripcion": "Massey Ferguson.",
+      "ubicacionReferencia": "Stand D7"
+    },
+    {
+      "id": "mdq_licuados_y_tragos",
+      "nombre": "MDQ LICUADOS Y TRAGOS",
+      "rubro": "gastronomia",
+      "stand": "K5",
+      "keywords": ["mdq", "mdq licuados", "licuados tragos"],
+      "descripcion": "Licuados y tragos.",
+      "ubicacionReferencia": "Stand K5"
+    },
+    {
+      "id": "medidores_del_tiempo_relojes_antiguos",
+      "nombre": "MEDIDORES DEL TIEMPO (RELOJES ANTIGUOS)",
+      "rubro": "otros",
+      "stand": "JOVENES PROFESIONALES",
+      "keywords": ["medidores del tiempo relojes antiguos"],
+      "descripcion": "",
+      "ubicacionReferencia": "Stand JOVENES PROFESIONALES"
+    },
+    {
+      "id": "metalurgica_camperos_s_a",
+      "nombre": "METALÚRGICA CAMPERO S.A. (PAMPERO)",
+      "rubro": "maquinaria",
+      "stand": "F4",
+      "keywords": [
+        "pampero",
+        "campero",
+        "metalurgica campero",
+        "rastra discos"
+      ],
+      "descripcion": "Rastras de discos.",
+      "ubicacionReferencia": "Stand F4"
+    },
+    {
+      "id": "metalurgica_canalis",
+      "nombre": "METALÚRGICA CANALIS",
+      "rubro": "maquinaria",
+      "stand": "G16",
+      "keywords": ["canalis", "metalurgica canalis", "implementos agricolas"],
+      "descripcion": "Implementos agrícolas, tractores y palas cargadoras.",
+      "ubicacionReferencia": "Stand G16"
+    },
+    {
+      "id": "milintegral",
+      "nombre": "MILINTEGRAL",
+      "rubro": "otros",
+      "stand": "K24",
+      "keywords": ["milintegral"],
+      "descripcion": "Expositor.",
+      "ubicacionReferencia": "Stand K24"
+    },
+    {
+      "id": "ministerio_de_educacion_del_chaco",
+      "nombre": "MINISTERIO DE EDUCACIÓN DEL CHACO",
+      "rubro": "institucional",
+      "stand": "D12",
+      "keywords": [
+        "educacion chaco",
+        "escuela",
+        "ministerio",
+        "agropecuaria",
+        "educacion",
+        "escuela agropecuaria"
+      ],
+      "descripcion": "Productos de escuelas agropecuarias y proyectos de formación técnica profesional.",
+      "ubicacionReferencia": "Stand D12"
+    },
+    {
+      "id": "ministerio_de_salud_del_chaco",
+      "nombre": "MINISTERIO DE SALUD DEL CHACO",
+      "rubro": "institucional",
+      "stand": "H18",
+      "keywords": ["ministerio", "salud", "chaco"],
+      "descripcion": "Ministerio de Salud del Chaco.",
+      "ubicacionReferencia": "Stand H18"
+    },
+    {
+      "id": "ministerio_de_seguridad",
+      "nombre": "MINISTERIO DE SEGURIDAD",
+      "rubro": "institucional",
+      "stand": "G24",
+      "keywords": ["ministerio", "seguridad"],
+      "descripcion": "Ministerio de Seguridad.",
+      "ubicacionReferencia": "Stand G24"
+    },
+    {
+      "id": "municipalidad_de_charata",
+      "nombre": "MUNICIPALIDAD DE CHARATA",
+      "rubro": "institucional",
+      "stand": "D5",
+      "keywords": ["municipalidad", "charata"],
+      "descripcion": "Municipalidad de Charata.",
+      "ubicacionReferencia": "Stand D5"
+    },
+    {
+      "id": "municipalidad_de_pampa_del_infierno",
+      "nombre": "MUNICIPALIDAD DE PAMPA DEL INFIERNO",
+      "rubro": "institucional",
+      "stand": "F3",
+      "keywords": ["municipio", "pampa del infierno", "municipalidad"],
+      "descripcion": "Stand municipal de Pampa del Infierno.",
+      "ubicacionReferencia": "Stand F3"
+    },
+    {
+      "id": "munoz_marchesi",
+      "nombre": "MUÑOZ MARCHESI",
+      "rubro": "servicios",
+      "stand": "G11",
+      "keywords": [
+        "munoz marchesi",
+        "muñoz marchesi",
+        "neumaticos",
+        "neumáticos",
+        "motos"
+      ],
+      "descripcion": "Neumáticos, herramientas y motos.",
+      "ubicacionReferencia": "Stand G11"
+    },
+    {
+      "id": "nestor_loiacono_alfa",
+      "nombre": "NÉSTOR LOIACONO",
+      "rubro": "gastronomia",
+      "stand": "K3",
+      "keywords": ["loiacono", "alfajores"],
+      "descripcion": "Néstor Loiacono. Gastronomía.",
+      "ubicacionReferencia": "Stand K3"
+    },
+    {
+      "id": "nestor_loiacono_hamb",
+      "nombre": "NÉSTOR LOIACONO (HAMBURGUESAS)",
+      "rubro": "gastronomia",
+      "stand": "K3",
+      "keywords": ["loiacono", "hamburguesa"],
+      "descripcion": "Néstor Loiacono. Hamburguesas.",
+      "ubicacionReferencia": "Stand K3"
+    },
+    {
+      "id": "nestor_loiacono_jugos_y_tragos",
+      "nombre": "NÉSTOR LOIACONO (JUGOS Y TRAGOS)",
+      "rubro": "gastronomia",
+      "stand": "K3",
+      "keywords": ["loiacono", "jugos", "tragos"],
+      "descripcion": "Néstor Loiacono. Jugos y tragos.",
+      "ubicacionReferencia": "Stand K3"
+    },
+    {
+      "id": "nordemaq_s_a",
+      "nombre": "NORDEMAQ SA",
+      "rubro": "maquinaria",
+      "stand": "D6",
+      "keywords": ["nordemaq", "nordema", "maquinas viales"],
+      "descripcion": "Máquinas viales, agrícolas e implementos.",
+      "ubicacionReferencia": "Stand D6"
+    },
+    {
+      "id": "norte_gruas",
+      "nombre": "NORTE GRÚAS",
+      "rubro": "servicios",
+      "stand": "G4",
+      "keywords": ["norte gruas", "grua", "grúas", "gruas"],
+      "descripcion": "Grúas.",
+      "ubicacionReferencia": "Stand G4"
+    },
+    {
+      "id": "norte_semillas",
+      "nombre": "NORTE SEMILLAS SRL",
+      "rubro": "maquinaria",
+      "stand": "A3",
+      "keywords": ["norte semillas", "semillas norte", "cosechadora"],
+      "descripcion": "Maquinaria agrícola: sembradoras, pulverizadoras y cosechadoras.",
+      "ubicacionReferencia": "Stand A3"
+    },
+    {
+      "id": "nuevo_banco_del_chaco",
+      "nombre": "NUEVO BANCO DEL CHACO",
+      "rubro": "financiero",
+      "stand": "F6",
+      "keywords": ["nuevo", "banco", "chaco"],
+      "descripcion": "Soluciones financieras.",
+      "ubicacionReferencia": "Stand F6"
+    },
+    {
+      "id": "ombu",
+      "nombre": "MÁQUINAS AGRÍCOLAS OMBÚ SA",
+      "rubro": "maquinaria",
+      "stand": "D10",
+      "keywords": [
+        "ombu",
+        "ombú",
+        "ombus",
+        "cabezal",
+        "rastra",
+        "pulverizadora"
+      ],
+      "descripcion": "Tolvas autodescargables, cabezales maiceros y girasoleros, rastras, remolques y pulverizadoras.",
+      "ubicacionReferencia": "Stand D10"
+    },
+    {
+      "id": "ops_consulting",
+      "nombre": "OPS CONSULTING",
+      "rubro": "servicios",
+      "stand": "2B",
+      "keywords": ["ops", "ops consulting", "inmobiliaria ops"],
+      "descripcion": "Inmobiliaria.",
+      "ubicacionReferencia": "Stand 2B"
+    },
+    {
+      "id": "pancheria_la_familia",
+      "nombre": "PANCHERÍA LA FAMILIA",
+      "rubro": "gastronomia",
+      "stand": "K2",
+      "keywords": ["pancheria", "familia", "pancho"],
+      "descripcion": "Panchos.",
+      "ubicacionReferencia": "Stand K2"
+    },
+    {
+      "id": "panchitu",
+      "nombre": "PANCHITU",
+      "rubro": "gastronomia",
+      "stand": "K19",
+      "keywords": ["panchitu", "pancho"],
+      "descripcion": "Panchos.",
+      "ubicacionReferencia": "Stand K19"
+    },
+    {
+      "id": "panificadora_del_valler",
+      "nombre": "PANIFICADORA DEL VALLER",
+      "rubro": "gastronomia",
+      "stand": "K25",
+      "keywords": ["panificadora", "valler", "pan"],
+      "descripcion": "Panificados.",
+      "ubicacionReferencia": "Stand K25"
+    },
+    {
+      "id": "perro_lobo",
+      "nombre": "PERRO LOBO",
+      "rubro": "gastronomia",
+      "stand": "K10",
+      "keywords": ["perro lobo", "foodtruck comida"],
+      "descripcion": "Comida rápida en foodtruck.",
+      "ubicacionReferencia": "Stand K10"
+    },
+    {
+      "id": "prodata",
+      "nombre": "PRODATA",
+      "rubro": "servicios",
+      "stand": "1B",
+      "keywords": [
+        "prodata",
+        "informatica",
+        "alarmas",
+        "seguridad electronica",
+        "conectividad"
+      ],
+      "descripcion": "Informática, alarmas, seguridad, conectividad.",
+      "ubicacionReferencia": "Stand 1B"
+    },
+    {
+      "id": "puro_de_campo",
+      "nombre": "PURO DE CAMPO",
+      "rubro": "gastronomia",
+      "stand": "K11",
+      "keywords": ["puro de campo", "fiambres"],
+      "descripcion": "Fiambres.",
+      "ubicacionReferencia": "Stand K11"
+    },
+    {
+      "id": "rodolfo_weibel",
+      "nombre": "RODOLFO WEIBEL",
+      "rubro": "maquinaria",
+      "stand": "G2",
+      "keywords": ["weibel", "wiebel", "maquinaria"],
+      "descripcion": "Maquinarias y equipamiento comercial.",
+      "ubicacionReferencia": "Stand G2"
+    },
+    {
+      "id": "rogelio_y_oscar_morelli",
+      "nombre": "ROGELIO Y OSCAR MORELLI",
+      "rubro": "maquinaria",
+      "stand": "D11",
+      "keywords": ["morelli", "agrometal"],
+      "descripcion": "Agrometal. Maquinaria agrícola.",
+      "ubicacionReferencia": "Stand D11"
+    },
+    {
+      "id": "r_l_servicios",
+      "nombre": "R&L SERVICIOS (LÓPEZ ANGEL RAMÓN)",
+      "rubro": "maquinaria",
+      "stand": "D15",
+      "keywords": ["ryl", "r y l", "ril"],
+      "descripcion": "Implementos y maquinarias agrícolas.",
+      "ubicacionReferencia": "Stand D15"
+    },
+    {
+      "id": "sancor_salud",
+      "nombre": "SANCOR SALUD",
+      "rubro": "financiero",
+      "stand": "JOVENES PROFESIONALES",
+      "keywords": [
+        "sancor",
+        "sancor salud",
+        "prepaga",
+        "medicina prepaga",
+        "obra social"
+      ],
+      "descripcion": "Servicio de medicina prepaga.",
+      "ubicacionReferencia": "Stand JOVENES PROFESIONALES"
+    },
+    {
+      "id": "schab_perforaciones",
+      "nombre": "SCHAB PERFORACIONES",
+      "rubro": "servicios",
+      "stand": "H9",
+      "keywords": ["schab", "bomba", "perforacion"],
+      "descripcion": "Bombas de agua y perforaciones.",
+      "ubicacionReferencia": "Stand H9"
+    },
+    {
+      "id": "sembradoras_malasia",
+      "nombre": "SEMBRADORAS MALASIA",
+      "rubro": "maquinaria",
+      "stand": "G21",
+      "keywords": ["sembradora", "malasia"],
+      "descripcion": "Sembradoras Malasia.",
+      "ubicacionReferencia": "Stand G21"
+    },
+    {
+      "id": "siid",
+      "nombre": "CONTROL AGRO (SIID)",
+      "rubro": "servicios",
+      "stand": "G17",
+      "keywords": ["siid", "controlagro", "tecnologia", "agro", "telemetria"],
+      "descripcion": "Soluciones Integrales de Ingeniería y Desarrollo. Tecnología para el agro.",
+      "ubicacionReferencia": "Stand G17"
+    },
+    {
+      "id": "super_al_cas",
+      "nombre": "SUPER AL-CAS",
+      "rubro": "maquinaria",
+      "stand": "F7",
+      "keywords": [
+        "alcas",
+        "al-cas",
+        "super alcas",
+        "casilla rural",
+        "taller rodante"
+      ],
+      "descripcion": "Casillas rurales, rastras, rolos, talleres rodantes, tolvas, acoplados, tanques y sacatroncos.",
+      "ubicacionReferencia": "Stand F7"
+    },
+    {
+      "id": "swagemakers_maquinas_viales",
+      "nombre": "SWAGEMAKERS",
+      "rubro": "maquinaria",
+      "stand": "E4",
+      "keywords": ["swagemakers", "cargadora frontal"],
+      "descripcion": "Tractores, cargadoras frontales, autoelevadores.",
+      "ubicacionReferencia": "Stand E4"
+    },
+    {
+      "id": "tbeh_equipos_agro_viales_s_a",
+      "nombre": "TBeH — EQUIPOS AGRO VIALES S.A.",
+      "rubro": "maquinaria",
+      "stand": "D4",
+      "keywords": [
+        "tbeh",
+        "tbe",
+        "niveladora",
+        "desmalezadora",
+        "rolo",
+        "manipulador telescopico"
+      ],
+      "descripcion": "Niveladoras, desmalezadoras, rastras, rolos, palas de arrastre y manipulador telescópico.",
+      "ubicacionReferencia": "Stand D4"
+    },
+    {
+      "id": "tecnoagronorte",
+      "nombre": "TECNOAGRO NORTE SA",
+      "rubro": "maquinaria",
+      "stand": "C3",
+      "keywords": ["tecnoagro", "tecnoagro norte"],
+      "descripcion": "Maquinaria agrícola.",
+      "ubicacionReferencia": "Stand C3"
+    },
+    {
+      "id": "tecnomateriales",
+      "nombre": "GRUPO PILAR SA (TECNOMATERIALES)",
+      "rubro": "servicios",
+      "stand": "3B",
+      "keywords": [
+        "tecnomateriales",
+        "panel termoaislante",
+        "aislante termico"
+      ],
+      "descripcion": "Paneles termoaislantes.",
+      "ubicacionReferencia": "Stand 3B"
+    },
+    {
+      "id": "tedeschi",
+      "nombre": "TEDESCHI MAQUINARIAS S.A.",
+      "rubro": "maquinaria",
+      "stand": "F9",
+      "keywords": ["tedeschi", "sembradora", "autotrailer"],
+      "descripcion": "Sembradora TT pliegue frontal y Sembradora Autotrailer M99 articulada.",
+      "ubicacionReferencia": "Stand F9"
+    },
+    {
+      "id": "tgn",
+      "nombre": "TGN SA",
+      "rubro": "servicios",
+      "stand": "H3",
+      "keywords": ["tgn", "gas del norte", "gasoducto", "transportadora"],
+      "descripcion": "Transportadora de Gas del Norte. Campaña de prevención de daños en gasoductos.",
+      "ubicacionReferencia": "Stand H3"
+    },
+    {
+      "id": "tolezano_park",
+      "nombre": "TOLEZANO PARK",
+      "rubro": "otros",
+      "stand": null,
+      "keywords": ["tolezano", "park"],
+      "descripcion": "Expositor.",
+      "ubicacionReferencia": ""
+    },
+    {
+      "id": "tractopartes",
+      "nombre": "ORLANDINI TRACTOPARTES",
+      "rubro": "servicios",
+      "stand": "5C",
+      "keywords": ["orlandini", "tractopartes", "repuesto", "tractor"],
+      "descripcion": "Repuestos multimarca para tractores.",
+      "ubicacionReferencia": "Stand 5C"
+    },
+    {
+      "id": "transpaq",
+      "nombre": "TRANSPAQ SRL",
+      "rubro": "servicios",
+      "stand": "2A",
+      "keywords": ["transpaq", "transporte transpaq"],
+      "descripcion": "Servicio de transporte.",
+      "ubicacionReferencia": "Stand 2A"
+    },
+    {
+      "id": "triunfo_seguros",
+      "nombre": "TRIUNFO SEGUROS",
+      "rubro": "financiero",
+      "stand": "4C",
+      "keywords": ["triunfo", "triunfo seguros", "seguros"],
+      "descripcion": "Seguros.",
+      "ubicacionReferencia": "Stand 4C"
+    },
+    {
+      "id": "uncaus",
+      "nombre": "UNIVERSIDAD NACIONAL DEL CHACO AUSTRAL (UNCAUS)",
+      "rubro": "institucional",
+      "stand": "E1",
+      "keywords": ["uncaus", "universidad chaco", "chaco austral", "agronomia"],
+      "descripcion": "Ingeniería Agronómica, Ciencias Veterinarias, Medicina, Farmacia y Biotecnología.",
+      "ubicacionReferencia": "Stand E1"
+    },
+    {
+      "id": "union_agricola_de_avellaneda",
+      "nombre": "UNIÓN AGRÍCOLA DE AVELLANEDA (UAA)",
+      "rubro": "servicios",
+      "stand": "G10",
+      "keywords": ["uaa", "union agricola", "avellaneda", "cooperativa uaa"],
+      "descripcion": "Cooperativa agro/industria/tecnología.",
+      "ubicacionReferencia": "Stand G10"
+    },
+    {
+      "id": "vitacheff_delicias_arabes",
+      "nombre": "VITACHEFF DELICIAS ÁRABES",
+      "rubro": "gastronomia",
+      "stand": "K21",
+      "keywords": ["vitacheff", "shawarma", "bondiola", "delicias arabes"],
+      "descripcion": "Shawarma, sándwich de bondiola, papas fritas gourmet.",
+      "ubicacionReferencia": "Stand K21"
+    },
+    {
+      "id": "vivero_la_galeria",
+      "nombre": "VIVERO LA GALERÍA",
+      "rubro": "otros",
+      "stand": "G27",
+      "keywords": [
+        "vivero",
+        "la galeria",
+        "plantas",
+        "macetas",
+        "ornamentales"
+      ],
+      "descripcion": "Plantas ornamentales, regalos, macetas.",
+      "ubicacionReferencia": "Stand G27"
+    },
+    {
+      "id": "yaguarete_del_dakar",
+      "nombre": "EL YAGUARETÉ DEL DAKAR",
+      "rubro": "otros",
+      "stand": "F19",
+      "keywords": ["yaguarete", "dakar", "rally"],
+      "descripcion": "Equipo deportivo Rally Dakar.",
+      "ubicacionReferencia": "Stand F19"
+    },
+    {
+      "id": "yomel",
+      "nombre": "YOMEL S.A.",
+      "rubro": "maquinaria",
+      "stand": "E6",
+      "keywords": [
+        "yomel",
+        "enfardadora",
+        "rotoenfardadora",
+        "segadora",
+        "rastrillo"
+      ],
+      "descripcion": "Rotoenfardadora, enfardadora, segadora, rastrillo, desmalezadora y fertilizadora.",
+      "ubicacionReferencia": "Stand E6"
+    },
+    {
+      "id": "zirka_s_a",
+      "nombre": "ZIRKA S.A.",
+      "rubro": "otros",
+      "stand": "H8",
+      "keywords": ["zirka"],
+      "descripcion": "Expositor.",
+      "ubicacionReferencia": "Stand H8"
+    },
+    {
+      "id": "drap_sas",
+      "nombre": "DRAP SAS",
+      "rubro": "servicios",
+      "stand": "G30",
+      "keywords": [
+        "drap",
+        "drap sas",
+        "drone",
+        "drones dji",
+        "aplicacion aerea"
+      ],
+      "descripcion": "Drones DJI para aplicaciones agrícolas.",
+      "ubicacionReferencia": "Stand G30"
+    },
+    {
+      "id": "vialidad_provincial",
+      "nombre": "VIALIDAD PROVINCIAL",
+      "rubro": "institucional",
+      "stand": "G31",
+      "keywords": ["vialidad", "vialidad provincial", "rutas", "chaco"],
+      "descripcion": "Dirección Provincial de Vialidad del Chaco.",
+      "ubicacionReferencia": "Stand G31"
+    },
+    {
+      "id": "favaron_servicios",
+      "nombre": "FAVARON SERVICIOS",
+      "rubro": "servicios",
+      "stand": "E14",
+      "keywords": ["favaron", "pulverizacion", "equipos pulverizacion"],
+      "descripcion": "Servicios y equipos anexos a pulverización agrícola.",
+      "ubicacionReferencia": "Stand E14"
+    },
+    {
+      "id": "rodante_scf",
+      "nombre": "RODANTE SCF",
+      "rubro": "servicios",
+      "stand": "H19",
+      "keywords": ["rodante", "scf", "rodante scf", "casilla rural"],
+      "descripcion": "Casillas rurales.",
+      "ubicacionReferencia": "Stand H19"
+    },
+    {
+      "id": "instituto_miguel_nemes",
+      "nombre": "INSTITUTO MIGUEL NEMES",
+      "rubro": "institucional",
+      "stand": "H20",
+      "keywords": ["instituto", "nemes", "miguel nemes", "conservas", "quesos"],
+      "descripcion": "Conservas y quesos.",
+      "ubicacionReferencia": "Stand H20"
+    },
+    {
+      "id": "aguas_ada",
+      "nombre": "AGUAS ADA",
+      "rubro": "servicios",
+      "stand": "H21",
+      "keywords": ["aguas ada", "agua", "ada"],
+      "descripcion": "Expositor.",
+      "ubicacionReferencia": "Stand H21"
+    },
+    {
+      "id": "morena_pochoclos",
+      "nombre": "MORENA POCHOCLOS",
+      "rubro": "gastronomia",
+      "stand": "K26",
+      "keywords": ["morena", "pochoclos", "pochoclo"],
+      "descripcion": "Pochoclos.",
+      "ubicacionReferencia": "Stand K26"
+    }
+  ],
+  "faqs": [
+    {
+      "id": "saludo",
+      "pregunta": "Hola / Información general",
+      "keywords": [
+        "hola",
+        "buenas",
+        "buen dia",
+        "buen día",
+        "buenos dias",
+        "buenos días",
+        "buenas tardes",
+        "buenas noches",
+        "hey",
+        "hi",
+        "saludos",
+        "info",
+        "informacion",
+        "información",
+        "dame info",
+        "contame",
+        "decime",
+        "que hay",
+        "qué hay"
+      ],
+      "respuesta": "¡Hola! Agronea 2026 se realiza del 3 al 5 de julio, de 9:00 a 18:00 hs, en el Predio de AGRONEA - Km 72.5 de la ruta 89, a unos 5 km de Charata, Chaco. ¿En qué más te ayudo?",
+      "related": ["fechas", "entradas", "como_llegar"],
+      "sector": null
+    },
+    {
+      "id": "horarios",
+      "pregunta": "¿Cuáles son los horarios del evento?",
+      "keywords": [
+        "horario",
+        "hora",
+        "abre",
+        "cierra",
+        "cuando",
+        "tiempo",
+        "hasta",
+        "desde",
+        "apertura",
+        "cierre"
+      ],
+      "respuesta": "Agronea 2026 abre todos los días de 9:00 a 18:00 hs. El acto inaugural es el viernes 3 de julio a las 11:00 hs. No se permite el reingreso al predio una vez que se sale.",
+      "related": ["fechas", "entradas", "ingreso_principal"],
+      "sector": null
+    },
+    {
+      "id": "fechas",
+      "pregunta": "¿Cuándo es el evento?",
+      "keywords": [
+        "fecha",
+        "cuando",
+        "dia",
+        "días",
+        "julio",
+        "2026",
+        "dura",
+        "duración"
+      ],
+      "respuesta": "Agronea 2026 se realiza del 3 al 5 de julio de 2026, de 9:00 a 18:00 hs. Acto inaugural: viernes 3 a las 11:00 hs. Ubicación: Predio de AGRONEA - Km 72.5 de la ruta 89, a unos 5 km de Charata, Chaco.",
+      "related": ["horarios", "entradas", "como_llegar"],
+      "sector": null
+    },
+    {
+      "id": "entradas",
+      "pregunta": "¿Cuánto cuesta la entrada?",
+      "keywords": [
+        "entrada",
+        "ticket",
+        "acceso",
+        "comprar",
+        "precio",
+        "costo",
+        "vale",
+        "bono",
+        "código",
+        "qr",
+        "cuanto sale",
+        "cuánto sale",
+        "valor"
+      ],
+      "respuesta": "La entrada cuesta $10.000 hasta el 2 de julio inclusive (precio anticipado). A partir del 3 de julio el precio es $15.000. Menores de 9 años entran gratis. Se compra online en agronea.store con tarjeta de crédito, o en el predio los días del evento con efectivo o tarjeta.",
+      "related": ["menores", "escuelas", "ingreso_principal"],
+      "sector": "ingreso_principal"
+    },
+    {
+      "id": "donde_comprar_entradas",
+      "pregunta": "¿Dónde compro la entrada?",
+      "keywords": [
+        "donde compro",
+        "donde comprar",
+        "como compro",
+        "cómo compro",
+        "agronea store",
+        "online",
+        "venta entradas",
+        "punto de venta"
+      ],
+      "respuesta": "Podés comprarla online y presencial. Online en agronea.store con cualquier tarjeta de crédito. Presencial en nuestras oficinas y también en el predio los días del evento con efectivo o tarjeta.",
+      "related": ["entradas", "ingreso_principal", "menores"],
+      "sector": null
+    },
+    {
+      "id": "reingreso",
+      "pregunta": "¿Puedo reingresar al predio?",
+      "keywords": [
+        "reingresar",
+        "reingreso",
+        "salir y entrar",
+        "volver a entrar",
+        "salgo y vuelvo"
+      ],
+      "respuesta": "No. Una vez que salís del predio no podés reingresar con la misma entrada.",
+      "related": ["entradas", "ingreso_principal", "horarios"],
+      "sector": null
+    },
+    {
+      "id": "escuelas",
+      "pregunta": "¿Las escuelas pueden ingresar gratis?",
+      "keywords": [
+        "escuela",
+        "escuelas",
+        "alumnos",
+        "colegio",
+        "colegios",
+        "estudiantes secundarios",
+        "gratis escuela",
+        "entrada escuela"
+      ],
+      "respuesta": "Sí. Las escuelas ingresan gratis solo el viernes 3 de julio, presentando lista de alumnos con un responsable mayor de edad en papel con membrete y/o sello del establecimiento. Más info: WhatsApp 3794 222011.",
+      "related": ["entradas", "menores", "universitarios"],
+      "sector": null
+    },
+    {
+      "id": "universitarios",
+      "pregunta": "¿Los universitarios tienen entrada gratis?",
+      "keywords": [
+        "universitario",
+        "universitarios",
+        "facultad",
+        "agronomia",
+        "veterinaria",
+        "libreta universitaria",
+        "universidad",
+        "gratis universitario"
+      ],
+      "respuesta": "Los alumnos de Ciencias Agrarias y Ciencias Veterinarias ingresan gratis el viernes 3 y sábado 4 de julio presentando libreta universitaria al día. El domingo 5 deben abonar la entrada.",
+      "related": ["entradas", "escuelas", "menores"],
+      "sector": null
+    },
+    {
+      "id": "menores",
+      "pregunta": "¿Pueden ingresar menores de edad?",
+      "keywords": [
+        "menor",
+        "menores",
+        "niño",
+        "niños",
+        "chico",
+        "chicos",
+        "hijo",
+        "hijos",
+        "familia",
+        "bebé",
+        "bebe",
+        "edad",
+        "gratis niños"
+      ],
+      "respuesta": "Solo los menores de 9 años no pagan entrada. No hay otros descuentos por edad. Deben ingresar acompañados de un adulto a su cargo.",
+      "related": ["entradas", "escuelas", "parque_atracciones"],
+      "sector": null
+    },
+    {
+      "id": "ubicacion",
+      "pregunta": "¿Dónde queda el predio?",
+      "keywords": [
+        "donde",
+        "ubicación",
+        "ubicacion",
+        "dirección",
+        "direccion",
+        "predio",
+        "lugar",
+        "km",
+        "ruta"
+      ],
+      "respuesta": "Predio de AGRONEA - Km 72.5 de la ruta 89, a unos 5 km de la Ciudad de Charata, Chaco.",
+      "related": ["como_llegar", "estacionamiento", "ingreso_principal"],
+      "sector": null
+    },
+    {
+      "id": "ingreso_principal",
+      "pregunta": "¿Dónde es el ingreso al evento?",
+      "keywords": [
+        "ingreso",
+        "puerta",
+        "como entro",
+        "donde entro",
+        "entrada principal"
+      ],
+      "respuesta": "El ingreso principal está en el sector este del predio, de cara a la ruta 89. Al llegar vas a encontrar toda la señalización.",
+      "related": ["estacionamiento", "entradas", "como_llegar"],
+      "sector": "ingreso_principal"
+    },
+    {
+      "id": "estacionamiento",
+      "pregunta": "¿Hay estacionamiento?",
+      "keywords": [
+        "estacionamiento",
+        "estacionar",
+        "auto",
+        "autos",
+        "vehículo",
+        "vehiculo",
+        "donde dejo",
+        "parking",
+        "playa",
+        "moto",
+        "motos"
+      ],
+      "respuesta": "Sí, hay estacionamiento en el predio. Es de pago tanto para autos como para motos. Al llegar vas a encontrar la señalización para estacionar.",
+      "related": ["ingreso_principal", "como_llegar"],
+      "sector": "ingreso_principal"
+    },
+    {
+      "id": "banos",
+      "pregunta": "¿Dónde están los baños?",
+      "keywords": [
+        "baño",
+        "baños",
+        "sanitario",
+        "sanitarios",
+        "toilette",
+        "wc",
+        "lavabo",
+        "necesidades"
+      ],
+      "respuesta": "Hay baños distribuidos en varios puntos del predio: cerca de las zonas gastronómicas, en el sector de corrales, cerca de la entrada y en el área de maquinarias. Seguí los carteles de señalización.",
+      "related": ["accesibilidad", "primeros_auxilios", "informes"],
+      "sector": null
+    },
+    {
+      "id": "comida",
+      "pregunta": "¿Hay para comer en el evento?",
+      "keywords": [
+        "comer",
+        "comida",
+        "food",
+        "restaurant",
+        "almorzar",
+        "almuerzo",
+        "merienda",
+        "hambre",
+        "bebida",
+        "agua",
+        "gaseosa",
+        "menú",
+        "menu",
+        "vegetariano",
+        "vegano"
+      ],
+      "respuesta": "Hay varias opciones: Gastronomía en general, Food Trucks, Comedor Adaka, Comedor Cooperativa y un puesto de comidas saludables. Para opciones vegetarianas o veganas consultá en cada puesto.",
+      "related": ["food_trucks", "sillas", "cajero"],
+      "sector": "gastro1"
+    },
+    {
+      "id": "food_trucks",
+      "pregunta": "¿Dónde están los food trucks?",
+      "keywords": ["food truck", "foodtruck", "camión comida", "camion comida"],
+      "respuesta": "Los food trucks están en el sector gastronómico, donde vas a encontrar varias opciones.",
+      "related": ["comida", "sillas", "estacionamiento"],
+      "sector": "food_trucks"
+    },
+    {
+      "id": "cajero",
+      "pregunta": "¿Hay cajeros automáticos en el predio?",
+      "keywords": [
+        "cajero",
+        "cajeros",
+        "atm",
+        "plata",
+        "efectivo",
+        "sacar plata",
+        "banco"
+      ],
+      "respuesta": "Hay cajero automático del Banco NBCH dentro del predio. Te recomendamos llevar efectivo de respaldo. La mayoría de los stands acepta tarjeta de crédito, débito y transferencias.",
+      "related": ["comida", "entradas", "contacto"],
+      "sector": null
+    },
+    {
+      "id": "pago_stands",
+      "pregunta": "¿Se puede pagar con tarjeta en los stands?",
+      "keywords": [
+        "tarjeta",
+        "pagar",
+        "débito",
+        "debito",
+        "mercadopago",
+        "transferencia",
+        "efectivo",
+        "como pago"
+      ],
+      "respuesta": "En la mayoría de los stands podés pagar con tarjeta de crédito, débito, transferencia y efectivo. Depende de cada expositor. Hay un cajero del Banco NBCH en el predio; igual conviene llevar efectivo de respaldo.",
+      "related": ["cajero", "entradas", "comida"],
+      "sector": null
+    },
+    {
+      "id": "wifi",
+      "pregunta": "¿Hay wifi en el predio?",
+      "keywords": [
+        "wifi",
+        "internet",
+        "señal",
+        "conexion",
+        "conexión",
+        "red",
+        "datos"
+      ],
+      "respuesta": "No hay wifi gratuito en el predio. Te recomendamos descargar la app antes de entrar para usar toda la información sin internet.",
+      "related": ["celular", "informes", "contacto"],
+      "sector": null
+    },
+    {
+      "id": "primeros_auxilios",
+      "pregunta": "¿Hay atención médica en el evento?",
+      "keywords": [
+        "médico",
+        "medico",
+        "emergencia",
+        "emergencias",
+        "salud",
+        "ambulancia",
+        "enfermero",
+        "primeros auxilios",
+        "accidente",
+        "me siento mal",
+        "hospital",
+        "dolor",
+        "alerta roja"
+      ],
+      "respuesta": "Sí. El puesto de Emergencias Alerta Roja tiene atención médica permanente durante todo el evento. Ante cualquier emergencia también podés acudir al Centro Operativo.",
+      "related": ["accesibilidad", "perdidos", "informes"],
+      "sector": "emergencias"
+    },
+    {
+      "id": "informes",
+      "pregunta": "¿Dónde puedo pedir información?",
+      "keywords": [
+        "informes",
+        "información",
+        "informacion",
+        "consulta",
+        "ayuda",
+        "atención",
+        "atencion",
+        "personal",
+        "donde pregunto"
+      ],
+      "respuesta": "El Centro Operativo y el stand de Informes cerca del ingreso principal son los lugares indicados. También podés escribir al WhatsApp 3794 222011 o al email agroneacharata@gmail.com.",
+      "related": ["contacto", "perdidos", "primeros_auxilios"],
+      "sector": "centro_operativo"
+    },
+    {
+      "id": "maquinarias",
+      "pregunta": "¿Dónde está el sector de maquinarias?",
+      "keywords": [
+        "maquinaria",
+        "maquinarias",
+        "tractor",
+        "tractores",
+        "cosechadora",
+        "implemento",
+        "campo",
+        "agrícola",
+        "agricola"
+      ],
+      "respuesta": "El Parque Cerrado de Maquinarias está en el sector oeste del predio. Las Dinámicas a Campo están en el sector este exterior.",
+      "related": ["ag_tech", "drones", "charlas"],
+      "sector": "parque_maquinarias"
+    },
+    {
+      "id": "ag_tech",
+      "pregunta": "¿Dónde está el sector de tecnología?",
+      "keywords": [
+        "tecnología",
+        "tecnologia",
+        "ag tech",
+        "agtech",
+        "digital",
+        "software",
+        "startup",
+        "innovación",
+        "innovacion",
+        "tech"
+      ],
+      "respuesta": "El Sector Servicios AG Tech 2026 está en la franja inferior del plano, con ingreso propio. Agronea Vuela (drones) está en el punto 8, sector central.",
+      "related": ["drones", "maquinarias", "charlas"],
+      "sector": "ag_tech"
+    },
+    {
+      "id": "drones",
+      "pregunta": "¿Dónde están los drones?",
+      "keywords": [
+        "drone",
+        "drones",
+        "vuelo",
+        "aéreo",
+        "aereo",
+        "vuela",
+        "agronea vuela"
+      ],
+      "respuesta": "La zona de drones se llama Agronea Vuela y está en el punto 8 del plano, sector central del predio.",
+      "related": ["ag_tech", "maquinarias", "charlas"],
+      "sector": "agronea_vuela"
+    },
+    {
+      "id": "charlas",
+      "pregunta": "¿Hay charlas o conferencias?",
+      "keywords": [
+        "charla",
+        "charlas",
+        "conferencia",
+        "conferencias",
+        "auditorio",
+        "capacitación",
+        "capacitacion",
+        "disertación",
+        "disertacion",
+        "panel",
+        "cronograma"
+      ],
+      "respuesta": "Sí. Las charlas se realizan en el Auditorio General y en el Salón Jóvenes Emprendedores. Hay charlas los 3 días sobre ganadería, agricultura de precisión, pulverización, economía y más. Consultá el cronograma completo en la app.",
+      "related": ["programa", "escenario", "jovenes"],
+      "sector": "auditorio"
+    },
+    {
+      "id": "escenario",
+      "pregunta": "¿Dónde es el escenario?",
+      "keywords": [
+        "escenario",
+        "show",
+        "música",
+        "musica",
+        "artista",
+        "entretenimiento",
+        "espectáculo",
+        "espectaculo"
+      ],
+      "respuesta": "El Escenario Principal está en el punto 7, sector central-norte del predio. El domingo desde las 15hs arrancan los espectáculos y a las 18hs es el Sorteo Veinte Millones.",
+      "related": ["charlas", "sorteo", "comida"],
+      "sector": "escenario"
+    },
+    {
+      "id": "ganaderia",
+      "pregunta": "¿Dónde está el sector ganadero?",
+      "keywords": [
+        "ganadería",
+        "ganaderia",
+        "hacienda",
+        "animales",
+        "vacas",
+        "toros",
+        "bovino",
+        "corrales",
+        "ganado"
+      ],
+      "respuesta": "Los Corrales están en el punto 9, sector este. El 14° Remate de reproductores es el sábado 4 de julio a las 14 hs, a cargo de Colombo y Colombo. Es abierto al público y sin costo de inscripción.",
+      "related": ["remate", "maquinarias", "informes"],
+      "sector": "corrales"
+    },
+    {
+      "id": "remate",
+      "pregunta": "¿Cuándo es el remate ganadero?",
+      "keywords": [
+        "remate",
+        "remates",
+        "subasta",
+        "colombo",
+        "martillero",
+        "venta animales",
+        "hacienda venta",
+        "reproductores"
+      ],
+      "respuesta": "El 14° Remate de reproductores es el sábado 4 de julio a las 14 hs en el Sector Ganadería, a cargo de la Consignataria Colombo y Colombo. Abierto al público, sin costo de inscripción.",
+      "related": ["ganaderia", "corrales", "programa"],
+      "sector": "corrales"
+    },
+    {
+      "id": "prensa_acceso",
+      "pregunta": "¿Cómo accedo si soy prensa?",
+      "keywords": [
+        "prensa",
+        "periodista",
+        "acreditación",
+        "acreditacion",
+        "credencial",
+        "medios",
+        "periodismo",
+        "fotógrafo",
+        "fotografo"
+      ],
+      "respuesta": "El sector de Prensa tiene una carpa exclusiva en el punto 13. Para acreditarte escribí a agroneacharata@gmail.com o al WhatsApp 3794 222011 antes del evento.",
+      "related": ["informes", "contacto", "ingreso_principal"],
+      "sector": "prensa"
+    },
+    {
+      "id": "jovenes",
+      "pregunta": "¿Hay algo para jóvenes profesionales?",
+      "keywords": [
+        "joven",
+        "jóvenes",
+        "jovenes",
+        "profesional",
+        "estudiante",
+        "universitario",
+        "agronomía",
+        "agronomia",
+        "emprendedores"
+      ],
+      "respuesta": "Sí. El Sector Jóvenes Profesionales y el Salón Jóvenes Emprendedores tienen charlas y espacios dedicados a estudiantes y profesionales jóvenes del agro durante los 3 días.",
+      "related": ["charlas", "ag_tech", "universitarios"],
+      "sector": "jovenes_profesionales"
+    },
+    {
+      "id": "pista_autos",
+      "pregunta": "¿Hay pista de manejo?",
+      "keywords": [
+        "pista",
+        "manejo",
+        "manejar",
+        "ford",
+        "toyota",
+        "test drive",
+        "prueba"
+      ],
+      "respuesta": "Hay dos pistas: Ford-Donnet en el punto 4 (noroeste) y Toyota en el punto 18 (sur). Ambas son gratuitas con registro en el stand de la marca.",
+      "related": ["estacionamiento", "maquinarias", "como_llegar"],
+      "sector": "pista_ford"
+    },
+    {
+      "id": "tienda",
+      "pregunta": "¿Hay tienda oficial del evento?",
+      "keywords": [
+        "tienda",
+        "ropa",
+        "merchandising",
+        "souvenirs",
+        "remera",
+        "gorra",
+        "comprar",
+        "cuponera",
+        "cupón",
+        "cupon"
+      ],
+      "respuesta": "Sí. La Tienda Oficial / Cuponera está en el punto 20, sector sur, cerca del ingreso principal.",
+      "related": ["entradas", "ingreso_principal", "informes"],
+      "sector": "tienda_oficial"
+    },
+    {
+      "id": "mascotas",
+      "pregunta": "¿Puedo ingresar con mascotas?",
+      "keywords": ["mascota", "mascotas", "perro", "perros", "gato", "animal"],
+      "respuesta": "No está permitido el ingreso de mascotas al predio, salvo animales de asistencia debidamente acreditados.",
+      "related": ["ingreso_principal", "accesibilidad", "informes"],
+      "sector": null
+    },
+    {
+      "id": "sillas",
+      "pregunta": "¿Hay sillas o lugares para descansar?",
+      "keywords": [
+        "silla",
+        "sillas",
+        "banco",
+        "descansar",
+        "sentar",
+        "sentarse",
+        "descanso"
+      ],
+      "respuesta": "Hay zonas de descanso con bancos y sillas en las áreas gastronómicas y cerca del escenario. Para el auditorio y charlas hay butacas disponibles.",
+      "related": ["comida", "charlas", "escenario"],
+      "sector": null
+    },
+    {
+      "id": "accesibilidad",
+      "pregunta": "¿El predio es accesible para personas con movilidad reducida?",
+      "keywords": [
+        "accesibilidad",
+        "discapacidad",
+        "silla de ruedas",
+        "movilidad reducida",
+        "rampa",
+        "accesible"
+      ],
+      "respuesta": "El predio cuenta con accesos habilitados para personas con movilidad reducida. Para asistencia especial acercate al Centro Operativo o escribí al WhatsApp 3794 222011.",
+      "related": ["primeros_auxilios", "banos", "informes"],
+      "sector": "centro_operativo"
+    },
+    {
+      "id": "perdidos",
+      "pregunta": "Perdí algo en el evento",
+      "keywords": [
+        "perdí",
+        "perdi",
+        "perdido",
+        "perdida",
+        "objetos perdidos",
+        "encontré",
+        "encontre",
+        "dejé",
+        "deje"
+      ],
+      "respuesta": "Para objetos perdidos o encontrados acercate al Centro Operativo o escribí al WhatsApp 3794 222011.",
+      "related": ["informes", "contacto", "primeros_auxilios"],
+      "sector": "centro_operativo"
+    },
+    {
+      "id": "como_llegar",
+      "pregunta": "¿Cómo llego al evento?",
+      "keywords": [
+        "como llego",
+        "cómo llego",
+        "transporte",
+        "colectivo",
+        "en colectivo",
+        "remis",
+        "taxi",
+        "ruta 89",
+        "charata"
+      ],
+      "respuesta": "El Predio de AGRONEA está en el Km 72.5 de la ruta 89, a unos 5 km de Charata. Desde la ciudad son aproximadamente 10 minutos. Hay remises de empresas locales disponibles.",
+      "related": ["estacionamiento", "ingreso_principal", "ubicacion"],
+      "sector": null
+    },
+    {
+      "id": "celular",
+      "pregunta": "¿Hay señal de celular en el predio?",
+      "keywords": [
+        "señal",
+        "celular",
+        "teléfono",
+        "telefono",
+        "4g",
+        "cobertura",
+        "llamada"
+      ],
+      "respuesta": "La cobertura puede ser limitada por la concentración de personas. Te recomendamos descargar la app antes de entrar para usar toda la información sin internet.",
+      "related": ["wifi", "informes", "contacto"],
+      "sector": null
+    },
+    {
+      "id": "lluvia",
+      "pregunta": "¿Qué pasa si llueve?",
+      "keywords": [
+        "lluvia",
+        "llueve",
+        "clima",
+        "tiempo",
+        "mal tiempo",
+        "paraguas",
+        "cancelar",
+        "suspender"
+      ],
+      "respuesta": "El evento se realiza con lluvia. Gran parte de los stands tienen cobertura. Ante suspensión por fuerza mayor se informará por redes oficiales.",
+      "related": ["contacto", "informes", "fechas"],
+      "sector": null
+    },
+    {
+      "id": "fotos",
+      "pregunta": "¿Puedo sacar fotos?",
+      "keywords": [
+        "foto",
+        "fotos",
+        "fotografía",
+        "fotografia",
+        "sacar fotos",
+        "filmar",
+        "video",
+        "cámara",
+        "camara"
+      ],
+      "respuesta": "Sí, podés sacar fotos y videos para uso personal. Para cobertura periodística necesitás acreditación de prensa.",
+      "related": ["prensa_acceso", "informes", "contacto"],
+      "sector": "prensa"
+    },
+    {
+      "id": "contacto",
+      "pregunta": "¿Cómo contacto a la organización?",
+      "keywords": [
+        "contacto",
+        "contactar",
+        "organización",
+        "organizacion",
+        "teléfono",
+        "telefono",
+        "whatsapp",
+        "llamar",
+        "escribir",
+        "email",
+        "correo"
+      ],
+      "respuesta": "WhatsApp: 3794 222011. Email: agroneacharata@gmail.com. Oficina en Caseros 539, Charata. Horario: lunes a viernes 8 a 12hs y 16 a 20hs, sábados 8 a 12hs.",
+      "related": ["informes", "perdidos", "primeros_auxilios"],
+      "sector": null
+    },
+    {
+      "id": "expositores_general",
+      "pregunta": "¿Quiénes son los expositores?",
+      "keywords": [
+        "expositor",
+        "expositores",
+        "empresa",
+        "empresas",
+        "stand",
+        "stands",
+        "quienes",
+        "quien",
+        "participan",
+        "hay",
+        "busco expositor"
+      ],
+      "respuesta": "En Agronea 2026 participan 150 empresas de maquinaria, insumos, vehículos, tecnología, gastronomía y más. Escribí el nombre del expositor que buscás y te digo en qué stand está.",
+      "related": ["maquinarias", "ag_tech", "ganaderia"],
+      "sector": null
+    },
+    {
+      "id": "seguridad_nocturna",
+      "pregunta": "¿Hay seguridad nocturna?",
+      "keywords": [
+        "seguridad",
+        "vigilancia",
+        "noche",
+        "nocturno",
+        "dejar cosas",
+        "robo",
+        "custodiar",
+        "guardia"
+      ],
+      "respuesta": "Sí, hay seguridad nocturna en el predio durante los tres días del evento.",
+      "related": ["informes", "contacto", "primeros_auxilios"],
+      "sector": null
+    },
+    {
+      "id": "juegos_ninos",
+      "pregunta": "¿Hay juegos para niños?",
+      "keywords": [
+        "juegos",
+        "niños",
+        "chicos",
+        "entretenimiento niños",
+        "parque infantil",
+        "atracciones"
+      ],
+      "respuesta": "Hay zona de juegos para niños en el Parque de Atracciones. Es el espacio de entretenimiento infantil del predio.",
+      "related": ["menores", "comida", "escenario"],
+      "sector": "parque_atracciones"
+    },
+    {
+      "id": "programa",
+      "pregunta": "¿Cuál es el programa del evento?",
+      "keywords": [
+        "programa",
+        "cronograma",
+        "agenda",
+        "actividades",
+        "que hacer",
+        "eventos"
+      ],
+      "respuesta": "Agronea 2026 tiene actividades los 3 días: Drive Experience, charlas en el Auditorio General y el Salón Jóvenes Emprendedores, demostraciones a campo, el 14° Remate de reproductores (sábado 14hs) y el cierre con espectáculos y el Sorteo Veinte Millones (domingo 18hs). Consultá el cronograma completo en la app.",
+      "related": ["charlas", "remate", "sorteo"],
+      "sector": null
+    },
+    {
+      "id": "sorteo",
+      "pregunta": "¿Hay sorteo?",
+      "keywords": [
+        "sorteo",
+        "veinte millones",
+        "20 millones",
+        "premio",
+        "ganar",
+        "rifa"
+      ],
+      "respuesta": "Sí. El Sorteo Veinte Millones es el domingo 5 de julio a las 18:00 hs en el Escenario Principal, antes del cierre.",
+      "related": ["programa", "escenario"],
+      "sector": "escenario"
+    },
+    {
+      "id": "drive_experience",
+      "pregunta": "¿Qué es el Drive Experience?",
+      "keywords": [
+        "drive experience",
+        "manejar maquinaria",
+        "probar maquinaria",
+        "experiencia manejo",
+        "dinamica"
+      ],
+      "respuesta": "El Drive Experience es una experiencia de manejo de maquinaria agrícola en el Sector Dinámica. Viernes desde las 9:30, sábado y domingo de 9 a 15hs.",
+      "related": ["maquinarias", "programa"],
+      "sector": "drive_experience"
+    },
+    {
+      "id": "inauguracion",
+      "pregunta": "¿Cuándo es la inauguración?",
+      "keywords": [
+        "inauguracion",
+        "inauguración",
+        "acto inaugural",
+        "apertura oficial",
+        "corte de cinta",
+        "edicion 23"
+      ],
+      "respuesta": "El acto de inauguración de Expo Agronea 2026 (Edición 23°) es el viernes 3 de julio a las 11:00 hs en la Entrada del Pórtico Principal. La feria abre al público a las 9:00 hs.",
+      "related": ["programa", "horarios"],
+      "sector": null
+    },
+    {
+      "id": "alojamiento",
+      "pregunta": "¿Dónde me puedo alojar?",
+      "keywords": [
+        "alojamiento",
+        "hotel",
+        "hoteles",
+        "hospedaje",
+        "dormir",
+        "donde quedarme",
+        "apart",
+        "residencial",
+        "temporario"
+      ],
+      "respuesta": "Hay hoteles y alojamientos en Charata, a unos 5 km de la expo: Hotel Catange, Hotel Mocovi, Hotel Platinium, Hnos. Ferronato, Apart Malocas, entre otros. Consultá la lista completa con teléfonos en la sección de alojamientos.",
+      "related": ["como_llegar", "contacto"],
+      "sector": null
+    },
+    {
+      "id": "expo_inscripcion",
+      "pregunta": "¿Cómo me inscribo como expositor?",
+      "keywords": [
+        "inscripción",
+        "inscripcion",
+        "inscribirme",
+        "participar",
+        "anotarme",
+        "registrarme",
+        "como expongo",
+        "quiero exponer"
+      ],
+      "respuesta": "Para inscribirte como expositor escribí a agroneacharata@gmail.com o al WhatsApp 3794 222011. El equipo de Agronea te va a orientar en el proceso.",
+      "sector": null,
+      "audiencia": "expositor"
+    },
+    {
+      "id": "expo_que_incluye",
+      "pregunta": "¿Qué incluye la compra del stand?",
+      "keywords": [
+        "que incluye",
+        "incluye stand",
+        "servicios stand",
+        "que tengo",
+        "beneficios stand"
+      ],
+      "respuesta": "La compra del stand incluye: uso del espacio durante armado, exhibición y desarme; limitación entre stands; en stands cubiertos paneles, cenefa y spot de iluminación; en aire libre área amojonada y pisos; cajas comunes para conexión eléctrica; credenciales e invitaciones según reglamento; mención en el catálogo online; y vigilancia general de la feria. No incluye vigilancia especial, personal de atención, fotografía/publicidad especial ni limpieza del stand.",
+      "sector": null,
+      "audiencia": "expositor"
+    },
+    {
+      "id": "expo_sorteo_stands",
+      "pregunta": "¿Cuándo fue el sorteo de stands?",
+      "keywords": [
+        "sorteo",
+        "sorteo stands",
+        "numero stand",
+        "número stand",
+        "asignacion stand",
+        "asignación stand"
+      ],
+      "respuesta": "El sorteo de stands se realizó el 3 de junio de 2026. Para consultar tu stand asignado escribí a agroneacharata@gmail.com.",
+      "sector": null,
+      "audiencia": "expositor"
+    },
+    {
+      "id": "expo_instalacion",
+      "pregunta": "¿Cuándo puedo instalar mi stand?",
+      "keywords": [
+        "instalar",
+        "instalación",
+        "instalacion",
+        "armar",
+        "armado",
+        "montaje",
+        "montar",
+        "cuando entro",
+        "acceso previo",
+        "dia previo"
+      ],
+      "respuesta": "Los stands al aire libre se pueden armar desde el lunes 29 de junio, de 9 a 18 hs. Los stands cubiertos se habilitan desde el miércoles 1 de julio. Todos los armadores deben retirarse el jueves 2 de julio antes de las 20:00 hs. Después de ese horario queda prohibido ingresar vehículos al predio.",
+      "sector": null,
+      "audiencia": "expositor"
+    },
+    {
+      "id": "expo_desmontaje",
+      "pregunta": "¿Cuándo puedo desmontar mi stand?",
+      "keywords": [
+        "desmontar",
+        "desmontaje",
+        "desarmar",
+        "retirar",
+        "retiro",
+        "cuando me voy",
+        "salida",
+        "fin del evento",
+        "desarme"
+      ],
+      "respuesta": "El desarme comienza el lunes 6 de julio. Los expositores deben retirar productos y stands, y devolver el lote en las mismas condiciones, dentro de las 48 horas posteriores al cierre (domingo 5 de julio).",
+      "sector": null,
+      "audiencia": "expositor"
+    },
+    {
+      "id": "expo_horario_reposicion",
+      "pregunta": "¿Cuál es el horario de reposición de mercaderías?",
+      "keywords": [
+        "reposicion",
+        "reposición",
+        "mercaderia",
+        "mercaderías",
+        "horario expositor",
+        "cuando abrir stand",
+        "abrir stand"
+      ],
+      "respuesta": "El horario de reposición de mercaderías es de 8:00 a 8:45 hs. El expositor debe abrir su stand 15 minutos antes de la apertura al público (8:45 hs) y mantenerlo abierto con personal hasta el cierre (18:00 hs).",
+      "sector": null,
+      "audiencia": "expositor"
+    },
+    {
+      "id": "expo_electricidad",
+      "pregunta": "¿Hay suministro eléctrico en los stands?",
+      "keywords": [
+        "electricidad",
+        "eléctrico",
+        "electrico",
+        "luz",
+        "corriente",
+        "enchufe",
+        "energia",
+        "energía"
+      ],
+      "respuesta": "Sí. El stand incluye conexión eléctrica sin costo hasta 1 Kw/hora (monofásica o trifásica). Si necesitás mayor potencia podés solicitarlo con cargo adicional; los formularios de electricidad deben entregarse 30 días antes de la inauguración. Consultas: agroneacharata@gmail.com.",
+      "sector": null,
+      "audiencia": "expositor"
+    },
+    {
+      "id": "expo_agua",
+      "pregunta": "¿Hay agua disponible en los stands?",
+      "keywords": [
+        "agua",
+        "desague",
+        "desagüe",
+        "pileta",
+        "conexion agua",
+        "conexión agua",
+        "grifo"
+      ],
+      "respuesta": "No se proveen conexiones de agua ni desagüe. Si necesitás este servicio consultá la factibilidad según la ubicación de tu stand a agroneacharata@gmail.com.",
+      "sector": null,
+      "audiencia": "expositor"
+    },
+    {
+      "id": "expo_seguridad",
+      "pregunta": "¿Hay seguridad nocturna en el predio?",
+      "keywords": [
+        "seguridad nocturna",
+        "vigilancia noche",
+        "dejar cosas",
+        "custodiar",
+        "guardia nocturno"
+      ],
+      "respuesta": "Sí, hay seguridad nocturna y vigilancia general durante los tres días. Aclaración: el Comité no se responsabiliza por robos o hurtos dentro de cada stand; el expositor es responsable de sus bienes.",
+      "sector": null,
+      "audiencia": "expositor"
+    },
+    {
+      "id": "expo_acreditaciones",
+      "pregunta": "¿Cómo obtengo mis acreditaciones?",
+      "keywords": [
+        "acreditación",
+        "acreditacion",
+        "credencial",
+        "credenciales",
+        "pase",
+        "identificación",
+        "identificacion",
+        "carnet",
+        "badge"
+      ],
+      "respuesta": "Las acreditaciones varían según el tamaño del stand. Stands al aire libre: 1 credencial cada 50 m² (mínimo 3). Stands cubiertos: 3 credenciales cada 9 m². Máximo 15. Cada credencial es personal e intransferible. Consultas: agroneacharata@gmail.com.",
+      "sector": null,
+      "audiencia": "expositor"
+    },
+    {
+      "id": "expo_invitaciones",
+      "pregunta": "¿Me dan invitaciones para clientes?",
+      "keywords": [
+        "invitaciones",
+        "invitacion",
+        "invitar clientes",
+        "tickets gratis",
+        "entradas gratis expositor"
+      ],
+      "respuesta": "Sí. El número de invitaciones es proporcional al tamaño del stand, en la misma cantidad que las credenciales. Son válidas para cualquiera de los tres días.",
+      "sector": null,
+      "audiencia": "expositor"
+    },
+    {
+      "id": "expo_estacionamiento",
+      "pregunta": "¿Dónde estaciono como expositor?",
+      "keywords": [
+        "estacionamiento expositor",
+        "donde estaciono",
+        "parking expositor",
+        "playa expositor"
+      ],
+      "respuesta": "El estacionamiento exclusivo para expositores está en el sector sur, frente al ingreso principal. Si no usás esa playa, abonás el estacionamiento como cualquier visitante.",
+      "sector": "estacionamiento_expositores",
+      "audiencia": "expositor"
+    },
+    {
+      "id": "expo_ingreso_vehiculos",
+      "pregunta": "¿Puedo ingresar vehículos al predio?",
+      "keywords": [
+        "vehículo",
+        "vehiculo",
+        "camión",
+        "camion",
+        "maquinaria ingreso",
+        "cargar",
+        "descargar",
+        "ingreso vehiculo"
+      ],
+      "respuesta": "El ingreso de vehículos para descarga está permitido durante el armado (29 de junio al 2 de julio hasta las 20:00 hs). Después queda prohibido. Durante el evento, la velocidad máxima en el predio es de 10 km/h.",
+      "sector": null,
+      "audiencia": "expositor"
+    },
+    {
+      "id": "expo_seguro",
+      "pregunta": "¿Necesito seguro para participar?",
+      "keywords": [
+        "seguro",
+        "poliza",
+        "póliza",
+        "responsabilidad civil",
+        "rc comprensiva",
+        "matafuego"
+      ],
+      "respuesta": "Sí. Es obligatorio contratar un Seguro de Responsabilidad Civil Comprensiva por stand y presentar copia de la póliza y comprobante de pago. Además, cada stand debe tener al menos un matafuego según su superficie.",
+      "sector": null,
+      "audiencia": "expositor"
+    },
+    {
+      "id": "expo_musica",
+      "pregunta": "¿Puedo poner música en mi stand?",
+      "keywords": [
+        "música",
+        "musica",
+        "sonido",
+        "altavoz",
+        "parlante",
+        "audio",
+        "sadaic",
+        "aadicapif",
+        "argentores"
+      ],
+      "respuesta": "Podés poner música pero el volumen no debe exceder 20 DB a 1 metro del perímetro del stand. Además debés acreditar el cumplimiento ante SADAIC, AADICAPIF y ARGENTORES y asumir los pagos correspondientes.",
+      "sector": null,
+      "audiencia": "expositor"
+    },
+    {
+      "id": "expo_stands_cubiertos_normas",
+      "pregunta": "¿Qué puedo hacer en un stand cubierto?",
+      "keywords": [
+        "stand cubierto",
+        "panel",
+        "paneles",
+        "clavar",
+        "pintar panel",
+        "pegar panel",
+        "normas stand cubierto"
+      ],
+      "respuesta": "En stands cubiertos solo podés fijar materiales autoadhesivos en los paneles. Prohibido pintar, pegar con pegamentos, agujerear o clavar. No usar la estructura como soporte de vitrinas pesadas.",
+      "sector": null,
+      "audiencia": "expositor"
+    },
+    {
+      "id": "expo_publicidad_normas",
+      "pregunta": "¿Puedo poner publicidad fuera de mi stand?",
+      "keywords": [
+        "publicidad fuera",
+        "cartel fuera",
+        "banner fuera",
+        "publicidad exterior",
+        "cartel exterior"
+      ],
+      "respuesta": "No. Toda publicidad debe realizarse dentro del stand y no puede superar el límite del lote. Para publicidad fuera del stand necesitás autorización por escrito de la organización.",
+      "sector": null,
+      "audiencia": "expositor"
+    },
+    {
+      "id": "expo_limpieza",
+      "pregunta": "¿Hay servicio de limpieza?",
+      "keywords": [
+        "limpieza",
+        "basura",
+        "residuos",
+        "recolección",
+        "recoleccion",
+        "higiene"
+      ],
+      "respuesta": "El predio cuenta con servicio general de limpieza de áreas comunes. La limpieza de cada stand está a cargo del expositor.",
+      "sector": null,
+      "audiencia": "expositor"
+    },
+    {
+      "id": "expo_acto_inaugural",
+      "pregunta": "¿Cuándo es el acto inaugural?",
+      "keywords": [
+        "acto inaugural",
+        "inauguracion",
+        "inauguración",
+        "apertura oficial",
+        "ceremonia"
+      ],
+      "respuesta": "El acto inaugural de Expo Agronea 2026 (Edición 23°) es el viernes 3 de julio a las 11:00 hs en el Pórtico Principal. La feria abre al público a las 9:00 hs.",
+      "sector": null,
+      "audiencia": "expositor"
+    },
+    {
+      "id": "expo_cesion",
+      "pregunta": "¿Puedo ceder o compartir mi stand?",
+      "keywords": [
+        "ceder",
+        "compartir",
+        "subalquilar",
+        "transferir",
+        "prestar stand",
+        "vender stand"
+      ],
+      "respuesta": "No. El expositor no puede ceder, donar, vender, alquilar, transferir ni compartir el lote adjudicado ni parte del mismo sin autorización previa por escrito de Agronea.",
+      "sector": null,
+      "audiencia": "expositor"
+    },
+    {
+      "id": "expo_contacto_organizacion",
+      "pregunta": "¿Con quién me contacto para consultas de expositor?",
+      "keywords": [
+        "contacto expositor",
+        "responsable",
+        "organización expositor",
+        "quien me atiende",
+        "coordinador",
+        "encargado expositor",
+        "consulta expositor",
+        "info expositor"
+      ],
+      "respuesta": "Para consultas de expositores: WhatsApp 3794 222011, email agroneacharata@gmail.com. Oficina en Caseros 539, Charata. Horario: lunes a viernes 8 a 12hs y 16 a 20hs, sábados 8 a 12hs.",
+      "sector": null,
+      "audiencia": "expositor"
+    },
+    {
+      "id": "expo_pago",
+      "pregunta": "¿Cómo y cuándo se paga el stand?",
+      "keywords": [
+        "pago stand",
+        "pagar stand",
+        "factura",
+        "precio stand",
+        "costo stand",
+        "cuanto sale stand",
+        "transferencia stand",
+        "cuota"
+      ],
+      "respuesta": "Para información sobre pagos y costos de stands contactá a la organización: agroneacharata@gmail.com o WhatsApp 3794 222011.",
+      "sector": null,
+      "audiencia": "expositor"
+    },
+    {
+      "id": "expo_normas",
+      "pregunta": "¿Hay reglamento para expositores?",
+      "keywords": [
+        "normas",
+        "reglamento",
+        "reglas",
+        "prohibido",
+        "permitido",
+        "conducta",
+        "instructivo",
+        "penalidad",
+        "contrato"
+      ],
+      "respuesta": "Sí. Hay un Reglamento General e Instructivo con todas las normas (construcción, alturas, electricidad, penalidades, rescisión). Para recibirlo escribí a agroneacharata@gmail.com o al WhatsApp 3794 222011.",
+      "sector": null,
+      "audiencia": "expositor"
+    },
+    {
+      "id": "prov_carpas",
+      "pregunta": "¿Quién alquila carpas?",
+      "keywords": ["carpa", "carpas", "alquiler carpa", "gazebo", "toldo"],
+      "respuesta": "Proveedores sugeridos de carpas: Alquileres Iberá (03644-351531), Carpas Joselito (03483-498523), JC Eventos Carpas (3865 22-3260), Pastori Producciones (362 4256256). Ver más en la sección de proveedores.",
+      "sector": null,
+      "audiencia": "expositor"
+    },
+    {
+      "id": "prov_stands",
+      "pregunta": "¿Quién arma stands?",
+      "keywords": [
+        "armar stand",
+        "armado stand",
+        "constructora stand",
+        "montaje stand",
+        "quien arma"
+      ],
+      "respuesta": "Proveedores sugeridos para armado de stands: CDF Constructiva (362 421-3602), Oersted Muebles (3624644662), PSG Productora (3624242253), Intermedios Diseños y Cartelería (3731-629096), AP Arquitecta (36248 66086).",
+      "sector": null,
+      "audiencia": "expositor"
+    },
+    {
+      "id": "prov_sonido",
+      "pregunta": "¿Quién alquila sonido, pantallas o iluminación?",
+      "keywords": [
+        "sonido",
+        "pantalla",
+        "tv led",
+        "iluminacion",
+        "iluminación",
+        "audio",
+        "luces"
+      ],
+      "respuesta": "Proveedores sugeridos: Sky Producciones (364-44630977), FG Sonido e Iluminación (3731-536252), Servicios Juliana (3735-453963), Mariano Gómez (3731-625250).",
+      "sector": null,
+      "audiencia": "expositor"
+    },
+    {
+      "id": "prov_seguridad",
+      "pregunta": "¿Quién ofrece seguridad privada?",
+      "keywords": [
+        "seguridad privada",
+        "vigilancia privada",
+        "custodia",
+        "guardia stand"
+      ],
+      "respuesta": "Proveedor sugerido: Vigilancia y Seguridad Privada Charata (Carlos Díaz), Cel 3731 51-2964.",
+      "sector": null,
+      "audiencia": "expositor"
+    },
+    {
+      "id": "prov_banos",
+      "pregunta": "¿Quién alquila baños químicos?",
+      "keywords": [
+        "baño quimico",
+        "baños quimicos",
+        "sanitario quimico",
+        "baño portatil"
+      ],
+      "respuesta": "Proveedores sugeridos: Alquileres Iberá (03644-351531), Carpas Joselito (03483-498523), Marisa (3735-540753).",
+      "sector": null,
+      "audiencia": "expositor"
+    },
+    {
+      "id": "prov_general",
+      "pregunta": "¿Tienen proveedores sugeridos?",
+      "keywords": [
+        "proveedor",
+        "proveedores",
+        "sugeridos",
+        "servicios",
+        "mobiliario",
+        "promotoras",
+        "agua",
+        "indumentaria",
+        "fotografia",
+        "plantas",
+        "mastiles"
+      ],
+      "respuesta": "Sí, hay un listado de proveedores sugeridos para carpas, mástiles, armado de stands, sonido, mobiliario, seguridad, plantas, fotografía, promotoras, agua, indumentaria y baños químicos. Decime qué rubro necesitás o consultá la sección de proveedores.",
+      "sector": null,
+      "audiencia": "expositor"
+    }
+  ]
+}

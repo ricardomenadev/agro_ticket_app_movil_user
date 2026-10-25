@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -6,195 +6,279 @@ import {
   TouchableOpacity,
   StyleSheet,
   StatusBar,
-  SafeAreaView,
-  Image,
-  Platform,
   Linking,
   Alert,
-} from "react-native";
-import {
-  ShoppingCart,
-  ExternalLink,
-  Ticket,
-  Car,
-  Shirt,
-  Gift,
-  ArrowRight,
-} from "lucide-react-native";
+  Animated,
+  Dimensions,
+  Easing,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { COLORS } from "../../constants/colors";
+import { Ionicons } from '@expo/vector-icons';
+import { COLORS } from '../../styles/theme';
 
-const ShopScreen = ({ navigation }) => {
-  // Función para abrir la tienda online
-  const handleOpenStore = async () => {
-    const url = "https://agronea.store";
-    
-    try {
-      const supported = await Linking.canOpenURL(url);
-      
-      if (supported) {
-        await Linking.openURL(url);
-      } else {
-        Alert.alert(
-          "Error",
-          "No se puede abrir el enlace. Por favor, visita agronea.store desde tu navegador."
-        );
-      }
-    } catch (error) {
-      console.error("Error al abrir la tienda:", error);
-      Alert.alert(
-        "Error",
-        "Hubo un problema al abrir la tienda. Por favor, intenta nuevamente."
-      );
+const { width: screenWidth } = Dimensions.get('window');
+
+const STORE_URL = 'https://agronea.store';
+
+const openStore = async () => {
+  try {
+    const supported = await Linking.canOpenURL(STORE_URL);
+    if (supported) {
+      await Linking.openURL(STORE_URL);
+    } else {
+      Alert.alert('Error', 'No se puede abrir el enlace. Visitá agronea.store desde tu navegador.');
     }
-  };
+  } catch {
+    Alert.alert('Error', 'Hubo un problema al abrir la tienda. Intentá nuevamente.');
+  }
+};
 
-  // Productos/categorías disponibles en la tienda
-  const storeCategories = [
-    {
-      id: 1,
-      icon: <Ticket size={32} color={COLORS.primary} />,
-      title: "Entradas",
-      description: "Acceso general al evento y actividades especiales",
-    },
-    // {
-    //   id: 2,
-    //   icon: <Car size={32} color={COLORS.primary} />,
-    //   title: "Estacionamiento",
-    //   description: "Para vehículos y motocicletas en zonas seguras",
-    // },
-    {
-      id: 3,
-      icon: <Shirt size={32} color={COLORS.primary} />,
-      title: "Merchandising",
-      description: "Remeras, gorras y productos oficiales del evento",
-    },
-    {
-      id: 4,
-      icon: <Gift size={32} color={COLORS.primary} />,
-      title: "Souvenirs",
-      description: "Recuerdos únicos y exclusivos de AGRONEA 2025",
-    },
+// ── PATRÓN DE CUADRADOS — identidad visual Agronea
+// Mismo elemento que en los tickets y cards del web
+const PatternGrid = ({ cols = 8, rows = 6, color = 'rgba(10,143,60,0.12)' }) => {
+  const squares = Array.from({ length: cols * rows });
+  return (
+    <View style={[StyleSheet.absoluteFill, { flexDirection: 'row', flexWrap: 'wrap', padding: 5, gap: 4 }]}>
+      {squares.map((_, i) => (
+        <View
+          key={i}
+          style={{
+            width: (screenWidth - 10 - (cols - 1) * 4) / cols,
+            height: ((screenWidth * 0.55) - 10 - (rows - 1) * 4) / rows,
+            borderRadius: 3,
+            backgroundColor: color,
+          }}
+        />
+      ))}
+    </View>
+  );
+};
+
+// ── CATEGORY CARD — mismo estilo que ProductCard del web
+const CategoryCard = ({ icon, title, description, delay, index }) => {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(20)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, { toValue: 1, duration: 400, delay, useNativeDriver: true }),
+      Animated.timing(slideAnim, {
+        toValue: 0, duration: 400, delay,
+        easing: Easing.out(Easing.ease), useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
+  return (
+    <Animated.View
+      style={[
+        styles.categoryCard,
+        { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
+        index % 2 === 0 ? { marginRight: 6 } : { marginLeft: 6 },
+      ]}
+    >
+      {/* Línea de acento verde→dorado — igual que ProductCard web */}
+      <View style={styles.categoryCardAccent} />
+
+      <View style={styles.categoryIconContainer}>
+        <Ionicons name={icon} size={24} color="#4ade80" />
+      </View>
+      <Text style={styles.categoryTitle}>{title}</Text>
+      <Text style={styles.categoryDescription}>{description}</Text>
+    </Animated.View>
+  );
+};
+
+// ── FEATURE ITEM
+const FeatureItem = ({ text, delay }) => {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(16)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, { toValue: 1, duration: 350, delay, useNativeDriver: true }),
+      Animated.timing(slideAnim, {
+        toValue: 0, duration: 350, delay,
+        easing: Easing.out(Easing.ease), useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
+  return (
+    <Animated.View style={[styles.featureItem, { opacity: fadeAnim, transform: [{ translateX: slideAnim }] }]}>
+      <View style={styles.featureCheck}>
+        <Ionicons name="checkmark" size={11} color="white" />
+      </View>
+      <Text style={styles.featureText}>{text}</Text>
+    </Animated.View>
+  );
+};
+
+const ShopScreen = () => {
+  const buttonScale = useRef(new Animated.Value(1)).current;
+  const heroFade   = useRef(new Animated.Value(0)).current;
+  const heroSlide  = useRef(new Animated.Value(20)).current;
+
+  useEffect(() => {
+    // Entrada del hero
+    Animated.parallel([
+      Animated.timing(heroFade,  { toValue: 1, duration: 500, delay: 100, useNativeDriver: true }),
+      Animated.timing(heroSlide, {
+        toValue: 0, duration: 500, delay: 100,
+        easing: Easing.out(Easing.ease), useNativeDriver: true,
+      }),
+    ]).start();
+
+    // Pulso sutil en el botón CTA
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(buttonScale, { toValue: 1.025, duration: 1200, useNativeDriver: true }),
+        Animated.timing(buttonScale, { toValue: 1,     duration: 1200, useNativeDriver: true }),
+      ]),
+    ).start();
+  }, []);
+
+  const categories = [
+    { icon: 'ticket-outline',  title: 'Entradas',        description: 'Acceso general al evento y actividades' },
+    { icon: 'shirt-outline',   title: 'Merchandising',   description: 'Remeras, gorras y productos oficiales' },
+    { icon: 'gift-outline',    title: 'Souvenirs',       description: 'Recuerdos únicos de AGRONEA 2026' },
+    { icon: 'car-outline',     title: 'Estacionamiento', description: 'Zonas seguras para vehículos y motos' },
+  ];
+
+  const features = [
+    'Pago seguro con múltiples métodos',
+    'Entrega inmediata de tickets digitales',
+    'Soporte para consultas antes del evento',
+    'Precios oficiales garantizados',
   ];
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar backgroundColor={COLORS.background} barStyle="light-content" />
-      
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Banner del evento */}
-        <View style={styles.bannerContainer}>
-          <Image
-            source={require("../../../assets/logoAgronea2.png")}
-            style={styles.bannerImageInside}
-            resizeMode="contain"
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <StatusBar backgroundColor="transparent" barStyle="light-content" translucent />
+
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+
+        {/* ── HERO — patrón de cuadrados + brillo radial + texto ── */}
+        <View style={styles.heroContainer}>
+
+          {/* Fondo base oscuro con gradiente verde sutil */}
+          <LinearGradient
+            colors={['#0a1a0a', '#080808', '#050505']}
+            start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+            style={StyleSheet.absoluteFill}
           />
-          <View style={styles.textContainer}>
-            <Text style={styles.bannerMainText}>
-              AGRONEA 2025 - Tienda Oficial
+
+          {/* Patrón de cuadrados redondeados — identidad Agronea */}
+          <PatternGrid cols={8} rows={6} color="rgba(10,143,60,0.1)" />
+
+          {/* Brillo radial verde centrado */}
+          <View style={styles.heroGlow} />
+
+          {/* Contenido del hero */}
+          <Animated.View
+            style={[
+              styles.heroContent,
+              { opacity: heroFade, transform: [{ translateY: heroSlide }] },
+            ]}
+          >
+            {/* Eyebrow */}
+            <Text style={styles.heroEyebrow}>Tienda oficial · Agronea 2026</Text>
+
+            {/* Título grande — igual que el web */}
+            <Text style={styles.heroTitle}>
+              TIENDA{'\n'}
+              <Text style={styles.heroTitleAccent}>AGRONEA</Text>
             </Text>
-            <Text style={styles.bannerSubText}>
-              Adquiere tus entradas y productos oficiales
-            </Text>
-          </View>
-        </View>
 
-        {/* Contenido principal */}
-        <View style={styles.mainContent}>
-          {/* Icono principal */}
-          <View style={styles.iconContainer}>
-            <LinearGradient
-              colors={[COLORS.primary, '#B8860B']}
-              style={styles.iconGradient}
-            >
-              <ShoppingCart size={48} color="white" />
-            </LinearGradient>
-          </View>
-
-          {/* Título principal */}
-          <Text style={styles.mainTitle}>
-            ¡Bienvenido a nuestra Tienda Online!
-          </Text>
-
-          {/* Descripción */}
-          <Text style={styles.description}>
-            Para una experiencia de compra completa y segura, te invitamos a visitar nuestra tienda oficial en línea donde encontrarás todo lo que necesitas para AGRONEA 2025.
-          </Text>
-
-          {/* Categorías de productos */}
-          <View style={styles.categoriesSection}>
-            <Text style={styles.sectionTitle}>¿Qué puedes encontrar?</Text>
-            
-            <View style={styles.categoriesGrid}>
-              {storeCategories.map((category) => (
-                <View key={category.id} style={styles.categoryCard}>
-                  <View style={styles.categoryIcon}>
-                    {category.icon}
-                  </View>
-                  <Text style={styles.categoryTitle}>{category.title}</Text>
-                  <Text style={styles.categoryDescription}>
-                    {category.description}
-                  </Text>
+            {/* Píldoras — mismo estilo que los tickets */}
+            <View style={styles.heroPills}>
+              {['28ª Edición', 'Jul 3–5 · 2026'].map((text) => (
+                <View key={text} style={styles.heroPill}>
+                  <Text style={styles.heroPillText}>{text}</Text>
                 </View>
               ))}
             </View>
+          </Animated.View>
+
+          {/* Línea cromática inferior — igual que en todos los componentes del web */}
+          <View style={styles.heroLine} />
+
+        </View>
+
+        {/* ── BODY ── */}
+        <View style={styles.body}>
+
+          {/* Metadata del evento — igual que el hero web */}
+          <View style={styles.metaRow}>
+            {[
+              { label: 'Fecha', value: '3, 4 y 5 de Julio' },
+              { label: 'Lugar', value: 'Ruta 16 km 264' },
+              { label: 'Edición', value: '28ª' },
+            ].map(({ label, value }) => (
+              <View key={label} style={styles.metaItem}>
+                <Text style={styles.metaLabel}>{label}</Text>
+                <Text style={styles.metaValue}>{value}</Text>
+              </View>
+            ))}
           </View>
 
-          {/* Características de la tienda */}
-          <View style={styles.featuresSection}>
-            <View style={styles.featureItem}>
-              <View style={styles.featureBullet} />
-              <Text style={styles.featureText}>Pago seguro con múltiples métodos</Text>
-            </View>
-            <View style={styles.featureItem}>
-              <View style={styles.featureBullet} />
-              <Text style={styles.featureText}>Entrega inmediata de tickets digitales</Text>
-            </View>
-            <View style={styles.featureItem}>
-              <View style={styles.featureBullet} />
-              <Text style={styles.featureText}>Soporte 24/7 para consultas</Text>
-            </View>
-            <View style={styles.featureItem}>
-              <View style={styles.featureBullet} />
-              <Text style={styles.featureText}>Precios oficiales garantizados</Text>
-            </View>
+          <Text style={styles.description}>
+            Conseguí tus entradas y productos oficiales de AGRONEA 2026 desde nuestra tienda online. Rápido, seguro y desde donde estés.
+          </Text>
+
+          {/* Sección categorías */}
+          <Text style={styles.sectionLabel}>¿QUÉ ENCONTRÁS?</Text>
+          <View style={styles.categoriesGrid}>
+            {categories.map((cat, i) => (
+              <CategoryCard
+                key={cat.title}
+                icon={cat.icon}
+                title={cat.title}
+                description={cat.description}
+                index={i}
+                delay={200 + i * 80}
+              />
+            ))}
           </View>
 
-          {/* Botón principal */}
-          <TouchableOpacity 
-            style={styles.storeButton}
-            onPress={handleOpenStore}
-            activeOpacity={0.9}
-          >
-            <LinearGradient
-              colors={[COLORS.primary, '#B8860B']}
-              style={styles.storeButtonGradient}
-            >
-              <ShoppingCart size={24} color="white" style={styles.buttonIcon} />
-              <Text style={styles.storeButtonText}>Ir a la Tienda Online</Text>
-              <ExternalLink size={20} color="white" />
-            </LinearGradient>
-          </TouchableOpacity>
+          {/* Features card */}
+          <View style={styles.featuresCard}>
+            {features.map((f, i) => (
+              <FeatureItem key={f} text={f} delay={500 + i * 70} />
+            ))}
+          </View>
 
-          {/* URL alternativa */}
-          <TouchableOpacity 
-            style={styles.urlContainer}
-            onPress={handleOpenStore}
-          >
+          {/* CTA principal */}
+          <Animated.View style={[styles.buttonWrapper, { transform: [{ scale: buttonScale }] }]}>
+            <TouchableOpacity onPress={openStore} activeOpacity={0.85} style={styles.buttonTouchable}>
+              <LinearGradient
+                colors={['#0A8F3C', '#064D20']}
+                start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                style={styles.button}
+              >
+                <Ionicons name="bag-handle-outline" size={20} color="white" />
+                <Text style={styles.buttonText}>IR A LA TIENDA</Text>
+                <Ionicons name="arrow-forward" size={16} color="rgba(255,255,255,0.6)" />
+              </LinearGradient>
+            </TouchableOpacity>
+          </Animated.View>
+
+          {/* URL row */}
+          <TouchableOpacity style={styles.urlRow} onPress={openStore} activeOpacity={0.7}>
+            <Ionicons name="globe-outline" size={14} color="#0A8F3C" />
             <Text style={styles.urlText}>agronea.store</Text>
-            <ArrowRight size={16} color={COLORS.primary} />
+            <Ionicons name="open-outline" size={13} color="rgba(255,255,255,0.25)" />
           </TouchableOpacity>
 
-          {/* Nota adicional */}
-          <View style={styles.noteContainer}>
+          {/* Nota informativa */}
+          <View style={styles.note}>
+            <Ionicons name="information-circle-outline" size={15} color="rgba(255,255,255,0.25)" />
             <Text style={styles.noteText}>
-              💡 Tip: Guarda el enlace en tus favoritos para acceder rápidamente a futuras compras
+              Guardá el enlace en favoritos para acceder rápido antes del evento.
             </Text>
           </View>
+
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -204,199 +288,273 @@ const ShopScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: COLORS.background,
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-    marginBottom: 16,
-  },
-  container: {
-    flex: 1,
+    backgroundColor: '#050505',
   },
   scrollContent: {
-    paddingBottom: 40,
+    paddingBottom: 48,
   },
-  bannerContainer: {
-    height: 80,
-    backgroundColor: "rgba(0,0,0,0.6)",
-    padding: 12,
-    flexDirection: "row",
-    alignItems: "center",
+
+  // ── HERO
+  heroContainer: {
+    height: screenWidth * 0.65, // proporcional al ancho de pantalla
+    position: 'relative',
+    overflow: 'hidden',
+    justifyContent: 'flex-end',
   },
-  bannerImageInside: {
-    width: 60,
-    height: 60,
+  heroGlow: {
+    position: 'absolute',
+    width: screenWidth * 0.7,
+    height: screenWidth * 0.7,
+    borderRadius: screenWidth * 0.35,
+    backgroundColor: 'transparent',
+    // Brillo radial simulado con sombra
+    shadowColor: '#0A8F3C',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.25,
+    shadowRadius: 80,
+    alignSelf: 'center',
+    top: '20%',
   },
-  textContainer: {
-    marginLeft: 12,
-    flex: 1,
+  heroContent: {
+    padding: 24,
+    paddingBottom: 28,
   },
-  bannerMainText: {
-    color: COLORS.text,
-    fontSize: 18,
-    fontWeight: "bold",
+  heroEyebrow: {
+    fontSize: 9,
+    letterSpacing: 3,
+    textTransform: 'uppercase',
+    color: 'rgba(10,143,60,0.85)',
+    marginBottom: 8,
+    fontWeight: '600',
   },
-  bannerSubText: {
-    color: COLORS.textSecondary,
+  heroTitle: {
+    fontSize: 44,
+    fontWeight: '900',
+    color: '#fff',
+    letterSpacing: -2,
+    lineHeight: 40,
+    marginBottom: 12,
+  },
+  heroTitleAccent: {
+    color: '#FFD700',
+  },
+  heroPills: {
+    flexDirection: 'row',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  heroPill: {
+    backgroundColor: 'rgba(10,143,60,0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(10,143,60,0.3)',
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 3,
+  },
+  heroPillText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#4ade80',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+  },
+  // Línea cromática — igual que en el web
+  heroLine: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 2,
+    // LinearGradient no funciona en View nativo, simulamos con un degradé de color
+    backgroundColor: '#0A8F3C',
+    opacity: 0.8,
+  },
+
+  // ── BODY
+  body: {
+    paddingHorizontal: 16,
+    paddingTop: 20,
+  },
+
+  // Metadata del evento
+  metaRow: {
+    flexDirection: 'row',
+    gap: 20,
+    marginBottom: 18,
+    paddingBottom: 18,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.06)',
+  },
+  metaItem: {},
+  metaLabel: {
+    fontSize: 8,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    color: 'rgba(255,255,255,0.25)',
+    marginBottom: 2,
+  },
+  metaValue: {
     fontSize: 12,
-    marginTop: 2,
+    fontWeight: '700',
+    color: 'rgba(255,255,255,0.75)',
   },
-  mainContent: {
-    flex: 1,
-    padding: 20,
-    alignItems: 'center',
-  },
-  iconContainer: {
-    marginTop: 20,
-    marginBottom: 30,
-  },
-  iconGradient: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  mainTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: COLORS.text,
-    textAlign: 'center',
-    marginBottom: 16,
-    lineHeight: 36,
-  },
+
   description: {
-    fontSize: 16,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 32,
-    paddingHorizontal: 10,
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.35)',
+    lineHeight: 21,
+    marginBottom: 24,
   },
-  categoriesSection: {
-    width: '100%',
-    marginBottom: 32,
+
+  sectionLabel: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: 'rgba(255,255,255,0.25)',
+    letterSpacing: 2,
+    marginBottom: 12,
   },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: COLORS.text,
-    textAlign: 'center',
-    marginBottom: 20,
-  },
+
+  // Category cards — mismo estilo que ProductCard web
   categoriesGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    marginBottom: 20,
   },
   categoryCard: {
-    width: '48%',
-    backgroundColor: COLORS.card,
+    width: (screenWidth - 32 - 12) / 2,
+    backgroundColor: '#0d1117',
     borderRadius: 12,
-    padding: 16,
+    padding: 14,
     marginBottom: 12,
-    alignItems: 'center',
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: 'rgba(10,143,60,0.2)',
+    overflow: 'hidden',
   },
-  categoryIcon: {
+  // Línea de acento igual que ProductCard web
+  categoryCardAccent: {
+    height: 2,
+    marginHorizontal: -14,
     marginBottom: 12,
+    marginTop: -14,
+    backgroundColor: '#0A8F3C',
+    opacity: 0.6,
+  },
+  categoryIconContainer: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: 'rgba(10,143,60,0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(10,143,60,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
   },
   categoryTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: COLORS.text,
-    marginBottom: 8,
-    textAlign: 'center',
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 4,
   },
   categoryDescription: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.3)',
     lineHeight: 16,
   },
-  featuresSection: {
-    width: '100%',
-    marginBottom: 32,
+
+  // Features card
+  featuresCard: {
+    backgroundColor: '#0d1117',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(10,143,60,0.2)',
+    gap: 12,
   },
   featureItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
-    paddingHorizontal: 20,
+    gap: 10,
   },
-  featureBullet: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: COLORS.primary,
-    marginRight: 12,
+  featureCheck: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#0A8F3C',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   featureText: {
-    fontSize: 14,
-    color: COLORS.text,
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.7)',
     flex: 1,
   },
-  storeButton: {
-    width: '100%',
-    marginBottom: 16,
-    borderRadius: 12,
+
+  // Botón CTA
+  buttonWrapper: {
+    marginBottom: 12,
+    borderRadius: 14,
     overflow: 'hidden',
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowColor: '#0A8F3C',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 10,
   },
-  storeButtonGradient: {
+  buttonTouchable: {
+    borderRadius: 14,
+    overflow: 'hidden',
+  },
+  button: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 18,
+    paddingVertical: 17,
     paddingHorizontal: 24,
+    gap: 10,
   },
-  buttonIcon: {
-    marginRight: 12,
-  },
-  storeButtonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
+  buttonText: {
+    fontSize: 15,
+    fontWeight: '800',
     color: 'white',
     flex: 1,
     textAlign: 'center',
-    marginRight: 12,
+    letterSpacing: 1,
   },
-  urlContainer: {
+
+  // URL row
+  urlRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
-    backgroundColor: 'rgba(255, 215, 0, 0.1)',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 215, 0, 0.3)',
-    marginBottom: 20,
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    marginBottom: 16,
   },
   urlText: {
-    fontSize: 16,
-    color: COLORS.primary,
+    fontSize: 14,
+    color: '#0A8F3C',
     fontWeight: '600',
-    marginRight: 8,
   },
-  noteContainer: {
-    backgroundColor: COLORS.card,
-    borderRadius: 8,
-    padding: 16,
+
+  // Nota informativa
+  note: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+    backgroundColor: '#0d1117',
+    borderRadius: 12,
+    padding: 14,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: 'rgba(255,255,255,0.06)',
+    marginBottom: 70,
   },
   noteText: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    lineHeight: 20,
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.3)',
+    lineHeight: 18,
+    flex: 1,
   },
 });
 

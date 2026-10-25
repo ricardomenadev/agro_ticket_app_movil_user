@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: COLORS.textSecondary,
-    marginBottom: 12,
+    marginBottom: 0,
     marginLeft: 8,
   },
   menuItem: {
