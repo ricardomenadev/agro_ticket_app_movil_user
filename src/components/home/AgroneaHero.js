@@ -21,8 +21,8 @@ const H = 220;
 const API_BASE = "https://api.agronea.store";
 const photo = (url) => (!url || /placeholder/.test(url) ? null : /^https?:/.test(url) ? url : `${API_BASE}${url.startsWith("/") ? "" : "/"}${url}`);
 
-const Cta = ({ label, onPress }) => (
-  <TouchableOpacity onPress={onPress} style={styles.cta} activeOpacity={0.85} accessibilityRole="button">
+const Cta = ({ label, onPress, center }) => (
+  <TouchableOpacity onPress={onPress} style={[styles.cta, center && styles.selfCenter]} activeOpacity={0.85} accessibilityRole="button">
     <Text style={styles.ctaText}>{label}</Text>
     <Ionicons name="arrow-forward" size={16} color="#000" />
   </TouchableOpacity>
@@ -43,13 +43,13 @@ const AgroneaHero = ({ agroneaNews }) => {
 
   const slides = [
     <ImageBackground key="brand" source={showcasePhoto ? { uri: typeof showcasePhoto === "string" ? showcasePhoto : showcasePhoto.url } : null} style={styles.slide} imageStyle={styles.radius}>
-      <LinearGradient colors={showcasePhoto ? ["rgba(0,0,0,0.2)", "rgba(0,0,0,0.85)"] : ["#0f6e3f", "#0a0a0a"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[styles.slideInner, styles.radius]}>
-        <View style={styles.logoCard}>
+      <LinearGradient colors={showcasePhoto ? ["rgba(0,0,0,0.2)", "rgba(0,0,0,0.85)"] : ["#0f6e3f", "#0a0a0a"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[styles.slideInner, styles.radius, styles.centered]}>
+        <View style={[styles.logoCard, styles.selfCenter]}>
           <Image source={require("../../../assets/images/logo_agronea_producciones.png")} style={styles.logo} resizeMode="contain" accessibilityLabel="Agronea Producciones" />
         </View>
-        <Text style={styles.title} numberOfLines={1}>{showcase?.settings?.title || "Agronea"}</Text>
-        <Text style={styles.text} numberOfLines={2}>{showcase?.settings?.subtitle || "El evento del agro del Norte Argentino"}</Text>
-        <Cta label="Conocé el evento" onPress={() => navigation.navigate("More", { screen: "Event" })} />
+        <Text style={[styles.title, styles.textCenter]} numberOfLines={1}>{showcase?.settings?.title || "Agronea"}</Text>
+        <Text style={[styles.text, styles.textCenter]} numberOfLines={2}>{showcase?.settings?.subtitle || "El evento del agro del Norte Argentino"}</Text>
+        <Cta label="Conocé el evento" center onPress={() => navigation.navigate("More", { screen: "Event" })} />
       </LinearGradient>
     </ImageBackground>,
 
@@ -155,6 +155,9 @@ const styles = StyleSheet.create({
   text: { color: C.soft, fontSize: 13, lineHeight: 18 },
   productImg: { width: H * 0.85, height: H, backgroundColor: "#fff" },
   frame: { borderWidth: 2, borderRadius: 22, overflow: "hidden" },
+  centered: { alignItems: "center" },
+  selfCenter: { alignSelf: "center" },
+  textCenter: { textAlign: "center" },
   socialRow: { flexDirection: "row", alignItems: "center", gap: 14 },
   socialIcon: { width: 64, height: 64, borderRadius: 32, backgroundColor: "rgba(255,255,255,0.18)", alignItems: "center", justifyContent: "center" },
   socialEyebrow: { color: "#fff", opacity: 0.85, fontSize: 10, letterSpacing: 2, fontWeight: "700" },
