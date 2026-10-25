@@ -25,6 +25,28 @@ export const useShowcase = () => {
   return data;
 };
 
+// Clima de Charata (Open-Meteo, sin clave): ahora, máxima, mínima y probabilidad de lluvia del día
+const WEATHER_URL =
+  "https://api.open-meteo.com/v1/forecast?latitude=-27.2144&longitude=-61.1882" +
+  "&current=temperature_2m,weather_code,is_day&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max" +
+  "&forecast_days=1&timezone=America%2FArgentina%2FBuenos_Aires";
+
+export const fetchWeather = async () => {
+  const res = await fetch(WEATHER_URL);
+  if (!res.ok) throw new Error(`clima: ${res.status}`);
+  const d = await res.json();
+  return {
+    temp: d.current?.temperature_2m,
+    code: d.current?.weather_code,
+    isDay: d.current?.is_day === 1,
+    max: d.daily?.temperature_2m_max?.[0],
+    min: d.daily?.temperature_2m_min?.[0],
+    rain: d.daily?.precipitation_probability_max?.[0],
+  };
+};
+
+export const useWeather = () => useCachedFeed("agroFeed.weather", fetchWeather).data;
+
 export const fetchNews = async () => {
   const res = await fetch(`${API_URL}/feed/news`);
   if (!res.ok) throw new Error(`noticias: ${res.status}`);

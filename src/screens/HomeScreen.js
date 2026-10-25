@@ -12,7 +12,19 @@ import CountdownTimer from "../components/home/CountdownTimer";
 import AgroneaHero from "../components/home/AgroneaHero";
 import { C, SectionHeader, PriceCard, PriceCardEmpty, NewsCard, NewsEmpty } from "../components/feed/FeedCards";
 import { fetchEvents } from "../api/apiMobile";
-import { useMarkets, useNews } from "../api/apiFeed";
+import { useMarkets, useNews, useWeather } from "../api/apiFeed";
+
+// Ícono según el código de clima de la OMM (0 despejado, 1-3 nubes, 45-48 niebla, 51-82 lluvia, 95+ tormenta)
+const weatherIcon = (w) => {
+  if (!w || w.code == null) return "partly-sunny-outline";
+  const c = w.code;
+  if (c === 0) return w.isDay ? "sunny-outline" : "moon-outline";
+  if (c <= 2) return w.isDay ? "partly-sunny-outline" : "cloudy-night-outline";
+  if (c <= 48) return "cloudy-outline";
+  if (c >= 95) return "thunderstorm-outline";
+  if (c >= 71 && c <= 77) return "snow-outline";
+  return "rainy-outline";
+};
 
 // Precios que se muestran en el inicio (el resto, en Mercados)
 const HOME_PRICES = [
@@ -69,6 +81,7 @@ const HomeScreen = () => {
   const [event, setEvent] = useState(null);
   const { markets } = useMarkets();
   const { news, loading: newsLoading } = useNews();
+  const weather = useWeather();
 
   useEffect(() => {
     fetchEvents()
@@ -87,10 +100,13 @@ const HomeScreen = () => {
             <Text style={styles.hello}>{greeting()}</Text>
           </View>
           <View style={styles.weather}>
-            <Ionicons name="sunny-outline" size={22} color={C.gold} />
+            <Ionicons name={weatherIcon(weather)} size={24} color={C.gold} />
             <View>
-              <Text style={styles.weatherTemp}>—°</Text>
-              <Text style={styles.weatherCity}>Charata</Text>
+              <Text style={styles.weatherTemp}>{weather?.temp != null ? `${Math.round(weather.temp)}°` : "—°"}</Text>
+              <Text style={styles.weatherCity}>
+                {weather?.max != null ? `${Math.round(weather.max)}° / ${Math.round(weather.min)}°` : "Charata"}
+              </Text>
+              {weather?.rain != null ? <Text style={styles.weatherCity}>💧 {weather.rain}% · Charata</Text> : null}
             </View>
           </View>
         </View>
