@@ -28,8 +28,28 @@ import ProvidersScreen from "../screens/more/ProvidersScreen";
 import EmergencyScreen from "../screens/more/EmergencyScreen";
 import ChatFAB from '../components/common/ChatFAB';
 
+import MarketsScreen from "../screens/MarketsScreen";
+import TicketsScreen from "../screens/TicketsScreen";
+import { TouchableOpacity, View, Text } from "react-native";
+
 // Importamos el tema y colores
 import { COLORS } from "../constants/colors";
+
+const ShopTabButton = ({ onPress, accessibilityState }) => (
+  <TouchableOpacity
+    onPress={onPress}
+    style={styles.shopBtnWrap}
+    accessibilityRole="button"
+    accessibilityLabel="Tienda"
+    accessibilityState={accessibilityState}
+    activeOpacity={0.85}
+  >
+    <View style={styles.shopBtn}>
+      <Ionicons name="bag-handle-outline" size={26} color="#06100a" />
+    </View>
+    <Text style={styles.shopLabel}>Tienda</Text>
+  </TouchableOpacity>
+);
 
 const Tab = createBottomTabNavigator();
 const MoreStack = createStackNavigator();
@@ -84,6 +104,16 @@ const MoreStackNavigator = () => {
         name="MoreMenu"
         component={MoreMenuScreen}
         options={{ title: "Más Opciones" }}
+      />
+      <MoreStack.Screen
+        name="Event"
+        component={EventInfoScreen}
+        options={{ title: "El evento" }}
+      />
+      <MoreStack.Screen
+        name="Exhibitors"
+        component={ExhibitorsStackNavigator}
+        options={{ headerShown: false }}
       />
       <MoreStack.Screen
         name="Login"
@@ -160,8 +190,8 @@ const MainTabNavigator = () => {
                 : 60 + insets.bottom,
           },
         ],
-        tabBarActiveTintColor: COLORS.primary,
-        tabBarInactiveTintColor: COLORS.textSecondary,
+        tabBarActiveTintColor: "#4ade80",
+        tabBarInactiveTintColor: "#9fb3a6",
         tabBarLabelStyle: styles.tabBarLabel,
       }}
     >
@@ -178,34 +208,33 @@ const MainTabNavigator = () => {
       />
 
       <Tab.Screen
-        name="Event"
-        component={EventInfoScreen}
+        name="Markets"
+        component={MarketsScreen}
         options={{
-          tabBarLabel: "Evento",
+          tabBarLabel: "Mercados",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="calendar-outline" size={size} color={color} />
+            <Ionicons name="trending-up-outline" size={size} color={color} />
           ),
         }}
       />
 
-      <Tab.Screen
-        name="Exhibitors"
-        component={ExhibitorsStackNavigator}
-        options={{
-          tabBarLabel: "Expositores",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="people-outline" size={size} color={color} />
-          ),
-        }}
-      />
-
+      {/* Tienda: botón grande en el centro, siempre visible haya o no evento */}
       <Tab.Screen
         name="Shop"
-        component={ShopStackNavigator} // Cambiado de ShopScreen a ShopStackNavigator
+        component={ShopStackNavigator}
         options={{
           tabBarLabel: "Tienda",
+          tabBarButton: (props) => <ShopTabButton {...props} />,
+        }}
+      />
+
+      <Tab.Screen
+        name="Tickets"
+        component={TicketsScreen}
+        options={{
+          tabBarLabel: "Entradas",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="cart-outline" size={size} color={color} />
+            <Ionicons name="ticket-outline" size={size} color={color} />
           ),
         }}
       />
@@ -228,9 +257,9 @@ const MainTabNavigator = () => {
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: COLORS.background,
+    backgroundColor: "#0a140d",
     borderTopWidth: 1,
-    borderTopColor: "#2A2A2A",
+    borderTopColor: "#213a2a",
     paddingTop: 5,
     position: "absolute",
     elevation: 8,
@@ -240,8 +269,31 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   tabBarLabel: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "500",
+  },
+  shopBtnWrap: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  shopBtn: {
+    width: 58,
+    height: 58,
+    marginTop: -26,
+    borderRadius: 29,
+    backgroundColor: "#F5C400",
+    borderWidth: 4,
+    borderColor: "#06100a",
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 6,
+  },
+  shopLabel: {
+    color: "#F5C400",
+    fontSize: 11,
+    fontWeight: "700",
+    marginTop: 2,
   },
 });
 

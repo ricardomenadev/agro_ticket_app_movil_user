@@ -43,6 +43,20 @@ const MoreMenuScreen = ({ navigation }) => {
         </View>
 
         <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Agronea</Text>
+          <MenuItem
+            title="El evento"
+            icon="calendar-outline"
+            onPress={() => navigation.navigate("Event")}
+          />
+          <MenuItem
+            title="Expositores"
+            icon="people-outline"
+            onPress={() => navigation.navigate("Exhibitors")}
+          />
+        </View>
+
+        <View style={styles.section}>
           <Text style={styles.sectionTitle}>Información</Text>
           <MenuItem
             title="Guía del Visitante"

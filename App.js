@@ -10,9 +10,11 @@ import MainTabNavigator from './src/navigation/MainTabNavigator';
 import { StoreProvider } from './src/context/StoreContext';
 import UpdateModal from './src/components/common/UpdateModal';
 import { registerForPushNotifications } from './src/utils/pushNotifications';
+import AnimatedSplash from './src/components/common/AnimatedSplash';
 
 export default function App() {
   const [versionChecked, setVersionChecked] = useState(false);
+  const [splashDone, setSplashDone] = useState(false);
 
   const [fontsLoaded] = useFonts({
     'Orbitron-Bold': require('./assets/fonts/Orbitron-VariableFont_wght.ttf'),
@@ -26,7 +28,7 @@ export default function App() {
 
   if (!fontsLoaded) {
     return (
-      <View style={{ flex: 1, backgroundColor: '#121212', justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flex: 1, backgroundColor: '#0b5e2c', justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator color="#0A8F3C" />
       </View>
     );
@@ -40,6 +42,7 @@ export default function App() {
           <MainTabNavigator versionChecked={versionChecked} />
         </NavigationContainer>
         <UpdateModal onDismiss={() => setVersionChecked(true)} />
+        {!splashDone && <AnimatedSplash onDone={() => setSplashDone(true)} />}
       </StoreProvider>
     </SafeAreaProvider>
   );
