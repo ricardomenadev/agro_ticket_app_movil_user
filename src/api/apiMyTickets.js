@@ -4,11 +4,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useEffect, useState } from "react";
 
 // EXPO_PUBLIC_API_URL solo se usa para probar contra un backend local (.env.local)
-const API = (process.env.EXPO_PUBLIC_API_URL || "https://api.agronea.store/api/mobile").replace(/\/mobile$/, "") + "/my-tickets";
+const API = (process.env.EXPO_PUBLIC_API_URL || "https://api.agronea.store/api/mobile").replace(/\/mobile$/, "");
 const STORAGE_KEY = "myTickets.orders"; // [{ token, order, savedAt }]
 
 // Error con el mensaje del servidor (ya viene en castellano y para el cliente)
-const call = async (path, options) => {
+export const call = async (path, options) => {
   let res;
   try {
     res = await fetch(`${API}${path}`, { headers: { "Content-Type": "application/json" }, ...options });
@@ -20,12 +20,12 @@ const call = async (path, options) => {
   return json.data;
 };
 
-export const lookupOrder = (input) => call("/lookup", { method: "POST", body: JSON.stringify(input) });
-export const fetchOrder = (token) => call(`/order/${token}`);
+export const lookupOrder = (input) => call("/my-tickets/lookup", { method: "POST", body: JSON.stringify(input) });
+export const fetchOrder = (token) => call(`/my-tickets/order/${token}`);
 // holder: { firstName, lastName, dni, email } de quien va a usar la entrada
 export const passTicket = (token, ticketId, holder) =>
-  call(`/order/${token}/tickets/${ticketId}/pass`, { method: "POST", body: JSON.stringify(holder) });
-export const recoverTicket = (token, ticketId) => call(`/order/${token}/tickets/${ticketId}/recover`, { method: "POST" });
+  call(`/my-tickets/order/${token}/tickets/${ticketId}/pass`, { method: "POST", body: JSON.stringify(holder) });
+export const recoverTicket = (token, ticketId) => call(`/my-tickets/order/${token}/tickets/${ticketId}/recover`, { method: "POST" });
 
 const readSaved = async () => {
   try {

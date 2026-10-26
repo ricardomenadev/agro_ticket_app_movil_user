@@ -11,6 +11,8 @@ import OrderCard from "../components/tickets/OrderCard";
 import TicketQrModal from "../components/tickets/TicketQrModal";
 import PassTicketSheet from "../components/tickets/PassTicketSheet";
 import GuideVideoModal from "../components/tickets/GuideVideoModal";
+import QuotaSheet from "../components/tickets/QuotaSheet";
+import { useMyInvitations, useMyQuotas, lookupInvitation, quotaTokenFrom } from "../api/apiInvitations";
 
 const GUIDE = require("../../assets/videos/guia-entradas-app.mp4");
 const GUIDE_POSTER = require("../../assets/videos/guia-entradas-app.jpg");
@@ -27,6 +29,12 @@ const Field = ({ label, ...props }) => (
 const TicketsScreen = ({ route, navigation }) => {
   const { orders, refreshing, refresh, upsert, remove } = useMyOrders();
   const linkToken = route?.params?.token;
+  const linkInvite = route?.params?.invite;
+  const invitations = useMyInvitations();
+  const quotas = useMyQuotas();
+  const [quotaToken, setQuotaToken] = useState(null); // cupo abierto (link de la empresa)
+  const [inv, setInv] = useState({ code: "", dni: "", link: "" });
+  const [invLoading, setInvLoading] = useState(false);
   const [form, setForm] = useState({ orderNumber: "", dni: "", email: "" });
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState(null); // { ok, text }
@@ -56,6 +64,50 @@ const TicketsScreen = ({ route, navigation }) => {
       }
     })();
   }, [linkToken, navigation, upsert]);
+
+  // Al abrir (con señal) se revisa que las invitaciones guardadas sigan vigentes: la empresa puede haber sacado a alguien
+  const checkedInvitations = React.useRef(false);
+  useEffect(() => {
+    if (checkedInvitations.current || !invitations.items?.length) return;
+    checkedInvitations.current = true;
+    invitations.items.forEach(async (i) => {
+      try {
+        const fresh = await lookupInvitation({ code: i.code, dni: i.dni });
+        if (i.cancelled || fresh.used !== i.used) await invitations.upsert({ ...i, ...fresh, cancelled: false });
+      } catch (err) {
+        if (err.status === 409 && !i.cancelled) await invitations.upsert({ ...i, cancelled: true });
+      }
+    });
+  }, [invitations]);
+
+  // Llegó desde el link de un cupo (agronea.store/i/<token>): se abre el cupo
+  useEffect(() => {
+    if (!linkInvite) return;
+    navigation?.setParams({ invite: undefined });
+    setQuotaToken(linkInvite);
+  }, [linkInvite, navigation]);
+
+  const loadInvitation = async () => {
+    if (!inv.code.trim() || !inv.dni.trim()) return setMsg({ ok: false, text: "Escribí el código de la invitación y tu DNI." });
+    setInvLoading(true);
+    try {
+      const found = await lookupInvitation({ code: inv.code, dni: inv.dni });
+      await invitations.upsert(found);
+      setInv((v) => ({ ...v, code: "", dni: "" }));
+      setMsg({ ok: true, text: `Listo: tu invitación de ${found.company || "Agronea"} quedó guardada en este teléfono.` });
+    } catch (err) {
+      setMsg({ ok: false, text: err.message });
+    } finally {
+      setInvLoading(false);
+    }
+  };
+
+  const openQuotaFromLink = () => {
+    const token = quotaTokenFrom(inv.link);
+    if (!token) return setMsg({ ok: false, text: "Pegá el link de invitaciones que te llegó por mail (agronea.store/i/...)." });
+    setInv((v) => ({ ...v, link: "" }));
+    setQuotaToken(token);
+  };
 
   const closeGuide = () => {
     setGuide(false);
@@ -147,6 +199,54 @@ const TicketsScreen = ({ route, navigation }) => {
             />
           ))}
 
+          {/* Invitaciones guardadas en el teléfono */}
+          {invitations.items?.map((i) => (
+            <TouchableOpacity
+              key={i.code}
+              style={[styles.invCard, i.cancelled && { opacity: 0.55 }]}
+              activeOpacity={0.85}
+              disabled={i.cancelled}
+              onPress={() =>
+                setShowing({
+                  ticket: { name: `Invitación · ${i.company || "Agronea"}`, holderName: i.name, holderDni: i.dni, qrCode: i.qrCode, code: i.code, type: "INVITATION" },
+                  label: "Invitación",
+                  eventTitle: i.event?.title || "Agronea",
+                })
+              }
+            >
+              <View style={[styles.invIcon, { backgroundColor: "rgba(192,132,252,.15)" }]}>
+                <Ionicons name="mail-open-outline" size={20} color="#c084fc" />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.invEyebrow}>Invitación · {i.company || "Agronea"}</Text>
+                <Text style={styles.invName}>{i.name}</Text>
+                <Text style={[styles.invHint, i.cancelled && { color: "#f87171" }]}>
+                  {i.cancelled ? "La empresa canceló esta invitación" : i.used ? `${i.event?.title} · Ya ingresó` : `${i.event?.title} · Tocá para ver el QR`}
+                </Text>
+              </View>
+              <TouchableOpacity onPress={() => invitations.remove(i.code)} hitSlop={12} accessibilityLabel="Quitar la invitación del teléfono">
+                <Ionicons name="trash-outline" size={18} color={C.muted} />
+              </TouchableOpacity>
+            </TouchableOpacity>
+          ))}
+
+          {/* Cupos de invitaciones de la empresa */}
+          {quotas.items?.map((q) => (
+            <TouchableOpacity key={q.token} style={styles.invCard} activeOpacity={0.85} onPress={() => setQuotaToken(q.token)}>
+              <View style={[styles.invIcon, { backgroundColor: "rgba(245,196,0,.14)" }]}>
+                <Ionicons name="people-outline" size={20} color={C.gold} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.invEyebrow, { color: C.gold }]}>Invitaciones de tu empresa</Text>
+                <Text style={styles.invName}>{q.company}</Text>
+                <Text style={styles.invHint}>{q.eventTitle} · Ver la lista y anotar gente</Text>
+              </View>
+              <TouchableOpacity onPress={() => quotas.remove(q.token)} hitSlop={12} accessibilityLabel="Quitar el cupo del teléfono">
+                <Ionicons name="trash-outline" size={18} color={C.muted} />
+              </TouchableOpacity>
+            </TouchableOpacity>
+          ))}
+
           {/* Video: cómo cargarlas */}
           <TouchableOpacity style={styles.video} onPress={() => setGuide(true)} activeOpacity={0.85}>
             <View style={styles.poster}>
@@ -168,10 +268,29 @@ const TicketsScreen = ({ route, navigation }) => {
               Escribí estos tres datos y te traemos tus entradas y productos. Los encontrás en el <Text style={styles.strong}>mail de tu compra</Text>: el número de compra está arriba de todo; el DNI y el mail son los que pusiste al comprar.
             </Text>
             <Field label="Número de compra" value={form.orderNumber} onChangeText={set("orderNumber")} placeholder="Ej: ORD-0615-VJ9PSE" autoCapitalize="characters" />
-            <Field label="DNI" value={form.dni} onChangeText={set("dni")} placeholder="Sin puntos" keyboardType="number-pad" />
+            <Field label="DNI" value={form.dni} onChangeText={set("dni")} placeholder="Con o sin puntos" keyboardType="number-pad" />
             <Field label="Mail" value={form.email} onChangeText={set("email")} placeholder="El mismo de la compra" keyboardType="email-address" autoCapitalize="none" returnKeyType="done" onSubmitEditing={load} />
             <TouchableOpacity style={styles.btn} onPress={load} disabled={loading} activeOpacity={0.85}>
               {loading ? <ActivityIndicator color={C.bg} /> : <Text style={styles.btnText}>Descargar mis entradas</Text>}
+            </TouchableOpacity>
+          </View>
+          {/* Invitaciones: el invitado (código + DNI) y la empresa (su link) */}
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>¿Te invitaron?</Text>
+            <Text style={styles.cardText}>Escribí el código de tu invitación (está en el mail que te llegó, empieza con INV) y tu DNI.</Text>
+            <Field label="Código de la invitación" value={inv.code} onChangeText={(v) => setInv((x) => ({ ...x, code: v.toUpperCase() }))} placeholder="Ej: INV-AB12-3C4D5E" autoCapitalize="characters" />
+            <Field label="DNI" value={inv.dni} onChangeText={(v) => setInv((x) => ({ ...x, dni: v }))} placeholder="Con o sin puntos" keyboardType="number-pad" />
+            <TouchableOpacity style={[styles.btn, { backgroundColor: "#c084fc" }]} onPress={loadInvitation} disabled={invLoading} activeOpacity={0.85}>
+              {invLoading ? <ActivityIndicator color="#160424" /> : <Text style={[styles.btnText, { color: "#160424" }]}>Cargar mi invitación</Text>}
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>¿Tenés invitaciones para tu empresa?</Text>
+            <Text style={styles.cardText}>Tocá el link que te llegó por mail o pegalo acá. Vas a ver la lista, anotar a tu gente y sacar a quien no vaya.</Text>
+            <Field label="Link de invitaciones" value={inv.link} onChangeText={(v) => setInv((x) => ({ ...x, link: v }))} placeholder="agronea.store/i/..." autoCapitalize="none" />
+            <TouchableOpacity style={[styles.btn, { backgroundColor: C.gold }]} onPress={openQuotaFromLink} activeOpacity={0.85}>
+              <Text style={[styles.btnText, { color: "#2a1f00" }]}>Abrir mis invitaciones</Text>
             </TouchableOpacity>
           </View>
           <View style={{ height: 110 }} />
@@ -180,6 +299,9 @@ const TicketsScreen = ({ route, navigation }) => {
 
       <TicketQrModal ticket={showing?.ticket} label={showing?.label} eventTitle={showing?.eventTitle} onClose={() => setShowing(null)} />
       {passing ? <PassTicketSheet key={passing.ticket.id} ticket={passing.ticket} index={passing.index} onSubmit={handlePass} onClose={() => setPassing(null)} /> : null}
+      {quotaToken ? (
+        <QuotaSheet token={quotaToken} onClose={() => setQuotaToken(null)} onSaveInvitation={invitations.upsert} onSeen={quotas.upsert} />
+      ) : null}
       <GuideVideoModal visible={guide} source={GUIDE} title="Tus entradas en la app" onClose={closeGuide} />
     </SafeAreaView>
   );
@@ -205,6 +327,11 @@ const styles = StyleSheet.create({
   strong: { color: C.text, fontWeight: "700" },
   label: { color: C.muted, fontSize: 11, marginBottom: 6 },
   input: { minHeight: 48, borderRadius: 12, borderWidth: 1, borderColor: C.borderStrong, backgroundColor: C.bg, color: C.text, paddingHorizontal: 14, fontSize: 15 },
+  invCard: { flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: C.card, borderColor: C.border, borderWidth: 1, borderRadius: 18, padding: 14 },
+  invIcon: { width: 44, height: 44, borderRadius: 12, alignItems: "center", justifyContent: "center" },
+  invEyebrow: { color: "#c084fc", fontSize: 11, fontWeight: "800", letterSpacing: 0.8, textTransform: "uppercase" },
+  invName: { color: C.text, fontSize: 16, fontWeight: "800", marginTop: 2, textTransform: "capitalize" },
+  invHint: { color: C.muted, fontSize: 12, marginTop: 2 },
   btn: { minHeight: 50, borderRadius: 14, backgroundColor: C.greenLight, alignItems: "center", justifyContent: "center", marginTop: 4 },
   btnText: { color: C.bg, fontWeight: "800", fontSize: 15 },
 });

@@ -54,6 +54,16 @@
               "scheme": "https",
               "host": "www.agronea.store",
               "pathPrefix": "/mis-entradas"
+            },
+            {
+              "scheme": "https",
+              "host": "agronea.store",
+              "pathPrefix": "/i/"
+            },
+            {
+              "scheme": "https",
+              "host": "www.agronea.store",
+              "pathPrefix": "/i/"
             }
           ],
           "category": [

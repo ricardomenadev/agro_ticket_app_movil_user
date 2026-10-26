@@ -13,11 +13,12 @@ import { registerForPushNotifications } from './src/utils/pushNotifications';
 import AnimatedSplash from './src/components/common/AnimatedSplash';
 import { ShopCartProvider } from './src/context/ShopCartContext';
 
-// Links que abren la app: el de "Mis entradas" del mail (agronea.store/mis-entradas/<token>) carga esa compra en Entradas.
+// Links que abren la app: el de "Mis entradas" del mail (agronea.store/mis-entradas/<token>) carga esa compra en Entradas;
+// el del cupo de invitaciones (agronea.store/i/<token>) abre ese cupo.
 // En desarrollo (Expo Go) también entra por exp://.../--/mis-entradas/<token>.
 const linking = {
   prefixes: ['agronea://', 'https://agronea.store', 'https://www.agronea.store', ...(__DEV__ ? ['exp://127.0.0.1:8081/--'] : [])],
-  config: { screens: { Tickets: { path: 'mis-entradas/:token', alias: ['entradas/:token'] } } },
+  config: { screens: { Tickets: { path: 'mis-entradas/:token', alias: ['entradas/:token', 'i/:invite'] } } },
 };
 
 export default function App() {
