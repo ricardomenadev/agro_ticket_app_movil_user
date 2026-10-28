@@ -19,7 +19,6 @@ import {
   ArrowRight,
   Ticket,
   Home,
-  Download,
   Clock,
   Mail,
   MessageCircle,
@@ -30,6 +29,7 @@ import {
 import { COLORS } from "../../constants/colors";
 import * as apiMobile from "../../api/apiMobile";
 import { useStore } from "../../context/StoreContext";
+import { fetchOrder, saveOrder } from "../../api/apiMyTickets";
 
 const PaymentConfirmationScreen = ({ route, navigation }) => {
   const {
@@ -229,6 +229,35 @@ useEffect(() => {
     }
   }, [passedShouldClearCart, clearCart]);
 
+  // Las entradas pagadas quedan guardadas solas en la pestaña Entradas (se ven sin señal).
+  // Se crean recién cuando Mercado Pago avisa el pago, que puede tardar unos segundos: mientras tanto se vuelve a consultar.
+  const [saved, setSaved] = useState(null); // null: esperando; false: el pago todavía no se confirmó; { token, count }
+  useEffect(() => {
+    if (!orderData || saved !== null || paymentMethod === "TRANSFER") return;
+    let cancelled = false;
+    (async () => {
+      let token = orderData.accessToken;
+      for (let i = 0; !token && i < 10 && !cancelled; i++) {
+        await new Promise((r) => setTimeout(r, 3000));
+        const res = await apiMobile.getOrderDetails(paymentId || orderId).catch(() => null);
+        token = res?.data?.order?.accessToken;
+      }
+      if (cancelled) return;
+      if (!token) return setSaved(false);
+      try {
+        const order = await fetchOrder(token);
+        if (!order.tickets?.length) return setSaved({ token, count: 0 }); // solo productos
+        await saveOrder(token, order);
+        if (!cancelled) setSaved({ token, count: order.tickets.length });
+      } catch {
+        if (!cancelled) setSaved({ token, count: orderData.tickets?.length || 1 }); // sin señal: el botón la vuelve a cargar
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [orderData, saved, paymentId, orderId, paymentMethod]);
+
   // Funciones existentes sin cambios...
   const shareOrder = async () => {
     try {
@@ -242,22 +271,6 @@ useEffect(() => {
       });
     } catch (error) {
       console.error("Error compartiendo orden:", error);
-    }
-  };
-
-  const downloadTickets = async () => {
-    try {
-      Alert.alert(
-        "Descarga de tickets",
-        "Tus tickets se descargarán a tu dispositivo.",
-        [{ text: "OK" }]
-      );
-    } catch (error) {
-      console.error("Error descargando tickets:", error);
-      Alert.alert(
-        "Error",
-        "No se pudieron descargar los tickets. Intenta más tarde."
-      );
     }
   };
 
@@ -637,26 +650,28 @@ useEffect(() => {
         </View>
 
         {/* Resto de secciones existentes (tickets, productos, etc.) sin cambios... */}
-        {hasTickets && paymentMethod !== "TRANSFER" && (
+        {(saved?.count > 0 || (!saved && hasTickets)) && (
           <View style={styles.ticketsCard}>
             <Text style={styles.sectionTitle}>Tus Entradas</Text>
             <Text style={styles.ticketsText}>
-              Se han generado {orderData.tickets.length} tickets para tu compra.
-              Los puedes ver en la sección "Mis Tickets" o descargarlos
-              directamente.
+              {saved
+                ? `Tus entradas (${saved.count}) ya quedaron guardadas en la pestaña Entradas. Ahí las ves aunque no tengas señal.`
+                : saved === false
+                ? "Cuando se confirme el pago te llega un mail con los datos para cargar tus entradas en la pestaña Entradas."
+                : "Estamos guardando tus entradas en la pestaña Entradas..."}
             </Text>
 
-            <TouchableOpacity
-              style={styles.actionButton}
-              onPress={downloadTickets}
-            >
-              <Download
-                size={18}
-                color={COLORS.text}
-                style={styles.buttonIcon}
-              />
-              <Text style={styles.actionButtonText}>Descargar Tickets</Text>
-            </TouchableOpacity>
+            {saved ? (
+              <TouchableOpacity
+                style={styles.primaryButton}
+                onPress={() => navigation.navigate("Tickets", { token: saved.token })}
+              >
+                <Ticket size={18} color={COLORS.text} style={styles.buttonIcon} />
+                <Text style={styles.primaryButtonText}>Ver mis entradas</Text>
+              </TouchableOpacity>
+            ) : saved === null ? (
+              <ActivityIndicator color={COLORS.primary} />
+            ) : null}
           </View>
         )}
 

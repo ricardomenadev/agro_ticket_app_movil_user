@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Configuración base
 
-const API_URL = 'https://api.agronea.store/api/mobile' || 'http://localhost:5000/api/mobile';
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://api.agronea.store/api/mobile';
 const API_TIMEOUT = 15000; // 15 segundos
 
 console.log('☀️ API_URL configurada:', API_URL);

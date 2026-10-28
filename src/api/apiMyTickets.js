@@ -35,6 +35,13 @@ const readSaved = async () => {
   }
 };
 
+// Guarda (o reemplaza) una compra en el teléfono. La usa también la confirmación de compra de la app
+export const saveOrder = async (token, order) => {
+  const list = [{ token, order, savedAt: new Date().toISOString() }, ...(await readSaved()).filter((o) => o.order?.orderNumber !== order.orderNumber)];
+  await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(list)).catch(() => {});
+  return list;
+};
+
 /**
  * Compras guardadas en el teléfono. Al abrir se actualizan con el servidor (si hay señal);
  * sin señal se muestra lo último guardado.
@@ -71,18 +78,15 @@ export const useMyOrders = () => {
   }, [refresh]);
 
   // Agrega o reemplaza una compra (si ya estaba cargada no se duplica)
-  const upsert = useCallback(
-    async (token, order) => {
-      const list = (await readSaved()).filter((o) => o.order?.orderNumber !== order.orderNumber);
-      await save([{ token, order, savedAt: new Date().toISOString() }, ...list]);
-    },
-    [save]
-  );
+  const upsert = useCallback(async (token, order) => setOrders(await saveOrder(token, order)), []);
+
+  // Vuelve a leer el teléfono sin ir al servidor (p. ej. la confirmación de compra guardó una nueva)
+  const reload = useCallback(async () => setOrders(await readSaved()), []);
 
   const remove = useCallback(
     async (orderNumber) => save((await readSaved()).filter((o) => o.order?.orderNumber !== orderNumber)),
     [save]
   );
 
-  return { orders, refreshing, refresh, upsert, remove };
+  return { orders, refreshing, refresh, reload, upsert, remove };
 };

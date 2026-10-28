@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { View, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator, RefreshControl, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useFocusEffect } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { C } from "../components/feed/FeedCards";
@@ -27,7 +28,8 @@ const Field = ({ label, ...props }) => (
 );
 
 const TicketsScreen = ({ route, navigation }) => {
-  const { orders, refreshing, refresh, upsert, remove } = useMyOrders();
+  const { orders, refreshing, refresh, reload, upsert, remove } = useMyOrders();
+  useFocusEffect(React.useCallback(() => void reload(), [reload]));
   const linkToken = route?.params?.token;
   const linkInvite = route?.params?.invite;
   const invitations = useMyInvitations();
