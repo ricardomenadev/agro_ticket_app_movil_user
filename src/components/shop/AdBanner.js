@@ -1,25 +1,15 @@
 // Publicidad de Agronea (foto, título y texto del panel: Vitrina). Se guarda en el teléfono, así que se ve sin señal.
-// compact: franja finita y discreta para debajo del QR de una entrada (no le tiene que robar protagonismo al QR)
 import React from "react";
 import { View, Text, StyleSheet, Image, ImageBackground } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useShowcase } from "../../api/apiFeed";
 import { C } from "../feed/FeedCards";
 
-export default function AdBanner({ compact }) {
+export default function AdBanner() {
   const showcase = useShowcase();
   const photo = showcase?.images?.[0]?.url || showcase?.images?.[0];
   const title = showcase?.settings?.title || "Agronea";
   const subtitle = showcase?.settings?.subtitle || "El evento del agro del Norte Argentino";
-  if (compact) {
-    // Debajo del QR: solo la marca, centrada y en gris (el título de la vitrina no aplica a una entrada)
-    return (
-      <View style={styles.strip}>
-        <Image source={require("../../../assets/images/logo_agronea_producciones.png")} style={styles.stripLogo} resizeMode="contain" accessibilityLabel="Agronea Producciones" />
-        <Text style={styles.stripText}>agronea.store · @agroneachaco</Text>
-      </View>
-    );
-  }
   const content = (
     <LinearGradient colors={photo ? ["rgba(0,0,0,0.15)", "rgba(0,0,0,0.85)"] : ["#0b3d1f", "#0a0a0a"]} style={styles.adInner}>
       <View style={styles.adLogoCard}>
@@ -46,7 +36,4 @@ const styles = StyleSheet.create({
   adLogo: { width: 180, height: 90 },
   adTitle: { color: C.gold, fontSize: 18, fontWeight: "800", textAlign: "center" },
   adText: { color: C.soft, fontSize: 13, textAlign: "center", lineHeight: 18 },
-  strip: { alignItems: "center", gap: 2, borderTopWidth: 1, borderTopColor: "#eef0ee", paddingTop: 10 },
-  stripLogo: { width: 92, height: 34, opacity: 0.9 },
-  stripText: { color: "#8a978e", fontSize: 11, letterSpacing: 0.3 },
 });
