@@ -5,6 +5,7 @@ import { View, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, Keyboa
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
+import QRCode from "react-native-qrcode-svg";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { C } from "../components/feed/FeedCards";
 import { useMyOrders, lookupOrder, fetchOrder, passTicket, recoverTicket } from "../api/apiMyTickets";
@@ -24,6 +25,14 @@ const Field = ({ label, ...props }) => (
   <View>
     <Text style={styles.label}>{label}</Text>
     <TextInput placeholderTextColor="#5d7466" autoCorrect={false} style={styles.input} {...props} />
+  </View>
+);
+
+// Título de cada grupo: compras (verde), invitaciones (violeta) y cupos de la empresa (dorado)
+const SectionTitle = ({ color, text }) => (
+  <View style={styles.section}>
+    <View style={[styles.sectionDot, { backgroundColor: color }]} />
+    <Text style={styles.sectionText}>{text}</Text>
   </View>
 );
 
@@ -198,6 +207,7 @@ const TicketsScreen = ({ route, navigation }) => {
 
           {orders === null ? <ActivityIndicator color={C.greenLight} style={{ marginVertical: 20 }} /> : null}
 
+          {orders?.length ? <SectionTitle color={C.greenLight} text="Compras" /> : null}
           {orders?.map(({ token, order }) => (
             <OrderCard
               key={order.orderNumber}
@@ -209,40 +219,58 @@ const TicketsScreen = ({ route, navigation }) => {
             />
           ))}
 
-          {/* Invitaciones guardadas en el teléfono */}
-          {invitations.items?.map((i) => (
-            <TouchableOpacity
-              key={i.code}
-              style={[styles.invCard, i.cancelled && { opacity: 0.55 }]}
-              activeOpacity={0.85}
-              disabled={i.cancelled}
-              onPress={() =>
-                setShowing({
-                  ticket: { name: `Invitación · ${i.company || "Agronea"}`, holderName: i.name, holderDni: i.dni, qrCode: i.qrCode, code: i.code, type: "INVITATION" },
-                  label: "Invitación",
-                  eventTitle: i.event?.title || "Agronea",
-                })
-              }
-            >
-              <View style={[styles.invIcon, { backgroundColor: "rgba(192,132,252,.15)" }]}>
-                <Ionicons name="mail-open-outline" size={20} color="#c084fc" />
+          {/* Invitaciones guardadas en el teléfono (violeta: no son compras) */}
+          {invitations.items?.length ? <SectionTitle color="#c084fc" text="Invitaciones" /> : null}
+          {invitations.items?.map((i) => {
+            const open = () =>
+              setShowing({
+                ticket: { name: `Invitación · ${i.company || "Agronea"}`, holderName: i.name, holderDni: i.dni, qrCode: i.qrCode, code: i.code, type: "INVITATION" },
+                label: "Invitación",
+                eventTitle: i.event?.title || "Agronea",
+              });
+            const usable = !i.cancelled && !i.used && i.qrCode;
+            return (
+              <View key={i.code} style={[styles.invCard, styles.invCardColumn, { borderLeftColor: "#c084fc" }, i.cancelled && { opacity: 0.55 }]}>
+                <View style={styles.invTop}>
+                  <TouchableOpacity onPress={open} disabled={!usable} activeOpacity={0.85}>
+                    {usable ? (
+                      <View style={styles.thumb}>
+                        <QRCode value={i.qrCode} size={58} ecl="L" />
+                      </View>
+                    ) : (
+                      <View style={[styles.thumb, { backgroundColor: "rgba(192,132,252,.15)" }]}>
+                        <Ionicons name="mail-open-outline" size={26} color="#c084fc" />
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                  <View style={{ flex: 1 }}>
+                    <View style={styles.badgeRow}>
+                      <Text style={styles.invBadge}>Invitación</Text>
+                      <Text style={styles.invEyebrow} numberOfLines={1}>{i.company || "Agronea"}</Text>
+                    </View>
+                    <Text style={styles.invName}>{i.name}</Text>
+                    <Text style={[styles.invHint, i.cancelled && { color: "#f87171" }]}>
+                      {i.cancelled ? "La empresa canceló esta invitación" : i.used ? `${i.event?.title} · Ya ingresó` : `${i.event?.title} · funciona sin señal`}
+                    </Text>
+                  </View>
+                  <TouchableOpacity onPress={() => invitations.remove(i.code)} hitSlop={12} accessibilityLabel="Quitar la invitación del teléfono">
+                    <Ionicons name="trash-outline" size={18} color={C.muted} />
+                  </TouchableOpacity>
+                </View>
+                {usable ? (
+                  <TouchableOpacity style={styles.invView} onPress={open} activeOpacity={0.85}>
+                    <Ionicons name="qr-code-outline" size={16} color="#160424" />
+                    <Text style={styles.invViewText}>Ver QR</Text>
+                  </TouchableOpacity>
+                ) : null}
               </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.invEyebrow}>Invitación · {i.company || "Agronea"}</Text>
-                <Text style={styles.invName}>{i.name}</Text>
-                <Text style={[styles.invHint, i.cancelled && { color: "#f87171" }]}>
-                  {i.cancelled ? "La empresa canceló esta invitación" : i.used ? `${i.event?.title} · Ya ingresó` : `${i.event?.title} · Tocá para ver el QR`}
-                </Text>
-              </View>
-              <TouchableOpacity onPress={() => invitations.remove(i.code)} hitSlop={12} accessibilityLabel="Quitar la invitación del teléfono">
-                <Ionicons name="trash-outline" size={18} color={C.muted} />
-              </TouchableOpacity>
-            </TouchableOpacity>
-          ))}
+            );
+          })}
 
           {/* Cupos de invitaciones de la empresa */}
+          {quotas.items?.length ? <SectionTitle color={C.gold} text="Tu empresa" /> : null}
           {quotas.items?.map((q) => (
-            <TouchableOpacity key={q.token} style={styles.invCard} activeOpacity={0.85} onPress={() => setQuotaToken(q.token)}>
+            <TouchableOpacity key={q.token} style={[styles.invCard, { borderLeftColor: C.gold }]} activeOpacity={0.85} onPress={() => setQuotaToken(q.token)}>
               <View style={[styles.invIcon, { backgroundColor: "rgba(245,196,0,.14)" }]}>
                 <Ionicons name="people-outline" size={20} color={C.gold} />
               </View>
@@ -337,7 +365,17 @@ const styles = StyleSheet.create({
   strong: { color: C.text, fontWeight: "700" },
   label: { color: C.muted, fontSize: 11, marginBottom: 6 },
   input: { minHeight: 48, borderRadius: 12, borderWidth: 1, borderColor: C.borderStrong, backgroundColor: C.bg, color: C.text, paddingHorizontal: 14, fontSize: 15 },
-  invCard: { flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: C.card, borderColor: C.border, borderWidth: 1, borderRadius: 18, padding: 14 },
+  invCard: { flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: C.card, borderColor: C.border, borderWidth: 1, borderLeftWidth: 4, borderRadius: 18, padding: 14 },
+  invCardColumn: { flexDirection: "column", alignItems: "stretch" },
+  invTop: { flexDirection: "row", alignItems: "center", gap: 12 },
+  thumb: { width: 72, height: 72, borderRadius: 14, backgroundColor: "#fff", alignItems: "center", justifyContent: "center" },
+  badgeRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  invBadge: { color: "#160424", backgroundColor: "#c084fc", fontSize: 10, fontWeight: "900", letterSpacing: 0.8, textTransform: "uppercase", borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2, overflow: "hidden" },
+  invView: { flexDirection: "row", gap: 6, alignItems: "center", justifyContent: "center", backgroundColor: "#c084fc", borderRadius: 12, paddingVertical: 10 },
+  invViewText: { color: "#160424", fontWeight: "800", fontSize: 14 },
+  section: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 6 },
+  sectionDot: { width: 8, height: 8, borderRadius: 4 },
+  sectionText: { color: C.text, fontSize: 13, fontWeight: "800", letterSpacing: 1, textTransform: "uppercase" },
   invIcon: { width: 44, height: 44, borderRadius: 12, alignItems: "center", justifyContent: "center" },
   invEyebrow: { color: "#c084fc", fontSize: 11, fontWeight: "800", letterSpacing: 0.8, textTransform: "uppercase" },
   invName: { color: C.text, fontSize: 16, fontWeight: "800", marginTop: 2, textTransform: "capitalize" },

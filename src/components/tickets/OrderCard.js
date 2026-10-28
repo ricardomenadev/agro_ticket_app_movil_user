@@ -33,10 +33,13 @@ export default function OrderCard({ order, onOpen, onPass, onRecover, onRemove }
     ]);
 
   return (
-    <View style={s.card}>
+    <View style={[s.card, !paid && { borderLeftColor: C.gold }]}>
       <View style={s.head}>
         <View style={{ flex: 1 }}>
-          <Text style={s.eyebrow}>Compra {orderNumber}</Text>
+          <View style={s.badgeRow}>
+            <Text style={[s.badge, !paid && s.badgePending]}>{paid ? "✓ Pagada" : "Pago pendiente"}</Text>
+            <Text style={s.eyebrow}>Compra {orderNumber}</Text>
+          </View>
           <Text style={s.title}>{event?.title || "Agronea"}</Text>
           {dateOf(event) ? (
             <Text style={s.meta}>
@@ -107,7 +110,11 @@ export default function OrderCard({ order, onOpen, onPass, onRecover, onRemove }
 }
 
 const s = StyleSheet.create({
-  card: { backgroundColor: C.card, borderColor: C.border, borderWidth: 1, borderRadius: 20, padding: 14, gap: 10 },
+  // borde verde: compra pagada (las invitaciones van en violeta)
+  card: { backgroundColor: C.card, borderColor: C.border, borderWidth: 1, borderLeftWidth: 4, borderLeftColor: C.greenLight, borderRadius: 20, padding: 14, gap: 10 },
+  badgeRow: { flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap" },
+  badge: { color: "#06100a", backgroundColor: C.greenLight, fontSize: 10, fontWeight: "900", letterSpacing: 0.8, textTransform: "uppercase", borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2, overflow: "hidden" },
+  badgePending: { backgroundColor: C.gold },
   head: { flexDirection: "row", gap: 10, alignItems: "flex-start" },
   eyebrow: { color: C.greenLight, fontSize: 11, fontWeight: "700", letterSpacing: 1, textTransform: "uppercase" },
   title: { color: C.text, fontSize: 18, fontWeight: "800", marginTop: 2 },
