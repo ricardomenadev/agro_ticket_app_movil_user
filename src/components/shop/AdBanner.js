@@ -12,10 +12,11 @@ export default function AdBanner({ compact }) {
   const title = showcase?.settings?.title || "Agronea";
   const subtitle = showcase?.settings?.subtitle || "El evento del agro del Norte Argentino";
   if (compact) {
+    // Debajo del QR: solo la marca, centrada y en gris (el título de la vitrina no aplica a una entrada)
     return (
       <View style={styles.strip}>
         <Image source={require("../../../assets/images/logo_agronea_producciones.png")} style={styles.stripLogo} resizeMode="contain" accessibilityLabel="Agronea Producciones" />
-        <Text style={styles.stripText} numberOfLines={1}>{title}</Text>
+        <Text style={styles.stripText}>agronea.store · @agroneachaco</Text>
       </View>
     );
   }
@@ -45,7 +46,7 @@ const styles = StyleSheet.create({
   adLogo: { width: 180, height: 90 },
   adTitle: { color: C.gold, fontSize: 18, fontWeight: "800", textAlign: "center" },
   adText: { color: C.soft, fontSize: 13, textAlign: "center", lineHeight: 18 },
-  strip: { flexDirection: "row", alignItems: "center", gap: 10, borderTopWidth: 1, borderTopColor: "#eef0ee", paddingTop: 10 },
-  stripLogo: { width: 64, height: 26, opacity: 0.85 },
-  stripText: { flex: 1, color: "#8a978e", fontSize: 12 },
+  strip: { alignItems: "center", gap: 2, borderTopWidth: 1, borderTopColor: "#eef0ee", paddingTop: 10 },
+  stripLogo: { width: 92, height: 34, opacity: 0.9 },
+  stripText: { color: "#8a978e", fontSize: 11, letterSpacing: 0.3 },
 });
