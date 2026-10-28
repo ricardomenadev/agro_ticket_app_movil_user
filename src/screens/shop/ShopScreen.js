@@ -2,18 +2,17 @@
 // agronea.store con Mercado Pago (el link lleva el carrito; los precios los vuelve a calcular el servidor).
 // Al pagar, la confirmación de la web vuelve sola a la app (?app=) y la compra queda guardada en Entradas.
 import React, { useMemo, useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image, ImageBackground, Linking, ActivityIndicator, Modal, Pressable } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image, Linking, ActivityIndicator, Modal, Pressable } from "react-native";
 import { useShopCart } from "../../context/ShopCartContext";
 import ProductSheet from "../../components/shop/ProductSheet";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useNavigation } from "@react-navigation/native";
 import * as WebBrowser from "expo-web-browser";
 import * as ExpoLinking from "expo-linking";
 import { useStore } from "../../context/StoreContext";
-import { useShowcase } from "../../api/apiFeed";
+import AdBanner from "../../components/shop/AdBanner";
 import { C } from "../../components/feed/FeedCards";
 
 // EXPO_PUBLIC_STORE_URL solo se usa para probar contra la web local (.env.local)
@@ -40,29 +39,6 @@ const cartItem = (p, cantidad) => {
   return { id: p.id, tipo: "producto", eventId: null, cantidad };
 };
 const base64url = (s) => btoa(unescape(encodeURIComponent(s))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-
-const AdBanner = () => {
-  const showcase = useShowcase();
-  const photo = showcase?.images?.[0]?.url || showcase?.images?.[0];
-  const title = showcase?.settings?.title || "Agronea";
-  const subtitle = showcase?.settings?.subtitle || "El evento del agro del Norte Argentino";
-  const content = (
-    <LinearGradient colors={photo ? ["rgba(0,0,0,0.15)", "rgba(0,0,0,0.85)"] : ["#0b3d1f", "#0a0a0a"]} style={styles.adInner}>
-      <View style={styles.adLogoCard}>
-        <Image source={require("../../../assets/images/logo_agronea_producciones.png")} style={styles.adLogo} resizeMode="contain" accessibilityLabel="Agronea Producciones" />
-      </View>
-      <Text style={styles.adTitle}>{title}</Text>
-      <Text style={styles.adText}>{subtitle}</Text>
-    </LinearGradient>
-  );
-  return photo ? (
-    <ImageBackground source={{ uri: typeof photo === "string" ? photo : photo.url }} style={styles.ad} imageStyle={{ borderRadius: 18 }}>
-      {content}
-    </ImageBackground>
-  ) : (
-    <View style={styles.ad}>{content}</View>
-  );
-};
 
 const ProductTile = ({ product, qty, onAdd, onRemove, onOpen }) => {
   const img = imageOf(product);
@@ -277,13 +253,6 @@ const styles = StyleSheet.create({
   chipActive: { backgroundColor: C.green, borderColor: C.green },
   chipText: { color: C.soft, fontSize: 13 },
   chipTextActive: { color: C.text, fontWeight: "700" },
-  ad: { borderRadius: 18, overflow: "hidden", borderWidth: 1, borderColor: C.border },
-  adInner: { padding: 20, alignItems: "center", gap: 6, minHeight: 170, justifyContent: "center" },
-  // logo original sobre blanco, como en la web
-  adLogoCard: { backgroundColor: "#fff", borderRadius: 14, paddingHorizontal: 14, paddingVertical: 6, marginBottom: 6 },
-  adLogo: { width: 180, height: 90 },
-  adTitle: { color: C.gold, fontSize: 18, fontWeight: "800", textAlign: "center" },
-  adText: { color: C.soft, fontSize: 13, textAlign: "center", lineHeight: 18 },
   section: { color: C.text, fontSize: 16, fontWeight: "700", marginTop: 4 },
   grid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", rowGap: 12 },
   tile: { width: "48.5%", backgroundColor: C.card, borderRadius: 16, borderWidth: 1, borderColor: C.border, overflow: "hidden" },

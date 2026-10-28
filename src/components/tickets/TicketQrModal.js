@@ -1,17 +1,18 @@
-// QR de una entrada en grande, sobre blanco, para mostrar en la puerta (funciona sin señal)
+// QR de una entrada en grande, sobre blanco, para mostrar en la puerta (funciona sin señal), con la publicidad de Agronea abajo
 import React from "react";
 import { Modal, View, Text, TouchableOpacity, StyleSheet, useWindowDimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import QRCode from "react-native-qrcode-svg";
 import { Ionicons } from "@expo/vector-icons";
 import { C } from "../feed/FeedCards";
+import AdBanner from "../shop/AdBanner";
 
 const dotted = (v) => String(v || "").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
 export default function TicketQrModal({ ticket, label, eventTitle, onClose }) {
   const { width } = useWindowDimensions();
   if (!ticket) return null;
-  const size = Math.min(width - 72, 340);
+  const size = Math.min(width - 96, 300);
   return (
     <Modal visible animationType="slide" onRequestClose={onClose}>
       <SafeAreaView style={s.safe}>
@@ -33,6 +34,9 @@ export default function TicketQrModal({ ticket, label, eventTitle, onClose }) {
             {ticket.type === "product" ? "Mostralo para retirar tu producto." : "Mostralo en la puerta. Subí el brillo de la pantalla."}
           </Text>
         </View>
+        <View style={s.ad}>
+          <AdBanner compact />
+        </View>
       </SafeAreaView>
     </Modal>
   );
@@ -48,5 +52,6 @@ const s = StyleSheet.create({
   dni: { color: "#5f7567", fontSize: 15 },
   qr: { marginTop: 16, padding: 12, borderRadius: 18, borderWidth: 1, borderColor: "#e5e7eb" },
   code: { marginTop: 14, color: C.green, fontSize: 15, fontWeight: "800", letterSpacing: 2 },
+  ad: { paddingHorizontal: 24, paddingBottom: 10 },
   hint: { marginTop: 8, color: "#5f7567", fontSize: 13, textAlign: "center" },
 });

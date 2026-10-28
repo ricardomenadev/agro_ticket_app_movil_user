@@ -1,7 +1,8 @@
-// Una compra cargada en el teléfono: evento, número de compra y sus entradas/productos con Pasar y Recuperar
+// Una compra cargada en el teléfono: evento, número de compra y sus entradas/productos con miniatura del QR, Ver, Pasar y Recuperar
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import QRCode from "react-native-qrcode-svg";
 import { C } from "../feed/FeedCards";
 
 const KIND = { event: "Entrada", parking: "Estacionamiento", product: "Producto" };
@@ -54,12 +55,19 @@ export default function OrderCard({ order, onOpen, onPass, onRecover, onRemove }
       {tickets.map((t, i) => {
         const st = statusOf(t);
         const mine = t.status === "MINE";
+        const showQr = mine && t.qrCode;
         return (
           <View key={t.id} style={s.row}>
-            <TouchableOpacity style={s.rowMain} onPress={() => onOpen(t, i)} disabled={!t.qrCode} activeOpacity={0.8}>
-              <View style={[s.icon, t.type === "product" && { backgroundColor: "rgba(245,196,0,.14)" }]}>
-                <Ionicons name={ICON[t.type] || ICON.event} size={20} color={t.type === "product" ? C.gold : C.greenLight} />
-              </View>
+            <TouchableOpacity style={s.rowMain} onPress={() => onOpen(t, i)} disabled={!showQr} activeOpacity={0.8}>
+              {showQr ? (
+                <View style={s.thumb} accessibilityLabel="Miniatura del QR">
+                  <QRCode value={t.qrCode} size={58} ecl="L" />
+                </View>
+              ) : (
+                <View style={[s.thumb, s.thumbIcon, t.type === "product" && { backgroundColor: "rgba(245,196,0,.14)" }]}>
+                  <Ionicons name={ICON[t.type] || ICON.event} size={28} color={t.type === "product" ? C.gold : t.status === "PASSED" ? "#c084fc" : C.muted} />
+                </View>
+              )}
               <View style={{ flex: 1 }}>
                 <Text style={s.rowLabel}>
                   {KIND[t.type] || "Entrada"} {i + 1} · <Text style={{ color: st.color }}>{st.label}</Text>
@@ -68,17 +76,28 @@ export default function OrderCard({ order, onOpen, onPass, onRecover, onRemove }
                   {t.type === "product" ? t.name : t.holderName}
                 </Text>
                 {t.status === "PASSED" ? <Text style={[s.tap, { color: "#c084fc" }]}>Le llegó por mail con su propio QR</Text> : null}
-                {mine && t.qrCode ? <Text style={s.tap}>Tocá para ver el QR</Text> : null}
+                {showQr ? <Text style={s.tap}>Lista para usar · funciona sin señal</Text> : null}
               </View>
             </TouchableOpacity>
-            {t.canPass && mine ? (
-              <TouchableOpacity style={s.pass} onPress={() => onPass(t, i)} activeOpacity={0.85}>
-                <Text style={s.passText}>Pasar</Text>
-              </TouchableOpacity>
-            ) : t.canRecover ? (
-              <TouchableOpacity style={s.recover} onPress={() => onRecover(t)} activeOpacity={0.85}>
-                <Text style={s.recoverText}>Recuperar</Text>
-              </TouchableOpacity>
+            {showQr || t.canRecover ? (
+              <View style={s.actions}>
+                {showQr ? (
+                  <TouchableOpacity style={s.view} onPress={() => onOpen(t, i)} activeOpacity={0.85}>
+                    <Ionicons name="qr-code-outline" size={16} color="#06100a" />
+                    <Text style={s.viewText}>Ver QR</Text>
+                  </TouchableOpacity>
+                ) : null}
+                {t.canPass && mine ? (
+                  <TouchableOpacity style={s.pass} onPress={() => onPass(t, i)} activeOpacity={0.85}>
+                    <Ionicons name="paper-plane-outline" size={15} color="#160424" />
+                    <Text style={s.passText}>Pasar</Text>
+                  </TouchableOpacity>
+                ) : t.canRecover ? (
+                  <TouchableOpacity style={s.recover} onPress={() => onRecover(t)} activeOpacity={0.85}>
+                    <Text style={s.recoverText}>Recuperar</Text>
+                  </TouchableOpacity>
+                ) : null}
+              </View>
             ) : null}
           </View>
         );
@@ -94,14 +113,19 @@ const s = StyleSheet.create({
   title: { color: C.text, fontSize: 18, fontWeight: "800", marginTop: 2 },
   meta: { color: C.muted, fontSize: 12, marginTop: 2 },
   warn: { color: C.gold, fontSize: 13, backgroundColor: "rgba(245,196,0,.08)", borderRadius: 12, padding: 10 },
-  row: { flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: C.bg, borderColor: C.border, borderWidth: 1, borderRadius: 16, padding: 10 },
-  rowMain: { flex: 1, flexDirection: "row", alignItems: "center", gap: 10 },
-  icon: { width: 40, height: 40, borderRadius: 12, backgroundColor: "rgba(74,222,128,.14)", alignItems: "center", justifyContent: "center" },
+  row: { backgroundColor: C.bg, borderColor: C.border, borderWidth: 1, borderRadius: 16, padding: 12, gap: 12 },
+  rowMain: { flexDirection: "row", alignItems: "center", gap: 12 },
+  // miniatura del QR real sobre blanco: se ve que la entrada ya está en el teléfono
+  thumb: { width: 72, height: 72, borderRadius: 14, backgroundColor: "#fff", alignItems: "center", justifyContent: "center" },
+  thumbIcon: { backgroundColor: "rgba(255,255,255,.06)" },
   rowLabel: { color: C.muted, fontSize: 11, fontWeight: "700", textTransform: "uppercase", letterSpacing: 0.6 },
-  rowName: { color: C.text, fontSize: 15, fontWeight: "700", marginTop: 1, textTransform: "capitalize" },
-  tap: { color: C.greenLight, fontSize: 11, marginTop: 2 },
-  pass: { backgroundColor: "#c084fc", borderRadius: 12, paddingHorizontal: 14, paddingVertical: 9 },
-  passText: { color: "#160424", fontWeight: "800", fontSize: 13 },
-  recover: { borderColor: "#c084fc", borderWidth: 1, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 8 },
+  rowName: { color: C.text, fontSize: 16, fontWeight: "800", marginTop: 2, textTransform: "capitalize" },
+  tap: { color: C.greenLight, fontSize: 12, marginTop: 3 },
+  actions: { flexDirection: "row", gap: 8 },
+  view: { flex: 1, flexDirection: "row", gap: 6, alignItems: "center", justifyContent: "center", backgroundColor: C.greenLight, borderRadius: 12, paddingVertical: 10 },
+  viewText: { color: "#06100a", fontWeight: "800", fontSize: 14 },
+  pass: { flex: 1, flexDirection: "row", gap: 6, alignItems: "center", justifyContent: "center", backgroundColor: "#c084fc", borderRadius: 12, paddingVertical: 10 },
+  passText: { color: "#160424", fontWeight: "800", fontSize: 14 },
+  recover: { flex: 1, alignItems: "center", borderColor: "#c084fc", borderWidth: 1, borderRadius: 12, paddingVertical: 9 },
   recoverText: { color: "#c084fc", fontWeight: "700", fontSize: 12 },
 });
