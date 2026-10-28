@@ -1,6 +1,6 @@
 // Invitaciones en la app (mismas rutas que agronea.store/i/<token>):
-// - el invitado guarda su invitación con QR (se anota acá o la carga con código + DNI);
-// - la empresa guarda el link de su cupo para ver la lista, anotar gente y sacar con la contraseña.
+// - el invitado guarda su invitación con QR (se registra acá o la carga con código + DNI);
+// - la empresa guarda el link de su cupo para ver la lista, sumar invitados y dar de baja con la contraseña.
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useEffect, useState } from "react";
 import { call } from "./apiMyTickets";

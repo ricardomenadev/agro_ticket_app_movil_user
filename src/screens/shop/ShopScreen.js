@@ -1,5 +1,6 @@
 // Tienda: entradas y productos de Agronea todo el año. El carrito se arma acá y el pago se hace en
 // agronea.store con Mercado Pago (el link lleva el carrito; los precios los vuelve a calcular el servidor).
+// Al pagar, la confirmación de la web vuelve sola a la app (?app=) y la compra queda guardada en Entradas.
 import React, { useMemo, useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image, ImageBackground, Linking, ActivityIndicator, Modal, Pressable } from "react-native";
 import { useShopCart } from "../../context/ShopCartContext";
@@ -8,11 +9,17 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { useNavigation } from "@react-navigation/native";
+import * as WebBrowser from "expo-web-browser";
+import * as ExpoLinking from "expo-linking";
 import { useStore } from "../../context/StoreContext";
 import { useShowcase } from "../../api/apiFeed";
 import { C } from "../../components/feed/FeedCards";
 
-const STORE_URL = "https://agronea.store";
+// EXPO_PUBLIC_STORE_URL solo se usa para probar contra la web local (.env.local)
+const STORE_URL = process.env.EXPO_PUBLIC_STORE_URL || "https://agronea.store";
+// Dirección de vuelta a la app: agronea:// (en Expo Go, exp://.../--/)
+const APP_RETURN = ExpoLinking.createURL("/").replace(/\/?$/, "/").replace(/^agronea:\/\/\/$/, "agronea://");
 const API_BASE = "https://api.agronea.store";
 
 const imageOf = (p) => {
@@ -102,7 +109,8 @@ const ShopScreen = () => {
   const tabBarHeight = useBottomTabBarHeight();
   const [filter, setFilter] = useState("all");
   const [detail, setDetail] = useState(null); // producto abierto en el detalle
-  const { items: cart, count, change, open, setOpen } = useShopCart();
+  const { items: cart, count, change, open, setOpen, clear } = useShopCart();
+  const navigation = useNavigation();
 
   // Entradas y estacionamientos solo de eventos a la venta (la lista trae también los de ediciones pasadas)
   const available = useMemo(() => {
@@ -125,13 +133,19 @@ const ShopScreen = () => {
   const lines = available.filter((p) => cart[p.id]);
   const total = lines.reduce((s, p) => s + priceOf(p) * cart[p.id], 0);
 
-  const pay = () => {
+  const pay = async () => {
     try {
-      const link = `${STORE_URL}/?carrito=${base64url(JSON.stringify(lines.map((p) => cartItem(p, cart[p.id]))))}`;
+      const link = `${STORE_URL}/?carrito=${base64url(JSON.stringify(lines.map((p) => cartItem(p, cart[p.id]))))}&app=${encodeURIComponent(APP_RETURN)}`;
       setOpen(false);
-      Linking.openURL(link).catch((err) => console.error("[tienda] no se pudo abrir el pago", err));
+      const result = await WebBrowser.openAuthSessionAsync(link, APP_RETURN);
+      if (result.type !== "success") return; // cerró sin pagar: el carrito queda como estaba
+      // Volvió de la confirmación con agronea://entradas/<token>?compra=1
+      const { path, queryParams } = ExpoLinking.parse(result.url);
+      const token = (path || "").split("/").pop();
+      clear();
+      if (token) navigation.navigate("Tickets", { token, compra: queryParams?.compra });
     } catch (err) {
-      console.error("[tienda] no se pudo armar el carrito", err);
+      console.error("[tienda] no se pudo abrir el pago", err);
     }
   };
 

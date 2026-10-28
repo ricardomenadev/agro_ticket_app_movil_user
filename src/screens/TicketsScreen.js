@@ -32,6 +32,7 @@ const TicketsScreen = ({ route, navigation }) => {
   useFocusEffect(React.useCallback(() => void reload(), [reload]));
   const linkToken = route?.params?.token;
   const linkInvite = route?.params?.invite;
+  const fromPurchase = route?.params?.compra; // volvió de pagar en la tienda
   const invitations = useMyInvitations();
   const quotas = useMyQuotas();
   const [quotaToken, setQuotaToken] = useState(null); // cupo abierto (link de la empresa)
@@ -45,8 +46,10 @@ const TicketsScreen = ({ route, navigation }) => {
   const [guide, setGuide] = useState(false);
 
   // El video se abre solo la primera vez que alguien entra sin compras cargadas
+  const cameByLink = React.useRef(false); // llegó por un link: la compra o invitación se carga sola, sin video
+  if (linkToken || linkInvite) cameByLink.current = true;
   useEffect(() => {
-    if (orders === null || orders.length) return;
+    if (orders === null || orders.length || cameByLink.current) return;
     AsyncStorage.getItem(GUIDE_SEEN).then((seen) => {
       if (!seen) setGuide(true);
     });
@@ -55,17 +58,22 @@ const TicketsScreen = ({ route, navigation }) => {
   // Llegó desde el link del mail: se carga esa compra sola, sin pedir los datos
   useEffect(() => {
     if (!linkToken) return;
-    navigation?.setParams({ token: undefined });
+    navigation?.setParams({ token: undefined, compra: undefined });
     (async () => {
       try {
         const order = await fetchOrder(linkToken);
         await upsert(linkToken, order);
-        setMsg({ ok: true, text: `Listo: cargamos tu compra ${order.orderNumber}. Quedó guardada en este teléfono.` });
+        setMsg({
+          ok: true,
+          text: fromPurchase
+            ? `¡Compra confirmada! Tus entradas de la compra ${order.orderNumber} ya están guardadas acá y las ves aunque no tengas señal.`
+            : `Listo: cargamos tu compra ${order.orderNumber}. Quedó guardada en este teléfono.`,
+        });
       } catch (err) {
         setMsg({ ok: false, text: err.message });
       }
     })();
-  }, [linkToken, navigation, upsert]);
+  }, [linkToken, fromPurchase, navigation, upsert]);
 
   // Al abrir (con señal) se revisa que las invitaciones guardadas sigan vigentes: la empresa puede haber sacado a alguien
   const checkedInvitations = React.useRef(false);
@@ -241,7 +249,7 @@ const TicketsScreen = ({ route, navigation }) => {
               <View style={{ flex: 1 }}>
                 <Text style={[styles.invEyebrow, { color: C.gold }]}>Invitaciones de tu empresa</Text>
                 <Text style={styles.invName}>{q.company}</Text>
-                <Text style={styles.invHint}>{q.eventTitle} · Ver la lista y anotar gente</Text>
+                <Text style={styles.invHint}>{q.eventTitle} · Ver y administrar la lista de invitados</Text>
               </View>
               <TouchableOpacity onPress={() => quotas.remove(q.token)} hitSlop={12} accessibilityLabel="Quitar el cupo del teléfono">
                 <Ionicons name="trash-outline" size={18} color={C.muted} />
@@ -289,7 +297,7 @@ const TicketsScreen = ({ route, navigation }) => {
 
           <View style={styles.card}>
             <Text style={styles.cardTitle}>¿Tenés invitaciones para tu empresa?</Text>
-            <Text style={styles.cardText}>Tocá el link que te llegó por mail o pegalo acá. Vas a ver la lista, anotar a tu gente y sacar a quien no vaya.</Text>
+            <Text style={styles.cardText}>Tocá el link que te llegó por mail o pegalo acá. Vas a ver la lista de invitados, sumar personas y dar de baja a quien no pueda ir.</Text>
             <Field label="Link de invitaciones" value={inv.link} onChangeText={(v) => setInv((x) => ({ ...x, link: v }))} placeholder="agronea.store/i/..." autoCapitalize="none" />
             <TouchableOpacity style={[styles.btn, { backgroundColor: C.gold }]} onPress={openQuotaFromLink} activeOpacity={0.85}>
               <Text style={[styles.btnText, { color: "#2a1f00" }]}>Abrir mis invitaciones</Text>

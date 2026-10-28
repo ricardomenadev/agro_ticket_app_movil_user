@@ -1,5 +1,5 @@
-// Link del cupo de invitaciones de una empresa, en la app: lugares libres, anotarse, compartir y sacar con la contraseña.
-// Lo usan el invitado (se anota y guarda su QR) y el responsable de la empresa (ve la lista y saca gente).
+// Link del cupo de invitaciones de una empresa, en la app: lugares libres, registrarse, compartir y sacar con la contraseña.
+// Lo usan el invitado (se registra y guarda su QR) y el responsable de la empresa (ve la lista y saca gente).
 import React, { useCallback, useEffect, useState } from "react";
 import { Modal, View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Share, ActivityIndicator, KeyboardAvoidingView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -46,7 +46,7 @@ export default function QuotaSheet({ token, onClose, onSaveInvitation, onSeen })
 
   const share = () =>
     Share.share({
-      message: `¡Hola! Te invitamos a ${data.event.title} de parte de ${data.quota.company}. Anotate en este link y te llega tu invitación con QR al instante: ${quotaLink(token)}`,
+      message: `¡Hola! Te invitamos a ${data.event.title} de parte de ${data.quota.company}. Registrate en este link y te llega tu invitación con QR al instante: ${quotaLink(token)}`,
     });
 
   const register = async () => {
@@ -99,7 +99,7 @@ export default function QuotaSheet({ token, onClose, onSaveInvitation, onSeen })
               <Text style={st.title}>{data.event.title}</Text>
               <View style={st.card}>
                 <Text style={st.big}>{s.free} {s.free === 1 ? "lugar libre" : "lugares libres"}</Text>
-                <Text style={st.muted}>{s.occupied} de {s.capacity} ocupados · Anotados {s.registered} · Ingresaron {s.checkedIn}</Text>
+                <Text style={st.muted}>{s.occupied} de {s.capacity} ocupados · Registrados {s.registered} · Ingresaron {s.checkedIn}</Text>
                 <TouchableOpacity style={st.share} onPress={share} activeOpacity={0.85}>
                   <Ionicons name="logo-whatsapp" size={18} color="#fff" />
                   <Text style={st.shareText}>Compartir el link</Text>
@@ -109,7 +109,7 @@ export default function QuotaSheet({ token, onClose, onSaveInvitation, onSeen })
               {msg ? <Text style={[st.msg, { color: msg.ok ? C.greenLight : C.gold }]}>{msg.text}</Text> : null}
 
               <View style={st.card}>
-                <Text style={st.cardTitle}>Anotate</Text>
+                <Text style={st.cardTitle}>Registrate</Text>
                 {blocked ? (
                   <Text style={st.muted}>{data.quota.status !== "ACTIVE" ? "Este cupo ya no recibe inscripciones." : "No quedan lugares en este cupo."}</Text>
                 ) : (
@@ -136,7 +136,7 @@ export default function QuotaSheet({ token, onClose, onSaveInvitation, onSeen })
                       <Text style={st.checkText}>Es para mí: guardar la invitación en este teléfono</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={st.btn} onPress={register} disabled={sending} activeOpacity={0.85}>
-                      {sending ? <ActivityIndicator color={C.bg} /> : <Text style={st.btnText}>Anotarme y recibir mi QR</Text>}
+                      {sending ? <ActivityIndicator color={C.bg} /> : <Text style={st.btnText}>Registrarme y recibir mi QR</Text>}
                     </TouchableOpacity>
                   </>
                 )}
@@ -150,7 +150,7 @@ export default function QuotaSheet({ token, onClose, onSaveInvitation, onSeen })
                   <View key={g.id} style={st.guest}>
                     <View style={{ flex: 1 }}>
                       <Text style={st.guestName}>{g.name}</Text>
-                      <Text style={[st.muted, { color: g.checkedInAt ? C.gold : C.greenLight }]}>{g.checkedInAt ? "✓ Ingresó" : "Anotado"}</Text>
+                      <Text style={[st.muted, { color: g.checkedInAt ? C.gold : C.greenLight }]}>{g.checkedInAt ? "✓ Ingresó" : "Registrado"}</Text>
                     </View>
                     {g.removable ? (
                       <TouchableOpacity onPress={() => setRemoving({ guest: g, code: "" })} hitSlop={10} accessibilityLabel={`Sacar a ${g.name}`} style={st.x}>

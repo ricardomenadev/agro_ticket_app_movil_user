@@ -109,7 +109,8 @@
           "savePhotosPermission": "Agronea necesita permiso para guardar el croquis del predio en tu galería.",
           "isAccessMediaLocationEnabled": false
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "scheme": "agronea"
   }
