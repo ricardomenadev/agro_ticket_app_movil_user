@@ -56,7 +56,10 @@ const MarketsScreen = ({ route }) => {
   }, [route?.params]);
 
   const labelOf = Object.fromEntries(NEWS_SECTIONS.map((s) => [s.id, s.label]));
-  const newsList = (section === "all" ? NEWS_SECTIONS.map((s) => s.id) : [section]).flatMap((id) => (news?.[id] || []).map((n) => ({ ...n, label: labelOf[id] })));
+  // En "Todas" se mezclan las secciones, de la más nueva a la más vieja
+  const newsList = (section === "all" ? NEWS_SECTIONS.map((s) => s.id) : [section])
+    .flatMap((id) => (news?.[id] || []).map((n) => ({ ...n, label: labelOf[id] })))
+    .sort((a, b) => (section === "all" ? new Date(b.publishedAt) - new Date(a.publishedAt) : 0));
   const newsRows = [];
   for (let i = 0; i < newsList.length; i += 2) newsRows.push(newsList.slice(i, i + 2));
   const marketNews = [...(news?.economy || []), ...(news?.national || []), ...(news?.nea || [])]
