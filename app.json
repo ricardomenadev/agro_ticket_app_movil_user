@@ -2,7 +2,7 @@
   "expo": {
     "name": "Agronea Producciones",
     "slug": "agro_app_movil_user",
-    "version": "1.3.6",
+    "version": "1.4.0",
     "orientation": "default",
     "icon": "./assets/logoAgronea3.png",
     "userInterfaceStyle": "light",
@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.agroapp.user",
-      "buildNumber": "14",
+      "buildNumber": "15",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "CFBundleDisplayName": "Agronea Producciones"
@@ -32,7 +32,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.agroapp.user",
-      "versionCode": 39,
+      "versionCode": 40,
       "googleServicesFile": "./google-services.json",
       "softwareKeyboardLayoutMode": "resize",
       "blockedPermissions": [
