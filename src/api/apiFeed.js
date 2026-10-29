@@ -25,6 +25,15 @@ export const useShowcase = () => {
   return data;
 };
 
+// Qué se ve en el menú Más (se prende desde el panel): /api/app/settings. Sin respuesta, todo oculto.
+export const fetchAppSettings = async () => {
+  const res = await fetch(`${API_URL.replace(/\/mobile$/, "")}/app/settings`);
+  if (!res.ok) throw new Error(`ajustes: ${res.status}`);
+  return (await res.json()).data;
+};
+
+export const useAppSettings = () => useCachedFeed("agroFeed.appSettings", fetchAppSettings).data || {};
+
 // Clima de Charata (Open-Meteo, sin clave): ahora, máxima, mínima y probabilidad de lluvia del día
 const WEATHER_URL =
   "https://api.open-meteo.com/v1/forecast?latitude=-27.2144&longitude=-61.1882" +

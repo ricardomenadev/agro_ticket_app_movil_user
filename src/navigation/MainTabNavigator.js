@@ -112,7 +112,7 @@ const MoreStackNavigator = () => {
       <MoreStack.Screen
         name="MoreMenu"
         component={MoreMenuScreen}
-        options={{ title: "Más Opciones" }}
+        options={{ title: "Más", headerShown: false }}
       />
       <MoreStack.Screen
         name="Event"
