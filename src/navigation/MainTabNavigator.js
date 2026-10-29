@@ -220,7 +220,7 @@ const MainTabNavigator = () => {
         name="Markets"
         component={MarketsScreen}
         options={{
-          tabBarLabel: "Mercados",
+          tabBarLabel: "Agro hoy",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="trending-up-outline" size={size} color={color} />
           ),

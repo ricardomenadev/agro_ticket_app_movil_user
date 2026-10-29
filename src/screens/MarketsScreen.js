@@ -1,8 +1,9 @@
-// Mercados: pizarra de granos (Rosario), hacienda (Cañuelas), dólar oficial y noticias de mercado.
-import React, { useState } from "react";
+// Mercados y noticias. Precios: pizarra de granos (Rosario), hacienda (Cañuelas), dólar oficial y noticias de mercado.
+// Noticias: todas las del feed en grilla, por sección (NEA, País, Economía).
+import React, { useEffect, useState } from "react";
 import { View, ScrollView, StyleSheet, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { C, SectionHeader, NewsCard, trendOf } from "../components/feed/FeedCards";
+import { C, SectionHeader, NewsCard, NewsTile, NewsEmpty, Chips, NEWS_SECTIONS, trendOf } from "../components/feed/FeedCards";
 import { useMarkets, useNews } from "../api/apiFeed";
 
 // Noticias que hablan de precios y mercados (de las que ya vienen en el feed)
@@ -35,10 +36,29 @@ const Row = ({ item, last }) => {
 
 const Board = ({ children }) => <View style={styles.board}>{children}</View>;
 
-const MarketsScreen = () => {
+const VIEWS = [
+  { id: "prices", label: "Precios" },
+  { id: "news", label: "Noticias" },
+];
+const NEWS_FILTERS = [{ id: "all", label: "Todas" }, ...NEWS_SECTIONS];
+
+const MarketsScreen = ({ route }) => {
   const [tab, setTab] = useState("grains");
+  const [view, setView] = useState("prices");
+  const [section, setSection] = useState("all");
   const { markets, loading } = useMarkets();
-  const { news } = useNews();
+  const { news, loading: newsLoading } = useNews();
+
+  // Desde el inicio se llega con { view, section } (p. ej. "Ver más del NEA")
+  useEffect(() => {
+    if (route?.params?.view) setView(route.params.view);
+    if (route?.params?.section) setSection(route.params.section);
+  }, [route?.params]);
+
+  const labelOf = Object.fromEntries(NEWS_SECTIONS.map((s) => [s.id, s.label]));
+  const newsList = (section === "all" ? NEWS_SECTIONS.map((s) => s.id) : [section]).flatMap((id) => (news?.[id] || []).map((n) => ({ ...n, label: labelOf[id] })));
+  const newsRows = [];
+  for (let i = 0; i < newsList.length; i += 2) newsRows.push(newsList.slice(i, i + 2));
   const marketNews = [...(news?.economy || []), ...(news?.national || []), ...(news?.nea || [])]
     .filter((n) => n.category === "economia" || MARKET_WORDS.test(n.title))
     .slice(0, 4);
@@ -88,39 +108,74 @@ const MarketsScreen = () => {
     <SafeAreaView style={styles.safe} edges={["top"]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View>
-          <Text style={styles.title}>Mercados</Text>
-          <Text style={styles.subtitle}>Se actualiza solo durante el día · fuentes oficiales</Text>
+          <Text style={styles.title}>Mercados y noticias</Text>
+          <Text style={styles.subtitle}>Precios y noticias del agro, al día</Text>
         </View>
 
-        <View style={styles.tabs}>
-          {TABS.map((t) => (
+        <View style={styles.segment}>
+          {VIEWS.map((v) => (
             <TouchableOpacity
-              key={t.id}
-              style={[styles.tab, tab === t.id && styles.tabActive]}
-              onPress={() => setTab(t.id)}
+              key={v.id}
+              style={[styles.segBtn, view === v.id && styles.segBtnOn]}
+              onPress={() => setView(v.id)}
               accessibilityRole="tab"
-              accessibilityState={{ selected: tab === t.id }}
+              accessibilityState={{ selected: view === v.id }}
             >
-              <Text style={[styles.tabText, tab === t.id && styles.tabTextActive]}>{t.label}</Text>
+              <Text style={[styles.tabText, view === v.id && styles.tabTextActive]}>{v.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
 
-        <Text style={styles.eyebrow}>{current.eyebrow}</Text>
-        {renderBoard()}
-        <Text style={styles.source}>
-          Fuente: {current.source}
-          {block?.date ? ` · ${block.date}` : ""}
-        </Text>
-
-        {marketNews.length ? (
+        {view === "news" ? (
           <>
-            <SectionHeader title="Noticias de mercado" />
-            {marketNews.map((n) => (
-              <NewsCard key={n.id} item={n} />
-            ))}
+            <Chips options={NEWS_FILTERS} value={section} onChange={setSection} />
+            {newsRows.length ? (
+              newsRows.map((row) => (
+                <View key={row[0].id} style={styles.newsRow}>
+                  {row.map((n) => (
+                    <NewsTile key={n.id} item={n} label={n.label} />
+                  ))}
+                  {row.length === 1 ? <View style={{ flex: 1 }} /> : null}
+                </View>
+              ))
+            ) : (
+              <NewsEmpty loading={newsLoading} />
+            )}
           </>
-        ) : null}
+        ) : (
+          <>
+            <Text style={styles.subtitle}>Se actualiza solo durante el día · fuentes oficiales</Text>
+            <View style={styles.tabs}>
+              {TABS.map((t) => (
+                <TouchableOpacity
+                  key={t.id}
+                  style={[styles.tab, tab === t.id && styles.tabActive]}
+                  onPress={() => setTab(t.id)}
+                  accessibilityRole="tab"
+                  accessibilityState={{ selected: tab === t.id }}
+                >
+                  <Text style={[styles.tabText, tab === t.id && styles.tabTextActive]}>{t.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Text style={styles.eyebrow}>{current.eyebrow}</Text>
+            {renderBoard()}
+            <Text style={styles.source}>
+              Fuente: {current.source}
+              {block?.date ? ` · ${block.date}` : ""}
+            </Text>
+
+            {marketNews.length ? (
+              <>
+                <SectionHeader title="Noticias de mercado" />
+                {marketNews.map((n) => (
+                  <NewsCard key={n.id} item={n} />
+                ))}
+              </>
+            ) : null}
+          </>
+        )}
 
         <View style={{ height: 110 }} />
       </ScrollView>
@@ -133,6 +188,10 @@ const styles = StyleSheet.create({
   content: { padding: 18, gap: 14 },
   title: { color: C.text, fontSize: 24, fontWeight: "800" },
   subtitle: { color: C.muted, fontSize: 12, marginTop: 2 },
+  segment: { flexDirection: "row", backgroundColor: C.card, borderColor: C.border, borderWidth: 1, borderRadius: 14, padding: 4 },
+  segBtn: { flex: 1, minHeight: 44, borderRadius: 10, alignItems: "center", justifyContent: "center" },
+  segBtnOn: { backgroundColor: C.borderStrong },
+  newsRow: { flexDirection: "row", gap: 12 },
   tabs: { flexDirection: "row", gap: 8, backgroundColor: C.card, borderRadius: 14, padding: 4 },
   tab: { flex: 1, minHeight: 44, borderRadius: 10, alignItems: "center", justifyContent: "center" },
   tabActive: { backgroundColor: C.green },

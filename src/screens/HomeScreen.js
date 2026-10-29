@@ -1,4 +1,4 @@
-// Inicio: herramienta diaria del agro (precios, noticias del NEA y del país, Agronea TV, redes y oficina).
+// Inicio: herramienta diaria del agro (precios, portada de noticias del NEA, el país y economía, Agronea TV, redes y oficina).
 // Cuando se acerca una edición, arriba aparece el bloque del evento con la cuenta regresiva.
 import React, { useEffect, useState } from "react";
 import { View, ScrollView, StyleSheet, Text, TouchableOpacity, Linking } from "react-native";
@@ -10,7 +10,7 @@ import { useNavigation } from "@react-navigation/native";
 import AgroneaTV from "../components/home/AgroneaTv";
 import CountdownTimer from "../components/home/CountdownTimer";
 import AgroneaHero from "../components/home/AgroneaHero";
-import { C, SectionHeader, PriceCard, PriceCardEmpty, NewsCard, NewsEmpty } from "../components/feed/FeedCards";
+import { C, SectionHeader, PriceCard, PriceCardEmpty, NewsCard, NewsEmpty, NewsCover, Chips, NEWS_SECTIONS, leadOf } from "../components/feed/FeedCards";
 import { fetchEvents } from "../api/apiMobile";
 import { useMarkets, useNews, useWeather } from "../api/apiFeed";
 
@@ -83,6 +83,11 @@ const HomeScreen = () => {
   const { markets } = useMarkets();
   const { news, loading: newsLoading } = useNews();
   const weather = useWeather();
+  const [sectionId, setSectionId] = useState("nea");
+  const leads = NEWS_SECTIONS.map((s) => ({ ...s, item: leadOf(news?.[s.id]) })).filter((l) => l.item);
+  const section = NEWS_SECTIONS.find((s) => s.id === sectionId);
+  const sectionLead = leadOf(news?.[sectionId]);
+  const moreNews = (news?.[sectionId] || []).filter((n) => n !== sectionLead).slice(0, 3);
 
   useEffect(() => {
     fetchEvents()
@@ -116,7 +121,7 @@ const HomeScreen = () => {
 
         <AgroneaHero agroneaNews={news?.agronea?.[0]} />
 
-        <SectionHeader title="Mercados de hoy" action="Ver todo" onAction={() => navigation.navigate("Markets")} />
+        <SectionHeader title="Mercados de hoy" action="Ver todo" onAction={() => navigation.navigate("Markets", { view: "prices" })} />
         <View style={styles.grid}>
           {[HOME_PRICES.slice(0, 2), HOME_PRICES.slice(2)].map((row, r) => (
             <View key={r} style={styles.gridRow}>
@@ -138,24 +143,33 @@ const HomeScreen = () => {
           </>
         ) : null}
 
-        <SectionHeader title="Noticias del campo · NEA" />
-        {news?.nea?.length ? news.nea.map((n, i) => <NewsCard key={n.id} item={n} big={i === 0} />) : <NewsEmpty loading={newsLoading} />}
+        {/* Portada: la principal del NEA grande y la del país y la de economía de a dos */}
+        <SectionHeader title="Lo más importante del agro" />
+        {leads.length ? (
+          <View style={{ gap: 8 }}>
+            <NewsCover item={leads[0].item} label={leads[0].label} />
+            {leads.length > 1 ? (
+              <View style={styles.gridRow}>
+                {leads.slice(1).map((l) => (
+                  <NewsCover key={l.id} item={l.item} label={l.label} half />
+                ))}
+              </View>
+            ) : null}
+          </View>
+        ) : (
+          <NewsEmpty loading={newsLoading} />
+        )}
 
-        {news?.national?.length ? (
+        {/* Las que siguen, de a una sección por vez; el resto en Mercados y noticias */}
+        {leads.length ? (
           <>
-            <SectionHeader title="Agro en el país" />
-            {news.national.map((n) => (
-              <NewsCard key={n.id} item={n} />
-            ))}
-          </>
-        ) : null}
-
-        {news?.economy?.length ? (
-          <>
-            <SectionHeader title="Economía que importa" />
-            {news.economy.map((n) => (
-              <NewsCard key={n.id} item={n} />
-            ))}
+            <SectionHeader title="Más noticias del campo" />
+            <Chips options={NEWS_SECTIONS} value={section.id} onChange={setSectionId} />
+            {moreNews.length ? moreNews.map((n) => <NewsCard key={n.id} item={n} />) : <Text style={styles.noMore}>Hoy no hay más noticias de {section.label}.</Text>}
+            <TouchableOpacity style={styles.moreBtn} onPress={() => navigation.navigate("Markets", { view: "news", section: section.id })} activeOpacity={0.85}>
+              <Text style={styles.moreBtnText}>{section.more}</Text>
+              <Ionicons name="chevron-forward" size={16} color={C.gold} />
+            </TouchableOpacity>
           </>
         ) : null}
 
@@ -214,6 +228,9 @@ const styles = StyleSheet.create({
   weatherCity: { color: C.muted, fontSize: 10 },
   grid: { gap: 10 },
   gridRow: { flexDirection: "row", gap: 10 },
+  noMore: { color: C.muted, fontSize: 13, paddingVertical: 6 },
+  moreBtn: { minHeight: 48, borderRadius: 14, borderWidth: 1, borderColor: C.gold, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6 },
+  moreBtnText: { color: C.gold, fontWeight: "700", fontSize: 14 },
   buyBtn: { minHeight: 52, borderRadius: 14, backgroundColor: C.gold, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 },
   buyBtnText: { color: C.bg, fontWeight: "800", fontSize: 16 },
   social: { flex: 1, minHeight: 76, borderRadius: 16, alignItems: "center", justifyContent: "center", gap: 6 },
