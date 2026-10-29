@@ -1,5 +1,5 @@
 // Tienda: entradas y productos de Agronea todo el año. El carrito se arma acá y el pago se hace en
-// agronea.store con Mercado Pago (el link lleva el carrito; los precios los vuelve a calcular el servidor).
+// el checkout de agronea.store con Mercado Pago (el link lleva el carrito; los precios los vuelve a calcular el servidor).
 // Al pagar, la confirmación de la web vuelve sola a la app (?app=) y la compra queda guardada en Entradas.
 import React, { useMemo, useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image, Linking, ActivityIndicator, Modal, Pressable } from "react-native";
@@ -111,7 +111,8 @@ const ShopScreen = () => {
 
   const pay = async () => {
     try {
-      const link = `${STORE_URL}/?carrito=${base64url(JSON.stringify(lines.map((p) => cartItem(p, cart[p.id]))))}&app=${encodeURIComponent(APP_RETURN)}`;
+      // Directo al checkout de la web (datos del comprador y pago), con el carrito cargado
+      const link = `${STORE_URL}/checkout?carrito=${base64url(JSON.stringify(lines.map((p) => cartItem(p, cart[p.id]))))}&app=${encodeURIComponent(APP_RETURN)}`;
       setOpen(false);
       const result = await WebBrowser.openAuthSessionAsync(link, APP_RETURN);
       if (result.type !== "success") return; // cerró sin pagar: el carrito queda como estaba
@@ -226,9 +227,9 @@ const ShopScreen = () => {
                 <Text style={styles.sheetTotal}>{money(total)}</Text>
               </View>
               <TouchableOpacity style={styles.payBtn} onPress={pay} activeOpacity={0.85}>
-                <Text style={styles.payBtnText}>Pagar con Mercado Pago</Text>
+                <Text style={styles.payBtnText}>Continuar compra</Text>
               </TouchableOpacity>
-              <Text style={styles.sheetNote}>Se abre la tienda de Agronea para terminar el pago de forma segura.</Text>
+              <Text style={styles.sheetNote}>Cargás tus datos y terminás el pago en agronea.store con Mercado Pago.</Text>
             </>
           ) : (
             <Text style={styles.empty}>Todavía no agregaste nada.</Text>
