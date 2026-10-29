@@ -16,5 +16,13 @@
         "EXPO_USE_FAST_RESOLVER": "1"
       }
     }
+  },
+  "submit": {
+    "production": {
+      "android": {
+        "track": "production",
+        "releaseStatus": "draft"
+      }
+    }
   }
 }
