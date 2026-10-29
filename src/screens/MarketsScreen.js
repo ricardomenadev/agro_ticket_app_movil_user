@@ -1,13 +1,11 @@
-// Mercados y noticias. Precios: pizarra de granos (Rosario), hacienda (Cañuelas), dólar oficial y noticias de mercado.
+// Mercados y noticias. Precios: pizarra de granos (Rosario), hacienda (Cañuelas) y dólar oficial.
 // Noticias: todas las del feed en grilla, por sección (NEA, País, Economía).
 import React, { useEffect, useState } from "react";
 import { View, ScrollView, StyleSheet, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { C, SectionHeader, NewsCard, NewsTile, NewsEmpty, Chips, NEWS_SECTIONS, trendOf } from "../components/feed/FeedCards";
+import { Ionicons } from "@expo/vector-icons";
+import { C, NewsTile, NewsEmpty, Chips, NEWS_SECTIONS, trendOf } from "../components/feed/FeedCards";
 import { useMarkets, useNews } from "../api/apiFeed";
-
-// Noticias que hablan de precios y mercados (de las que ya vienen en el feed)
-const MARKET_WORDS = /precio|mercado|pizarra|cotiza|export|ca[ñn]uelas|remate|d[oó]lar|retencion|chicago|cosecha/i;
 
 const TABS = [
   { id: "grains", label: "Granos", eyebrow: "PIZARRA ROSARIO · $ POR TONELADA", source: "Bolsa de Comercio de Rosario" },
@@ -62,9 +60,6 @@ const MarketsScreen = ({ route }) => {
     .sort((a, b) => (section === "all" ? new Date(b.publishedAt) - new Date(a.publishedAt) : 0));
   const newsRows = [];
   for (let i = 0; i < newsList.length; i += 2) newsRows.push(newsList.slice(i, i + 2));
-  const marketNews = [...(news?.economy || []), ...(news?.national || []), ...(news?.nea || [])]
-    .filter((n) => n.category === "economia" || MARKET_WORDS.test(n.title))
-    .slice(0, 4);
   const current = TABS.find((t) => t.id === tab);
   const block = markets?.[tab];
 
@@ -169,14 +164,12 @@ const MarketsScreen = ({ route }) => {
               {block?.date ? ` · ${block.date}` : ""}
             </Text>
 
-            {marketNews.length ? (
-              <>
-                <SectionHeader title="Noticias de mercado" />
-                {marketNews.map((n) => (
-                  <NewsCard key={n.id} item={n} />
-                ))}
-              </>
-            ) : null}
+            {/* Las noticias viven en Noticias: acá solo el atajo, para no repetirlas */}
+            <TouchableOpacity style={styles.newsLink} onPress={() => { setSection("economy"); setView("news"); }} activeOpacity={0.85} accessibilityRole="button">
+              <Ionicons name="newspaper-outline" size={20} color={C.gold} />
+              <Text style={styles.newsLinkText}>Noticias de economía y mercados</Text>
+              <Ionicons name="chevron-forward" size={18} color={C.gold} />
+            </TouchableOpacity>
           </>
         )}
 
@@ -195,6 +188,8 @@ const styles = StyleSheet.create({
   segBtn: { flex: 1, minHeight: 44, borderRadius: 10, alignItems: "center", justifyContent: "center" },
   segBtnOn: { backgroundColor: C.borderStrong },
   newsRow: { flexDirection: "row", gap: 12 },
+  newsLink: { flexDirection: "row", alignItems: "center", gap: 10, minHeight: 52, borderRadius: 14, borderWidth: 1, borderColor: C.gold, paddingHorizontal: 16, marginTop: 6 },
+  newsLinkText: { flex: 1, color: C.gold, fontWeight: "700", fontSize: 14 },
   tabs: { flexDirection: "row", gap: 8, backgroundColor: C.card, borderRadius: 14, padding: 4 },
   tab: { flex: 1, minHeight: 44, borderRadius: 10, alignItems: "center", justifyContent: "center" },
   tabActive: { backgroundColor: C.green },
