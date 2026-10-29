@@ -1,7 +1,7 @@
-// Inicio: herramienta diaria del agro (precios, portada de noticias del NEA, el país y economía, Agronea TV, redes y oficina).
+// Inicio: herramienta diaria del agro (precios, portada de noticias del NEA, el país y economía, Agronea TV y el cierre con oficina, redes y Wesyx).
 // Cuando se acerca una edición, arriba aparece el bloque del evento con la cuenta regresiva.
 import React, { useEffect, useState } from "react";
-import { View, ScrollView, StyleSheet, Text, TouchableOpacity, Linking } from "react-native";
+import { View, ScrollView, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
@@ -10,6 +10,7 @@ import { useNavigation } from "@react-navigation/native";
 import AgroneaTV from "../components/home/AgroneaTv";
 import CountdownTimer from "../components/home/CountdownTimer";
 import AgroneaHero from "../components/home/AgroneaHero";
+import HomeFooter from "../components/home/HomeFooter";
 import { C, SectionHeader, PriceCard, PriceCardEmpty, NewsCard, NewsEmpty, NewsCover, Chips, NEWS_SECTIONS, leadOf } from "../components/feed/FeedCards";
 import { fetchEvents } from "../api/apiMobile";
 import { useMarkets, useNews, useWeather } from "../api/apiFeed";
@@ -34,14 +35,6 @@ const HOME_PRICES = [
   { block: "cattle", id: "novillos", place: "Cañuelas", unit: "kg vivo" },
 ];
 
-const SOCIAL = [
-  { id: "ig", label: "Instagram", icon: "logo-instagram", color: "#dd2a7b", url: "https://www.instagram.com/agroneachaco/" },
-  { id: "fb", label: "Facebook", icon: "logo-facebook", color: "#1877f2", url: "https://www.facebook.com/agroneachaco" },
-  { id: "yt", label: "YouTube", icon: "logo-youtube", color: "#d62d20", url: "https://www.youtube.com/@agroneaproducciones" },
-  { id: "x", label: "X", icon: "logo-x", color: "#000000", url: "https://x.com/AgroneaChaco" },
-];
-const WHATSAPP = "https://wa.me/5493794222011";
-const OFFICE_MAP = "https://maps.app.goo.gl/rKai7BcMQEF3x6Z46";
 // Días antes de la edición en que el inicio pasa a mostrar el evento arriba de todo
 const EVENT_WINDOW_DAYS = 60;
 
@@ -95,7 +88,6 @@ const HomeScreen = () => {
       .catch(() => setEvent(null)); // sin conexión: el inicio se ve igual, sin el bloque del evento
   }, []);
 
-  const open = (url) => Linking.openURL(url).catch(() => {});
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
@@ -175,31 +167,6 @@ const HomeScreen = () => {
 
         <AgroneaTV />
 
-        <SectionHeader title="Seguinos" />
-        <View style={styles.gridRow}>
-          {SOCIAL.map((n) => (
-            <TouchableOpacity key={n.id} style={[styles.social, { backgroundColor: n.color }]} onPress={() => open(n.url)} activeOpacity={0.85}>
-              <Ionicons name={n.icon} size={26} color="#fff" />
-              <Text style={styles.socialText}>{n.label}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        <View style={styles.office}>
-          <Text style={styles.officeTitle}>Oficina Agronea</Text>
-          <Text style={styles.officeText}>Charata, Chaco</Text>
-          <View style={styles.gridRow}>
-            <TouchableOpacity style={[styles.officeBtn, { backgroundColor: "#25d366" }]} onPress={() => open(WHATSAPP)}>
-              <Ionicons name="logo-whatsapp" size={18} color={C.bg} />
-              <Text style={[styles.officeBtnText, { color: C.bg }]}>WhatsApp</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.officeBtn, { borderColor: C.borderStrong, borderWidth: 1 }]} onPress={() => open(OFFICE_MAP)}>
-              <Ionicons name="navigate-outline" size={18} color={C.text} />
-              <Text style={styles.officeBtnText}>Cómo llegar</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
         {!event ? (
           <LinearGradient colors={["#1a1a1a", "#0a0a0a"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.next}>
             <View style={{ flex: 1 }}>
@@ -210,6 +177,8 @@ const HomeScreen = () => {
             <Ionicons name="notifications-outline" size={26} color={C.gold} />
           </LinearGradient>
         ) : null}
+
+        <HomeFooter />
 
         <View style={{ height: 110 }} />
       </ScrollView>
@@ -233,13 +202,6 @@ const styles = StyleSheet.create({
   moreBtnText: { color: C.gold, fontWeight: "700", fontSize: 14 },
   buyBtn: { minHeight: 52, borderRadius: 14, backgroundColor: C.gold, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 },
   buyBtnText: { color: C.bg, fontWeight: "800", fontSize: 16 },
-  social: { flex: 1, minHeight: 76, borderRadius: 16, alignItems: "center", justifyContent: "center", gap: 6 },
-  socialText: { color: "#fff", fontSize: 12, fontWeight: "700" },
-  office: { backgroundColor: C.card, borderColor: C.border, borderWidth: 1, borderRadius: 18, padding: 14, gap: 8 },
-  officeTitle: { color: C.text, fontSize: 15, fontWeight: "700" },
-  officeText: { color: C.soft, fontSize: 13 },
-  officeBtn: { flex: 1, minHeight: 44, borderRadius: 12, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6 },
-  officeBtnText: { color: C.text, fontWeight: "700", fontSize: 13 },
   next: { borderRadius: 20, padding: 16, flexDirection: "row", alignItems: "center", gap: 12 },
   nextEyebrow: { color: C.gold, fontSize: 10, letterSpacing: 2, fontWeight: "600" },
   nextTitle: { color: C.text, fontSize: 18, fontWeight: "800", marginTop: 4 },
