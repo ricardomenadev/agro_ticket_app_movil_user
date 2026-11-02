@@ -6,7 +6,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useStore } from "../../context/StoreContext";
-import { useShowcase } from "../../api/apiFeed";
+import { useShowcase, useAppSettings } from "../../api/apiFeed";
 import { C } from "../feed/FeedCards";
 
 // Redes de Agronea (mismos links que el pie del inicio)
@@ -32,6 +32,7 @@ const Cta = ({ label, onPress, center }) => (
 const AgroneaHero = ({ agroneaNews }) => {
   const navigation = useNavigation();
   const showcase = useShowcase();
+  const { showEvent } = useAppSettings();
   const { products } = useStore();
   const scroller = useRef(null);
   const [page, setPage] = useState(0);
@@ -50,7 +51,8 @@ const AgroneaHero = ({ agroneaNews }) => {
         </View>
         <Text style={[styles.title, styles.textCenter]} numberOfLines={1}>{showcase?.settings?.title || "Agronea"}</Text>
         <Text style={[styles.text, styles.textCenter]} numberOfLines={2}>{showcase?.settings?.subtitle || "El evento del agro del Norte Argentino"}</Text>
-        <Cta label="Conocé el evento" center onPress={() => navigation.navigate("More", { screen: "Event" })} />
+        {/* Con la misma tilde del panel que muestra "El evento" en Más */}
+        {showEvent ? <Cta label="Conocé el evento" center onPress={() => navigation.navigate("More", { screen: "Event" })} /> : null}
       </LinearGradient>
     </ImageBackground>,
 
