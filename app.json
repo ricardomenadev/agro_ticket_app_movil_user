@@ -98,7 +98,7 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/logoAgronea3.png",
+          "icon": "./assets/notification-icon.png",
           "color": "#0A8F3C",
           "sounds": []
         }
