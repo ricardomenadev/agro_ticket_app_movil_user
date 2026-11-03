@@ -1,4 +1,4 @@
-// Más: info para el visitante, contacto y legales. "El evento" y "Expositores" aparecen solo cuando
+// Más: info para el visitante, prensa, contacto y legales. "El evento" y "Expositores" aparecen solo cuando
 // se prenden desde el panel (Menú de la app); las pantallas siguen en la app aunque estén ocultas.
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Linking } from "react-native";
@@ -61,6 +61,10 @@ const MoreMenuScreen = ({ navigation }) => {
             { title: "Guía del visitante", icon: "compass-outline", onPress: go("VisitorGuide") },
             { title: "Información importante", icon: "information-circle-outline", onPress: go("ImportantInfo") },
           ]}
+        />
+        <Group
+          title="Prensa"
+          items={[{ title: "Acreditación de prensa", subtitle: "Para medios y periodistas", icon: "newspaper-outline", onPress: go("PressAccreditation") }]}
         />
         <Group title="Ayuda" items={[{ title: "Contacto", subtitle: "WhatsApp y mail", icon: "chatbubble-ellipses-outline", onPress: go("Contact") }]} />
         <Group

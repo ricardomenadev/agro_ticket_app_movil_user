@@ -21,6 +21,7 @@ import ImportantInfoScreen from "../screens/more/ImportantInfoScreen";
 import MoreMenuScreen from "../screens/more/MoreMenuScreen";
 import MercadoPagoWebView from "../screens/shop/MercadoPagoWebView";
 import ContactScreen from "../screens/more/ContactScreen";
+import PressAccreditationScreen from "../screens/more/PressAccreditationScreen";
 import AppVersionScreen from "../screens/more/AppVersionScreen";
 import TermsConditionsScreen from "../screens/more/TermsConditionsScreen";
 import AccommodationScreen from "../screens/more/AccommodationScreen";
@@ -169,6 +170,11 @@ const MoreStackNavigator = () => {
         name="Contact"
         component={ContactScreen}
         options={{ title: "Contacto" }}
+      />
+      <MoreStack.Screen
+        name="PressAccreditation"
+        component={PressAccreditationScreen}
+        options={{ title: "Acreditación de prensa" }}
       />
       <MoreStack.Screen
         name="AppVersion"
