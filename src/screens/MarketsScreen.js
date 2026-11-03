@@ -1,4 +1,4 @@
-// Mercados y noticias. Precios: pizarra de granos (Rosario), hacienda (Cañuelas) y dólar oficial.
+// Mercados y noticias. Precios: pizarra de granos (Rosario), hacienda (Cañuelas) y cotizaciones del dólar.
 // Noticias: todas las del feed en grilla, por sección (NEA, País, Economía).
 import React, { useEffect, useState } from "react";
 import { View, ScrollView, StyleSheet, Text, TouchableOpacity, ActivityIndicator } from "react-native";
@@ -10,7 +10,7 @@ import { useMarkets, useNews } from "../api/apiFeed";
 const TABS = [
   { id: "grains", label: "Granos", eyebrow: "PIZARRA ROSARIO · $ POR TONELADA", source: "Bolsa de Comercio de Rosario" },
   { id: "cattle", label: "Hacienda", eyebrow: "MERCADO DE CAÑUELAS · $ POR KG VIVO (PROMEDIO)", source: "Mercado Agroganadero de Cañuelas" },
-  { id: "dollar", label: "Dólar", eyebrow: "DÓLAR OFICIAL · BANCO NACIÓN", source: "Cotización oficial" },
+  { id: "dollar", label: "Dólar", eyebrow: "COTIZACIONES DEL DÓLAR · COMPRA / VENTA", source: "DolarApi (oficial: Banco Nación)" },
 ];
 
 const money = (n) => (n == null ? "$ —" : `$ ${Math.round(n).toLocaleString("es-AR")}`);
@@ -75,16 +75,22 @@ const MarketsScreen = ({ route }) => {
     }
     if (tab === "dollar") {
       const d = markets.dollar;
+      // Si el servidor todavía manda solo el oficial, se muestra ese
+      const rows = d?.items?.length ? d.items : [{ id: "oficial", name: "Oficial", buy: d?.buy, sell: d?.sell }];
       return (
         <Board>
-          <View style={[styles.row, styles.rowBorder]}>
-            <Text style={styles.rowName}>Compra</Text>
-            <Text style={styles.rowPrice}>{money(d?.buy)}</Text>
+          <View style={[styles.row, styles.rowBorder, styles.dollarHead]}>
+            <Text style={[styles.rowSub, styles.dollarName]}>Tipo</Text>
+            <Text style={[styles.rowSub, styles.dollarCol]}>Compra</Text>
+            <Text style={[styles.rowSub, styles.dollarCol]}>Venta</Text>
           </View>
-          <View style={styles.row}>
-            <Text style={styles.rowName}>Venta</Text>
-            <Text style={styles.rowPrice}>{money(d?.sell)}</Text>
-          </View>
+          {rows.map((r, i) => (
+            <View key={r.id} style={[styles.row, i < rows.length - 1 && styles.rowBorder]}>
+              <Text style={[styles.rowName, styles.dollarName]} numberOfLines={1}>{r.name}</Text>
+              <Text style={[styles.dollarPrice, styles.dollarCol]}>{money(r.buy)}</Text>
+              <Text style={[styles.rowPrice, styles.dollarCol]}>{money(r.sell)}</Text>
+            </View>
+          ))}
         </Board>
       );
     }
@@ -205,6 +211,10 @@ const styles = StyleSheet.create({
   rowChange: { fontSize: 12 },
   loading: { padding: 24, alignItems: "center" },
   source: { color: C.muted, fontSize: 11, marginTop: -6 },
+  dollarHead: { paddingVertical: 8 },
+  dollarName: { flex: 1.2 },
+  dollarCol: { flex: 1, textAlign: "right" },
+  dollarPrice: { color: C.muted, fontSize: 15, fontWeight: "700" },
 });
 
 export default MarketsScreen;

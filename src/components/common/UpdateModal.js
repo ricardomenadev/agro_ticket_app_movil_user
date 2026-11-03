@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Constants from "expo-constants";
-import { COLORS } from "../../styles/theme";
+import { C } from "../feed/FeedCards";
 
 const API_URL = __DEV__
   ? "http://192.168.1.244:5000/api"
@@ -108,7 +108,7 @@ const UpdateModal = ({ onDismiss }) => {
           {/* Franja superior verde */}
           <View style={s.topStripe}>
             <Image
-              source={require("../../../assets/images/logo_agronea_2026.png")}
+              source={require("../../../assets/images/logo_splash_blanco.png")}
               style={s.logo}
               resizeMode="contain"
             />
@@ -117,7 +117,7 @@ const UpdateModal = ({ onDismiss }) => {
           {/* Ícono de update */}
           <View style={s.iconWrapper}>
             <View style={s.iconCircle}>
-              <Ionicons name="arrow-up-circle-outline" size={32} color={COLORS.primary} />
+              <Ionicons name="arrow-up-circle-outline" size={32} color={C.gold} />
             </View>
           </View>
 
@@ -135,7 +135,7 @@ const UpdateModal = ({ onDismiss }) => {
               ].map((f) => (
                 <View key={f.text} style={s.featureRow}>
                   <View style={s.featureIcon}>
-                    <Ionicons name={f.icon} size={14} color={COLORS.primary} />
+                    <Ionicons name={f.icon} size={14} color={C.greenLight} />
                   </View>
                   <Text style={s.featureText}>{f.text}</Text>
                 </View>
@@ -146,7 +146,7 @@ const UpdateModal = ({ onDismiss }) => {
           {/* Botones */}
           <View style={s.buttons}>
             <TouchableOpacity style={s.btnPrimary} onPress={handleUpdate} activeOpacity={0.85}>
-              <Ionicons name="download-outline" size={18} color="#fff" />
+              <Ionicons name="download-outline" size={18} color="#000" />
               <Text style={s.btnPrimaryText}>Actualizar ahora</Text>
             </TouchableOpacity>
 
@@ -164,139 +164,71 @@ const UpdateModal = ({ onDismiss }) => {
   );
 };
 
+// Mismo estilo que el inicio de la app: fondo negro, franja verde y botón dorado
 const s = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.55)",
+    backgroundColor: "rgba(0,0,0,0.75)",
     alignItems: "center",
     justifyContent: "center",
     padding: 24,
   },
   card: {
-    backgroundColor: "#fff",
+    backgroundColor: C.card,
     borderRadius: 24,
+    borderWidth: 1,
+    borderColor: C.border,
     width: "100%",
     maxWidth: 360,
     overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.18,
-    shadowRadius: 24,
-    elevation: 12,
   },
-
-  // Franja verde superior
   topStripe: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: C.greenDeep,
+    borderBottomWidth: 1,
+    borderBottomColor: C.green,
     paddingVertical: 24,
     alignItems: "center",
   },
-  logo: {
-    width: 160,
-    height: 50,
-  },
-
-  // Ícono flotante
-  iconWrapper: {
-    alignItems: "center",
-    marginTop: -22,
-    marginBottom: 4,
-  },
+  logo: { width: 160, height: 72 },
+  iconWrapper: { alignItems: "center", marginTop: -26, marginBottom: 4 },
   iconCircle: {
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: "#fff",
+    backgroundColor: C.card,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
-    borderColor: COLORS.primary + "30",
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    elevation: 4,
+    borderColor: C.gold,
   },
-
-  // Contenido
-  content: {
-    paddingHorizontal: 24,
-    paddingBottom: 16,
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "800",
-    color: "#1A2E1C",
-    textAlign: "center",
-    marginBottom: 10,
-  },
-  message: {
-    fontSize: 14,
-    color: "#6B8A6E",
-    textAlign: "center",
-    lineHeight: 21,
-    marginBottom: 16,
-  },
-
-  // Features
-  featuresList: {
-    width: "100%",
-    backgroundColor: "#F5F7F5",
-    borderRadius: 14,
-    padding: 14,
-    gap: 10,
-  },
-  featureRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
+  content: { paddingHorizontal: 24, paddingBottom: 16, alignItems: "center" },
+  title: { fontSize: 20, fontWeight: "800", color: C.text, textAlign: "center", marginBottom: 10 },
+  message: { fontSize: 14, color: C.soft, textAlign: "center", lineHeight: 21, marginBottom: 16 },
+  featuresList: { width: "100%", backgroundColor: C.bg, borderRadius: 14, borderWidth: 1, borderColor: C.border, padding: 14, gap: 10 },
+  featureRow: { flexDirection: "row", alignItems: "center", gap: 10 },
   featureIcon: {
     width: 26,
     height: 26,
     borderRadius: 13,
-    backgroundColor: COLORS.primary + "18",
+    backgroundColor: C.greenDeep,
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
   },
-  featureText: {
-    fontSize: 13,
-    color: "#1A2E1C",
-    fontWeight: "500",
-  },
-
-  // Botones
-  buttons: {
-    paddingHorizontal: 24,
-    paddingBottom: 24,
-    paddingTop: 8,
-    gap: 10,
-  },
+  featureText: { fontSize: 13, color: C.text, fontWeight: "500" },
+  buttons: { paddingHorizontal: 24, paddingBottom: 24, paddingTop: 8, gap: 10 },
   btnPrimary: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: C.gold,
     borderRadius: 14,
-    paddingVertical: 14,
+    minHeight: 50,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
   },
-  btnPrimaryText: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#fff",
-  },
-  btnSecondary: {
-    paddingVertical: 10,
-    alignItems: "center",
-  },
-  btnSecondaryText: {
-    fontSize: 14,
-    color: "#6B8A6E",
-    fontWeight: "500",
-  },
+  btnPrimaryText: { fontSize: 16, fontWeight: "800", color: "#000" },
+  btnSecondary: { minHeight: 44, alignItems: "center", justifyContent: "center" },
+  btnSecondaryText: { fontSize: 14, color: C.muted, fontWeight: "600" },
 });
 
 export default UpdateModal;
