@@ -1,9 +1,8 @@
 // src/services/chatService.js
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Fuse from 'fuse.js';
 import chatDataFallback from '../data/chatDataFallback.json';
-import { EXHIBITORS_DATA } from '../constants/exhibitorsData2026';
+import { localAnswer } from './chatLocalSearch';
 
 // ─── Configuración ────────────────────────────────────────────────────────────
 
@@ -23,42 +22,12 @@ const STORAGE_KEYS = {
   deviceId:    'agronea_chat_deviceId',
   aiUsage:     'agronea_chat_aiUsage',
   offlineData: 'agronea_chat_offlineData',
+  pendingLeads: 'agronea_chat_pendingLeads', // mails dejados sin internet, se mandan al volver la señal
 };
 
 // Límite de consultas con IA por defecto, si el JSON no lo trae.
 // Unificado en 10 (antes había un 5 y un 10 mezclados en el código).
 const DEFAULT_AI_LIMIT = 10;
-
-// ─── Palabras de intención — usadas SOLO en el motor offline ─────────────────
-const EXPOSITOR_INTENT_KEYWORDS = [
-  'donde esta', 'dónde está', 'donde queda', 'dónde queda',
-  'busco', 'buscar', 'encontrar',
-  'stand de', 'stand del',
-  'empresa', 'expositor',
-  'donde puedo ver', 'donde puedo encontrar',
-  'tienen stand', 'tiene stand',
-  'ubicacion de', 'ubicación de',
-];
-
-// ─── Fuse.js — solo para el motor offline ────────────────────────────────────
-
-const FUSE_OPTIONS = {
-  keys: [
-    { name: 'name',        weight: 0.5 },
-    { name: 'id',          weight: 0.2 },
-    { name: 'keywords',    weight: 0.2 },
-    { name: 'description', weight: 0.1 },
-  ],
-  threshold: 0.40,
-  includeScore: true,
-  minMatchCharLength: 2,
-  ignoreLocation: true,
-};
-
-const fuseIndex = new Fuse(EXHIBITORS_DATA, FUSE_OPTIONS);
-
-const DIRECT_ANSWER_SCORE = 0.10;
-const DISAMBIGUATION_MAX  = 3;
 
 // ─── Comparación de versiones (semver simple) ────────────────────────────────
 // Compara "1.10.0" vs "1.9.0" correctamente (numérico por segmento).
@@ -191,124 +160,61 @@ export const saveAiUsage = async (aiUsage) => {
   }
 };
 
-// ─── Normalización ────────────────────────────────────────────────────────────
+// ─── Mails de interesados ─────────────────────────────────────────────────────
 
-const normalize = (text) =>
-  (text || '')
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
-
-// ─── Detección de intención — solo para el motor offline ─────────────────────
-
-const hasExpositorIntent = (message) => {
-  const texto = normalize(message);
-  return EXPOSITOR_INTENT_KEYWORDS.some(kw => texto.includes(normalize(kw)));
+const postLead = async (lead) => {
+  const response = await fetch(`${API_URL}/public/chat-lead`, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(lead),
+  });
+  const json = await response.json().catch(() => ({}));
+  // 400: el mail está mal escrito → se avisa, no se guarda para después
+  if (response.status === 400) return { ok: false, message: json.message };
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return { ok: true, message: json.message };
 };
 
-// ─── Motor de keywords para FAQs — solo offline ──────────────────────────────
-
-export const keywordSearchFaq = (message, eventData) => {
-  const texto = normalize(message);
-  let mejorFaq = null;
-  let mejorScore = 0;
-
-  for (const faq of eventData.faqs) {
-    let score = 0;
-    for (const keyword of faq.keywords) {
-      if (texto.includes(normalize(keyword))) score++;
-    }
-    if (score > mejorScore) {
-      mejorScore = score;
-      mejorFaq = faq;
-    }
+const queueLead = async (lead) => {
+  try {
+    const stored = JSON.parse((await AsyncStorage.getItem(STORAGE_KEYS.pendingLeads)) || '[]');
+    stored.push(lead);
+    await AsyncStorage.setItem(STORAGE_KEYS.pendingLeads, JSON.stringify(stored));
+  } catch (error) {
+    console.warn('[ChatService] Error guardando mail pendiente:', error.message);
   }
-
-  return mejorScore >= 1 ? mejorFaq : null;
 };
 
-// ─── Búsqueda fuzzy de expositores — solo offline ────────────────────────────
-
-export const fuzzySearchExpositor = (message) => {
-  const results = fuseIndex.search(message);
-  if (!results.length) return { type: 'none' };
-
-  const best = results[0];
-
-  if (best.score <= DIRECT_ANSWER_SCORE) {
-    return { type: 'direct', expositor: best.item };
+// Guarda el mail de alguien que quiere recibir información. Sin internet queda en el celular
+// y se manda la próxima vez que se abre el chat con señal.
+export const saveLead = async ({ email, name, company, topic = 'expositor' }) => {
+  const lead = { email: email.trim(), name, company, topic, deviceId: await getDeviceId() };
+  try {
+    return await postLead(lead);
+  } catch (error) {
+    await queueLead(lead);
+    return { ok: true, queued: true, message: '¡Listo! Guardamos tu mail. Lo mandamos apenas tengas internet y te escribimos cuando haya novedades 🙌' };
   }
-
-  const candidates = results.slice(0, DISAMBIGUATION_MAX).map(r => r.item);
-  return { type: 'disambiguation', candidates };
 };
 
-// Quita las palabras de intención del mensaje para buscar solo el nombre.
-// "ubicación de akron" → "akron"
-const stripIntentWords = (message) => {
-  let texto = normalize(message);
-  for (const kw of EXPOSITOR_INTENT_KEYWORDS) {
-    texto = texto.replace(normalize(kw), ' ');
+export const flushPendingLeads = async () => {
+  let stored;
+  try {
+    stored = JSON.parse((await AsyncStorage.getItem(STORAGE_KEYS.pendingLeads)) || '[]');
+  } catch {
+    return;
   }
-  return texto.trim().replace(/\s+/g, ' ');
-};
-
-// ─── Formato de respuesta de expositor ───────────────────────────────────────
-
-export const formatExpositorResponse = (exp) => {
-  let resp = `*${exp.name}*`;
-  if (exp.description) resp += `\n${exp.description}`;
-  if (exp.stand)       resp += `\nStand: ${exp.stand}`;
-  if (exp.category)    resp += ` | Categoría: ${exp.category}`;
-  if (!exp.stand)      resp += `\nEl stand se confirma en los carteles del predio o en Informes (punto 12).`;
-  return resp;
-};
-
-// ─── Búsqueda local completa — SOLO se usa cuando no hay internet ─────────────
-//
-// ORDEN CORREGIDO:
-//   1. Si hay INTENCIÓN de expositor ("ubicación de X", "stand de X", "dónde está X")
-//      → buscar el EXPOSITOR primero (sacando las palabras de intención).
-//      Esto evita que "ubicación de akron" caiga en la FAQ de ubicación del predio.
-//   2. Si no hay intención → FAQs primero (comportamiento normal).
-//   3. Match directo de expositor por nombre exacto (sin intención).
-
-export const localSearch = (message, eventData) => {
-  const tieneIntencion = hasExpositorIntent(message);
-
-  // 1. Intención de expositor → buscar expositor ANTES que FAQs
-  if (tieneIntencion) {
-    const soloNombre = stripIntentWords(message);
-    const fuzzyIntent = soloNombre.length >= 2
-      ? fuzzySearchExpositor(soloNombre)
-      : { type: 'none' };
-
-    if (fuzzyIntent.type === 'direct') {
-      return { type: 'expositor', data: fuzzyIntent.expositor };
-    }
-    if (fuzzyIntent.type === 'disambiguation') {
-      // Si hay un candidato claramente mejor, lo devuelvo directo;
-      // si son varios parecidos, desambiguo.
-      return { type: 'disambiguation', data: fuzzyIntent.candidates };
-    }
-    // Si no encontró nada con el nombre, pido el nombre
-    return { type: 'ask_name' };
+  if (!stored.length) return;
+  const left = [];
+  for (const lead of stored) {
+    try { await postLead(lead); } catch { left.push(lead); }
   }
-
-  // 2. Sin intención → FAQs primero
-  const faq = keywordSearchFaq(message, eventData);
-  if (faq) return { type: 'faq', data: faq };
-
-  // 3. Match directo de expositor por nombre exacto
-  const fuzzyResult = fuzzySearchExpositor(message);
-  if (fuzzyResult.type === 'direct') return { type: 'expositor', data: fuzzyResult.expositor };
-
-  return { type: 'none' };
+  await AsyncStorage.setItem(STORAGE_KEYS.pendingLeads, JSON.stringify(left)).catch(() => {});
 };
 
 // ─── Envío de mensaje — flujo principal ──────────────────────────────────────
 
-export const sendMessage = async (message, history, eventData) => {
+export const sendMessage = async (message, history, eventData, topic) => {
   const deviceId = await getDeviceId();
   const aiUsage  = await getAiUsage();
 
@@ -320,7 +226,7 @@ export const sendMessage = async (message, history, eventData) => {
     const response = await fetch(`${API_URL}/public/chat-message`, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ deviceId, message, history, aiUsage }),
+      body:    JSON.stringify({ deviceId, message, history, aiUsage, topic }),
       signal:  controller.signal
     });
     clearTimeout(timeoutId);
@@ -331,7 +237,6 @@ export const sendMessage = async (message, history, eventData) => {
       await saveAiUsage(result.aiUsage);
 
       return {
-        type:     'response',
         response: result.response,
         usedAI:   result.usedAI,
         logId:    result.logId || null,
@@ -342,37 +247,22 @@ export const sendMessage = async (message, history, eventData) => {
     console.warn('[ChatService] Sin conexión, usando motor local:', error.message);
   }
 
-  // ── Motor local completo — fallback sin internet ───────────────────────────
-  const localResult = localSearch(message, eventData);
-
-  if (localResult.type === 'disambiguation') {
-    return {
-      type:       'disambiguation',
-      candidates: localResult.data
-    };
-  }
-
+  // ── Sin internet: busca en lo que bajó el celular la última vez ────────────
+  const local = localAnswer(message, eventData, topic);
   let responseText;
-  let matchedFaqId = null;
-
-  if (localResult.type === 'faq') {
-    responseText = localResult.data.respuesta;
-    matchedFaqId = localResult.data.id;
-  } else if (localResult.type === 'expositor') {
-    responseText = formatExpositorResponse(localResult.data);
-  } else if (localResult.type === 'ask_name') {
-    responseText = '¿Qué expositor estás buscando? Escribí el nombre y te digo en qué stand está.';
-  } else {
-    responseText = 'No tengo información sobre eso. Podés consultar en el stand de Informes o escribir al WhatsApp 3794 222011.';
+  if (local.type === 'email') {
+    responseText = (await saveLead({ email: local.email, topic: topic || 'expositor' })).message;
+  } else if (local.type === 'welcome') {
+    responseText = eventData?.temas?.[topic || 'visitante']?.welcome;
+  } else if (local.type === 'answer') {
+    responseText = local.text;
   }
 
   return {
-    type:         'response',
-    response:     responseText,
-    usedAI:       false,
-    logId:        null,
-    matchedFaqId,
-    aiUsage       // sin cambios porque no se usó el backend
+    response: responseText || eventData?.noAnswer || 'Todavía no tengo esa información. Escribinos por WhatsApp al +54 9 3794 222011 y te respondemos.',
+    usedAI:   false,
+    logId:    null,
+    aiUsage   // sin cambios porque no se usó el backend
   };
 };
 

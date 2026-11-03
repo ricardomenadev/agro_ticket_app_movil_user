@@ -1,15 +1,17 @@
 // src/screens/ChatScreen.js
+// Chat de la app. Lo que sabe (bienvenida, botones y documentos de cada tema) se carga en el panel web
+// (Chat de la app) y llega con /public/chat-data; el celular lo guarda para usarlo sin internet.
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet,
-  KeyboardAvoidingView, Platform, ActivityIndicator, Animated, ScrollView, Image,
+  KeyboardAvoidingView, Platform, ActivityIndicator, Animated, Image,
   StatusBar,
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { EXHIBITORS_DATA } from '../constants/exhibitorsData2026';
-import { sendMessage, sendFeedback, getEventDataInstant, refreshEventDataFromServer, formatExpositorResponse } from '../services/chatService';
+import { sendMessage, sendFeedback, getEventDataInstant, refreshEventDataFromServer, saveLead, flushPendingLeads } from '../services/chatService';
+import { EMAIL_RE } from '../services/chatLocalSearch';
 const C = {
   bg:           '#F5F7F5',
   card:         '#FFFFFF',
@@ -24,46 +26,11 @@ const C = {
   shadow:       'rgba(45,122,58,0.10)',
 };
 
-const CATEGORY_CONFIG = {
-  maquinaria:    { icon: 'construct-outline',           label: 'Maquinaria' },
-  insumos:       { icon: 'leaf-outline',                label: 'Insumos y Semillas' },
-  vehiculos:     { icon: 'car-outline',                 label: 'Vehículos' },
-  servicios:     { icon: 'laptop-outline',              label: 'Servicios y Tecnología' },
-  financiero:    { icon: 'card-outline',                label: 'Financiero' },
-  institucional: { icon: 'school-outline',              label: 'Institucional' },
-  gastronomia:   { icon: 'restaurant-outline',          label: 'Gastronomía' },
-  otros:         { icon: 'ellipsis-horizontal-outline', label: 'Otros' },
-};
+const FALLBACK_WELCOME = '¡Hola! Soy el asistente de Agronea 🌾\n¿Sobre qué querés consultar?';
 
-const MENU_VISITANTE = [
-  { id: 'fechas',              label: 'Fechas y horarios',   icon: 'calendar-outline' },
-  { id: 'entradas',            label: 'Entradas y precios',  icon: 'ticket-outline' },
-  { id: 'como_llegar',         label: 'Cómo llegar',         icon: 'navigate-outline' },
-  { id: 'estacionamiento',     label: 'Estacionamiento',     icon: 'car-outline' },
-  { id: 'comida',              label: 'Dónde comer',         icon: 'restaurant-outline' },
-  { id: 'primeros_auxilios',   label: 'Emergencias',         icon: 'medkit-outline' },
-  { id: 'expositores_general', label: 'Expositores',         icon: 'business-outline' },
-  { id: 'charlas',             label: 'Charlas y auditorio', icon: 'mic-outline' },
-  { id: 'maquinarias',         label: 'Maquinarias',         icon: 'construct-outline' },
-  { id: 'cajero',              label: 'Cajero / Pagos',      icon: 'cash-outline' },
-  { id: 'banos',               label: 'Baños',               icon: 'water-outline' },
-  { id: 'contacto',            label: 'Contacto',            icon: 'call-outline' },
-];
-
-const MENU_EXPOSITOR = [
-  { id: 'expo_instalacion',           label: 'Armado de stand',    icon: 'hammer-outline' },
-  { id: 'expo_desmontaje',            label: 'Desarme',            icon: 'archive-outline' },
-  { id: 'expo_credenciales_detalle',  label: 'Credenciales',       icon: 'id-card-outline' },
-  { id: 'expo_invitaciones',          label: 'Invitaciones',       icon: 'mail-outline' },
-  { id: 'expo_electricidad_detalle',  label: 'Electricidad',       icon: 'flash-outline' },
-  { id: 'expo_agua',                  label: 'Agua',               icon: 'water-outline' },
-  { id: 'expo_seguro',                label: 'Seguro obligatorio', icon: 'shield-checkmark-outline' },
-  { id: 'expo_limpieza',              label: 'Limpieza',           icon: 'brush-outline' },
-  { id: 'expo_seguridad',             label: 'Seguridad nocturna', icon: 'lock-closed-outline' },
-  { id: 'expo_acreditaciones',        label: 'Acreditaciones',     icon: 'person-circle-outline' },
-  { id: 'expo_normas',                label: 'Reglamento',         icon: 'document-text-outline' },
-  { id: 'expo_contacto_organizacion', label: 'Contacto org.',      icon: 'call-outline' },
-];
+// Botones del tema: los documentos marcados "Botón en el menú" en el panel
+const menuFor = (eventData, tab) =>
+  (eventData?.faqs || []).filter(f => f.menu && f.topic === tab);
 
 // ─── TabSelector ──────────────────────────────────────────────────────────────
 
@@ -134,47 +101,31 @@ const ts = StyleSheet.create({
 
 // ─── MenuGrid ─────────────────────────────────────────────────────────────────
 
-const MenuGrid = ({ menuItems, eventData, onSelect }) => {
-  if (!menuItems || !eventData) return null;
+const MenuGrid = ({ items, onSelect }) => {
+  if (!items?.length) return null;
   return (
     <View style={s.menuGridWrapper}>
       <View style={s.menuGrid}>
-        {menuItems.map((item) => {
-          const faq = eventData.faqs.find(f => f.id === item.id);
-          if (!faq) return null;
-          return (
-            <TouchableOpacity key={item.id} style={s.menuGridBtn} onPress={() => onSelect(faq)} activeOpacity={0.75}>
-              <View style={s.menuGridIcon}>
-                <Ionicons name={item.icon || 'help-circle-outline'} size={18} color={C.primary} />
-              </View>
-              <Text style={s.menuGridLabel} numberOfLines={2}>{item.label}</Text>
-            </TouchableOpacity>
-          );
-        })}
+        {items.map((faq) => (
+          <TouchableOpacity key={faq.id} style={s.menuGridBtn} onPress={() => onSelect(faq)} activeOpacity={0.75}>
+            <View style={s.menuGridIcon}>
+              <Ionicons name="document-text-outline" size={18} color={C.primary} />
+            </View>
+            <Text style={s.menuGridLabel} numberOfLines={2}>{faq.pregunta}</Text>
+          </TouchableOpacity>
+        ))}
       </View>
     </View>
   );
 };
 
-// ─── RelatedChips ─────────────────────────────────────────────────────────────
+// ─── MoreTopics ───────────────────────────────────────────────────────────────
 
-const RelatedChips = ({ relatedFaqs, eventData, onSelect, onExpand }) => {
+const MoreTopics = ({ items, onSelect, onExpand }) => {
   const [showAll, setShowAll] = useState(false);
-  if (!eventData) return null;
-  const items = (relatedFaqs || []).map(id => eventData.faqs.find(f => f.id === id)).filter(Boolean);
-
+  if (!items?.length) return null;
   return (
     <View style={s.chipsWrapper}>
-      <Text style={s.chipsLabel}>Seguir consultando</Text>
-      {items.length > 0 && (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.chipsScroll}>
-          {items.map(faq => (
-            <TouchableOpacity key={faq.id} style={s.chip} onPress={() => onSelect(faq)} activeOpacity={0.75}>
-              <Text style={s.chipText}>{faq.pregunta}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      )}
       <TouchableOpacity
         style={s.btnVerTodos}
         onPress={() => { const next = !showAll; setShowAll(next); if (next && onExpand) onExpand(); }}
@@ -185,70 +136,68 @@ const RelatedChips = ({ relatedFaqs, eventData, onSelect, onExpand }) => {
       </TouchableOpacity>
       {showAll && (
         <View style={s.allTopicsPanel}>
-          <MenuGrid
-            menuItems={MENU_VISITANTE}
-            eventData={eventData}
-            onSelect={(faq) => { setShowAll(false); onSelect(faq); }}
-          />
+          <MenuGrid items={items} onSelect={(faq) => { setShowAll(false); onSelect(faq); }} />
         </View>
       )}
     </View>
   );
 };
 
-// ─── ExpositorCategorias ──────────────────────────────────────────────────────
+// ─── LeadForm ─────────────────────────────────────────────────────────────────
+// "Dejar mi mail": para avisarle cuando haya información de stands
 
-const ExpositorCategorias = ({ onSelectCategory }) => {
-  const counts = EXHIBITORS_DATA.reduce((acc, exp) => {
-    acc[exp.category] = (acc[exp.category] || 0) + 1;
-    return acc;
-  }, {});
+const LeadForm = ({ onSubmit, onCancel }) => {
+  const [email, setEmail]     = useState('');
+  const [company, setCompany] = useState('');
+  const [error, setError]     = useState(null);
+  const [sending, setSending] = useState(false);
+
+  const submit = async () => {
+    if (!new RegExp(`^${EMAIL_RE.source}$`).test(email.trim())) {
+      setError('Revisá el mail: tiene que ser como nombre@ejemplo.com');
+      return;
+    }
+    setSending(true);
+    const result = await onSubmit({ email, company: company.trim() || undefined });
+    setSending(false);
+    if (!result.ok) setError(result.message || 'No pudimos guardar el mail. Probá de nuevo.');
+  };
+
   return (
-    <View style={s.expositorWrapper}>
-      <Text style={s.sectionLabel}>Categorías</Text>
-      {Object.entries(CATEGORY_CONFIG).map(([key, config]) => {
-        const count = counts[key] || 0;
-        if (!count) return null;
-        return (
-          <TouchableOpacity key={key} style={s.categoryBtn} onPress={() => onSelectCategory(key)} activeOpacity={0.75}>
-            <View style={s.categoryIcon}>
-              <Ionicons name={config.icon} size={19} color={C.primary} />
-            </View>
-            <View style={s.categoryTextWrapper}>
-              <Text style={s.categoryLabel}>{config.label}</Text>
-              <Text style={s.categoryCount}>{count} expositores</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={15} color={C.textSub} />
-          </TouchableOpacity>
-        );
-      })}
-    </View>
-  );
-};
-
-// ─── ExpositorLista ───────────────────────────────────────────────────────────
-
-const ExpositorLista = ({ category, onSelectExpositor, onBack }) => {
-  const config = CATEGORY_CONFIG[category];
-  const expositores = EXHIBITORS_DATA.filter(e => e.category === category);
-  return (
-    <View style={s.expositorWrapper}>
-      <TouchableOpacity style={s.backBtn} onPress={onBack} activeOpacity={0.75}>
-        <Ionicons name="arrow-back" size={15} color={C.primary} />
-        <Text style={s.backBtnText}>Volver a categorías</Text>
-      </TouchableOpacity>
-      <Text style={s.sectionLabel}>{config?.label || category}</Text>
-      {expositores.map(exp => (
-        <TouchableOpacity key={exp.id} style={s.expositorItem} onPress={() => onSelectExpositor(exp)} activeOpacity={0.75}>
-          <View style={s.expositorItemLeft}>
-            <Text style={s.expositorItemName}>{exp.name}</Text>
-            {exp.description && (
-              <Text style={s.expositorItemDesc} numberOfLines={1}>{exp.description}</Text>
-            )}
-          </View>
-          <Ionicons name="chevron-forward" size={15} color={C.textSub} />
+    <View style={s.leadCard}>
+      <Text style={s.leadTitle}>Te avisamos cuando haya novedades</Text>
+      <Text style={s.leadText}>Cómo ser expositor, precios y condiciones de los stands.</Text>
+      <TextInput
+        style={s.leadInput}
+        value={email}
+        onChangeText={(t) => { setEmail(t); setError(null); }}
+        placeholder="Tu mail"
+        placeholderTextColor={C.textSub}
+        keyboardType="email-address"
+        autoCapitalize="none"
+        autoCorrect={false}
+        autoComplete="email"
+        accessibilityLabel="Tu mail"
+      />
+      <TextInput
+        style={s.leadInput}
+        value={company}
+        onChangeText={setCompany}
+        placeholder="Nombre o empresa (opcional)"
+        placeholderTextColor={C.textSub}
+        accessibilityLabel="Nombre o empresa, opcional"
+      />
+      {error && <Text style={s.leadError}>{error}</Text>}
+      <View style={s.leadActions}>
+        <TouchableOpacity style={s.leadCancel} onPress={onCancel} activeOpacity={0.75}>
+          <Text style={s.leadCancelText}>Cancelar</Text>
         </TouchableOpacity>
-      ))}
+        <TouchableOpacity style={[s.leadSubmit, sending && s.sendBtnDisabled]} onPress={submit} disabled={sending} activeOpacity={0.8}>
+          {sending
+            ? <ActivityIndicator size="small" color={C.card} />
+            : <Text style={s.leadSubmitText}>Guardar mi mail</Text>}
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -303,29 +252,6 @@ const MessageBubble = ({ message, onFeedback }) => {
   );
 };
 
-// ─── DisambiguationBubble ─────────────────────────────────────────────────────
-
-const DisambiguationBubble = ({ candidates, onSelect }) => (
-  <View style={s.bubbleWrapperBot}>
-    <View style={s.botAvatar}>
-      <Image
-        source={require('../../assets/images/logo_agronea_2026_2.png')}
-        style={s.botAvatarLogo}
-        resizeMode="contain"
-      />
-    </View>
-    <View style={[s.bubble, s.bubbleBot, s.disambiguationBubble]}>
-      <Text style={s.bubbleTextBot}>¿Te referías a alguno de estos?</Text>
-      {candidates.map((c, i) => (
-        <TouchableOpacity key={c.id} style={s.disambiguationOption} onPress={() => onSelect(c)} activeOpacity={0.75}>
-          <View style={s.menuNumber}><Text style={s.menuNumberText}>{i + 1}</Text></View>
-          <Text style={s.disambiguationOptionText}>{c.name}</Text>
-        </TouchableOpacity>
-      ))}
-    </View>
-  </View>
-);
-
 // ─── TypingIndicator ──────────────────────────────────────────────────────────
 
 const TypingIndicator = () => {
@@ -370,27 +296,26 @@ const TypingIndicator = () => {
 };
 
 // ─── Mensaje de bienvenida ────────────────────────────────────────────────────
+// El texto sale de eventData al dibujar, así toma lo último que bajó del panel
 
-const makeWelcomeMessage = () => ({
-  id: 'welcome',
+const makeWelcomeMessage = (tab) => ({
+  id: `welcome_${tab}_${Date.now()}`,
   role: 'assistant',
-  text: '¡Hola! Soy el asistente de Agronea 2026\nEcosistema de Oportunidades 🌾\n¿Sobre qué querés consultar?',
-  logId: null, feedback: null, relatedFaqs: null, showMenu: true,
+  welcomeTab: tab,
+  logId: null, feedback: null,
 });
 
 // ─── ChatScreen ───────────────────────────────────────────────────────────────
 
 const ChatScreen = ({ onClose }) => {
-  const insets = useSafeAreaInsets();
-  const [messages, setMessages]                   = useState([makeWelcomeMessage()]);
+  const [messages, setMessages]                   = useState(() => [makeWelcomeMessage('visitante')]);
   const [inputText, setInputText]                 = useState('');
   const [isLoading, setIsLoading]                 = useState(false);
   const [eventData, setEventData]                 = useState(null);
   const [remainingQueries, setRemainingQueries]   = useState(null);
-  const [pendingDisambiguation, setPendingDisambiguation] = useState(null);
-  const [basicMode, setBasicMode]                 = useState(false);
   const [activeTab, setActiveTab]                 = useState('visitante');
-  const [expositorFlow, setExpositorFlow]         = useState(null);
+  const [leadOpen, setLeadOpen]                   = useState(false);
+  const [leadSaved, setLeadSaved]                 = useState(false);
   const flatListRef = useRef(null);
 
   const loadEventData = useCallback(async () => {
@@ -409,6 +334,8 @@ const ChatScreen = ({ onClose }) => {
         );
       }
     });
+    // 3. Mails que quedaron guardados sin internet
+    flushPendingLeads();
   }, []);
 
   useEffect(() => { loadEventData(); }, [loadEventData]);
@@ -419,91 +346,62 @@ const ChatScreen = ({ onClose }) => {
     }
   }, [messages]);
 
+  const welcomeText = (tab) => eventData?.temas?.[tab]?.welcome || FALLBACK_WELCOME;
+  const askEmail = !!eventData?.temas?.expositor?.askEmail && !leadSaved;
+
   const handleTabChange = (tab) => {
     if (tab === activeTab) return;
     setActiveTab(tab);
-    setExpositorFlow(null);
-    setPendingDisambiguation(null);
-    const tabText = tab === 'visitante'
-      ? 'Acá tenés los temas para visitantes 👇'
-      : 'Acá tenés los temas para expositores 👇';
+    setLeadOpen(false);
+    setMessages(prev => [...prev, makeWelcomeMessage(tab)]);
+  };
+
+  const addBotMessage = (text, logId = null) => {
     setMessages(prev => [...prev, {
-      id: `tab_${Date.now()}`,
-      role: 'assistant',
-      text: tabText,
-      logId: null, feedback: null, relatedFaqs: null,
-      showMenu: true,
-      menuTab: tab,
+      id: `bot_${Date.now()}`, role: 'assistant', text,
+      logId, feedback: null,
     }]);
   };
 
-  const addBotMessage = (text, logId = null, relatedFaqs = null) => {
+  const addUserMessage = (text) => {
     setMessages(prev => [...prev, {
-      id: `bot_${Date.now()}`, role: 'assistant', text,
-      logId, feedback: null, relatedFaqs,
+      id: `user_${Date.now()}`, role: 'user', text, logId: null, feedback: null,
     }]);
   };
 
   const handleMenuSelect = (faq) => {
-    setPendingDisambiguation(null);
-    if (faq.id === 'expositores_general') {
-      setMessages(prev => [...prev, {
-        id: `user_${Date.now()}`, role: 'user', text: faq.pregunta, logId: null, feedback: null,
-      }]);
-      setExpositorFlow('categories');
-      return;
-    }
-    setMessages(prev => [...prev, {
-      id: `user_${Date.now()}`, role: 'user', text: faq.pregunta, logId: null, feedback: null,
-    }]);
-    addBotMessage(faq.respuesta, null, faq.related || null);
+    setLeadOpen(false);
+    addUserMessage(faq.pregunta);
+    addBotMessage(faq.respuesta);
   };
 
-  const handleExpositorSelect = (expositor) => {
-    setPendingDisambiguation(null);
-    setExpositorFlow(null);
-    setMessages(prev => [...prev, {
-      id: `user_${Date.now()}`, role: 'user', text: expositor.name, logId: null, feedback: null,
-    }]);
-    addBotMessage(formatExpositorResponse(expositor), null, null);
+  const handleLeadSubmit = async (lead) => {
+    const result = await saveLead({ ...lead, topic: 'expositor' });
+    if (result.ok) {
+      setLeadOpen(false);
+      setLeadSaved(true);
+      addUserMessage(lead.email.trim());
+      addBotMessage(result.message || '¡Listo! Guardamos tu mail. Te vamos a escribir apenas tengamos novedades 🙌');
+    }
+    return result;
   };
 
   const handleSend = async () => {
     const text = inputText.trim();
     if (!text || isLoading || !eventData) return;
-    if (pendingDisambiguation) {
-      const num = parseInt(text);
-      if (!isNaN(num) && num >= 1 && num <= pendingDisambiguation.candidates.length) {
-        setInputText('');
-        handleExpositorSelect(pendingDisambiguation.candidates[num - 1]);
-        return;
-      }
-      setPendingDisambiguation(null);
-    }
-    setMessages(prev => [...prev, {
-      id: `user_${Date.now()}`, role: 'user', text, logId: null, feedback: null,
-    }]);
+    setLeadOpen(false);
+    addUserMessage(text);
     setInputText('');
     setIsLoading(true);
-    const history = messages.filter(m => m.id !== 'welcome').slice(-6).map(m => ({
+    const history = messages.filter(m => m.text).slice(-6).map(m => ({
       role: m.role, content: m.text,
     }));
-    const result = await sendMessage(text, history, eventData);
+    const result = await sendMessage(text, history, eventData, activeTab);
     setIsLoading(false);
-    if (result.type === 'disambiguation') {
-      setPendingDisambiguation({ candidates: result.candidates });
-      return;
-    }
-    // basicMode solo se activa cuando se agotan las consultas
-    // No lo activamos por cada respuesta sin IA (puede ser fallback puntual)
-    const matchedFaq = result.matchedFaqId
-      ? eventData.faqs.find(f => f.id === result.matchedFaqId)
-      : null;
-    addBotMessage(result.response, result.logId, matchedFaq?.related || null);
+    addBotMessage(result.response, result.logId);
+    if (EMAIL_RE.test(text)) setLeadSaved(true);
     if (result.aiUsage) {
-      const remaining = Math.max(0, (eventData?.aiLimit ?? 10) - result.aiUsage.count);
-      setRemainingQueries(remaining);
-      if (remaining === 0) setBasicMode(true);
+      setRemainingQueries(Math.max(0, (eventData?.aiLimit ?? 10) - result.aiUsage.count));
     }
   };
 
@@ -514,25 +412,28 @@ const ChatScreen = ({ onClose }) => {
     await sendFeedback(logId, wasHelpful);
   };
 
-  const currentMenu = activeTab === 'visitante' ? MENU_VISITANTE : MENU_EXPOSITOR;
+  const scrollToEnd = () => setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
 
   const renderItem = ({ item }) => {
-    const itemMenu = item.menuTab
-      ? (item.menuTab === 'visitante' ? MENU_VISITANTE : MENU_EXPOSITOR)
-      : currentMenu;
+    if (item.welcomeTab) {
+      return (
+        <View>
+          <MessageBubble message={{ ...item, text: welcomeText(item.welcomeTab) }} onFeedback={handleFeedback} />
+          <MenuGrid items={menuFor(eventData, item.welcomeTab)} onSelect={handleMenuSelect} />
+          {item.welcomeTab === 'expositor' && askEmail && !leadOpen && (
+            <TouchableOpacity style={s.leadBtn} onPress={() => { setLeadOpen(true); scrollToEnd(); }} activeOpacity={0.8}>
+              <Ionicons name="mail-outline" size={18} color={C.card} />
+              <Text style={s.leadBtnText}>Dejar mi mail</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      );
+    }
     return (
       <View>
         <MessageBubble message={item} onFeedback={handleFeedback} />
-        {(item.id === 'welcome' || item.showMenu) && eventData && (
-          <MenuGrid menuItems={itemMenu} eventData={eventData} onSelect={handleMenuSelect} />
-        )}
-        {item.role === 'assistant' && !item.showMenu && eventData && (
-          <RelatedChips
-            relatedFaqs={item.relatedFaqs}
-            eventData={eventData}
-            onSelect={handleMenuSelect}
-            onExpand={() => setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100)}
-          />
+        {item.role === 'assistant' && (
+          <MoreTopics items={menuFor(eventData, activeTab)} onSelect={handleMenuSelect} onExpand={scrollToEnd} />
         )}
       </View>
     );
@@ -540,22 +441,7 @@ const ChatScreen = ({ onClose }) => {
 
   const renderFooter = () => {
     if (isLoading) return <TypingIndicator />;
-    if (pendingDisambiguation) return (
-      <DisambiguationBubble
-        candidates={pendingDisambiguation.candidates}
-        onSelect={handleExpositorSelect}
-      />
-    );
-    if (expositorFlow === 'categories') return (
-      <ExpositorCategorias onSelectCategory={setExpositorFlow} />
-    );
-    if (expositorFlow && expositorFlow !== 'categories') return (
-      <ExpositorLista
-        category={expositorFlow}
-        onSelectExpositor={handleExpositorSelect}
-        onBack={() => setExpositorFlow('categories')}
-      />
-    );
+    if (leadOpen) return <LeadForm onSubmit={handleLeadSubmit} onCancel={() => setLeadOpen(false)} />;
     return null;
   };
 
@@ -564,6 +450,7 @@ const ChatScreen = ({ onClose }) => {
     : remainingQueries > 0
       ? `${remainingQueries} consultas con IA`
       : 'Respondiendo con info guardada';
+
 
   return (
     <SafeAreaView style={s.container} edges={['top', 'bottom']}>
@@ -629,40 +516,34 @@ const ChatScreen = ({ onClose }) => {
           onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
         />
 
-        {basicMode ? (
-          <View style={s.basicModeBar}>
-            <Ionicons name="list-outline" size={16} color={C.textSub} />
-            <Text style={s.basicModeText}>Tocá una opción para continuar</Text>
-          </View>
-        ) : (
-          <View style={s.inputContainer}>
-            <TextInput
-              style={s.input}
-              value={inputText}
-              onChangeText={setInputText}
-              placeholder={pendingDisambiguation ? 'Escribí 1, 2 o 3...' : '¿Tenés alguna consulta?'}
-              placeholderTextColor={C.textSub}
-              multiline={false}
-              returnKeyType="send"
-              onSubmitEditing={handleSend}
-              editable={!isLoading && !!eventData}
-            />
-            <TouchableOpacity
-              style={[s.sendBtn, (!inputText.trim() || isLoading) && s.sendBtnDisabled]}
-              onPress={handleSend}
-              disabled={!inputText.trim() || isLoading}
-            >
-              {isLoading
-                ? <ActivityIndicator size="small" color={C.card} />
-                : <Ionicons name="send" size={16} color={C.card} />
-              }
-            </TouchableOpacity>
-          </View>
-        )}
+        <View style={s.inputContainer}>
+          <TextInput
+            style={s.input}
+            value={inputText}
+            onChangeText={setInputText}
+            placeholder={activeTab === 'expositor' ? 'Consultá o escribí tu mail' : '¿Tenés alguna consulta?'}
+            placeholderTextColor={C.textSub}
+            multiline={false}
+            returnKeyType="send"
+            onSubmitEditing={handleSend}
+            editable={!isLoading && !!eventData}
+          />
+          <TouchableOpacity
+            style={[s.sendBtn, (!inputText.trim() || isLoading) && s.sendBtnDisabled]}
+            onPress={handleSend}
+            disabled={!inputText.trim() || isLoading}
+          >
+            {isLoading
+              ? <ActivityIndicator size="small" color={C.card} />
+              : <Ionicons name="send" size={16} color={C.card} />
+            }
+          </TouchableOpacity>
+        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
+
 
 // ─── Estilos ──────────────────────────────────────────────────────────────────
 
@@ -760,18 +641,7 @@ const s = StyleSheet.create({
   },
   menuGridLabel: { fontSize: 13, fontWeight: '600', color: C.text, flex: 1, lineHeight: 18 },
 
-  chipsWrapper: { marginTop: 8, marginBottom: 4, paddingLeft: 36 },
-  chipsLabel: {
-    fontSize: 10, color: C.textSub, fontWeight: '700',
-    letterSpacing: 0.8, marginBottom: 8, textTransform: 'uppercase',
-  },
-  chipsScroll: { gap: 8, paddingRight: 16 },
-  chip: {
-    backgroundColor: C.primaryLight,
-    borderRadius: 20, paddingHorizontal: 13, paddingVertical: 7,
-    borderWidth: 1, borderColor: C.border,
-  },
-  chipText: { fontSize: 13, color: C.primary, fontWeight: '500' },
+  chipsWrapper: { marginTop: 4, marginBottom: 4, paddingLeft: 36 },
   btnVerTodos: {
     flexDirection: 'row', alignItems: 'center', gap: 5,
     marginTop: 10, paddingVertical: 7, paddingHorizontal: 4,
@@ -783,19 +653,6 @@ const s = StyleSheet.create({
     borderRadius: 16, padding: 12,
     borderWidth: 1, borderColor: C.border,
   },
-
-  disambiguationBubble: { maxWidth: '85%', paddingBottom: 8 },
-  disambiguationOption: {
-    flexDirection: 'row', alignItems: 'center', gap: 10,
-    paddingVertical: 9, borderTopWidth: 1, borderTopColor: C.border,
-  },
-  menuNumber: {
-    width: 24, height: 24, borderRadius: 12,
-    backgroundColor: C.primary,
-    alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-  },
-  menuNumberText: { fontSize: 11, fontWeight: '700', color: C.card },
-  disambiguationOptionText: { fontSize: 13, color: C.text, flex: 1, fontWeight: '500' },
 
   typingBubble: {
     flexDirection: 'row', alignItems: 'center', gap: 5,
@@ -823,48 +680,35 @@ const s = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   sendBtnDisabled: { backgroundColor: C.border },
-  basicModeBar: {
+  leadBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
-    paddingTop: 14, paddingHorizontal: 16, paddingBottom: 14,
-    backgroundColor: C.card,
-    borderTopWidth: 1, borderTopColor: C.border,
+    backgroundColor: C.primary, borderRadius: 16,
+    minHeight: 48, paddingHorizontal: 16, marginTop: 4, marginBottom: 6,
   },
-  basicModeText: { fontSize: 13, color: C.textSub, fontWeight: '500' },
-
-  expositorWrapper: { marginHorizontal: 4, marginTop: 8, marginBottom: 8 },
-  sectionLabel: {
-    fontSize: 11, fontWeight: '700', color: C.textSub,
-    textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10,
+  leadBtnText: { fontSize: 15, fontWeight: '700', color: C.card },
+  leadCard: {
+    backgroundColor: C.card, borderRadius: 18, padding: 14, marginTop: 8, marginBottom: 8,
+    borderWidth: 1, borderColor: C.border, gap: 8,
+    shadowColor: C.shadow, shadowOffset: { width: 0, height: 1 }, shadowOpacity: 1, shadowRadius: 3, elevation: 1,
   },
-  categoryBtn: {
-    flexDirection: 'row', alignItems: 'center',
-    backgroundColor: C.card, borderRadius: 16, padding: 14,
-    borderWidth: 1, borderColor: C.border, gap: 12, marginBottom: 8,
-    shadowColor: C.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 1, shadowRadius: 3, elevation: 1,
+  leadTitle: { fontSize: 15, fontWeight: '700', color: C.text },
+  leadText:  { fontSize: 13, color: C.textSub, lineHeight: 19 },
+  leadInput: {
+    backgroundColor: C.bg, borderRadius: 12, borderWidth: 1, borderColor: C.border,
+    paddingHorizontal: 14, minHeight: 46, fontSize: 15, color: C.text,
   },
-  categoryIcon: {
-    width: 40, height: 40, borderRadius: 20,
-    backgroundColor: C.primaryLight,
-    alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+  leadError: { fontSize: 13, color: C.error },
+  leadActions: { flexDirection: 'row', gap: 10, marginTop: 2 },
+  leadCancel: {
+    flex: 1, minHeight: 46, borderRadius: 12, borderWidth: 1, borderColor: C.border,
+    alignItems: 'center', justifyContent: 'center',
   },
-  categoryTextWrapper: { flex: 1 },
-  categoryLabel: { fontSize: 15, fontWeight: '700', color: C.text },
-  categoryCount:  { fontSize: 12, color: C.textSub, marginTop: 2 },
-  backBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12, paddingVertical: 4 },
-  backBtnText: { fontSize: 13, color: C.primary, fontWeight: '600' },
-  expositorItem: {
-    flexDirection: 'row', alignItems: 'center',
-    backgroundColor: C.card, borderRadius: 14, padding: 14,
-    borderWidth: 1, borderColor: C.border, marginBottom: 6, gap: 10,
-    shadowColor: C.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 1, shadowRadius: 2, elevation: 1,
+  leadCancelText: { fontSize: 14, fontWeight: '600', color: C.textSub },
+  leadSubmit: {
+    flex: 2, minHeight: 46, borderRadius: 12, backgroundColor: C.primary,
+    alignItems: 'center', justifyContent: 'center',
   },
-  expositorItemLeft: { flex: 1 },
-  expositorItemName: { fontSize: 14, fontWeight: '700', color: C.text },
-  expositorItemDesc: { fontSize: 12, color: C.textSub, marginTop: 2 },
+  leadSubmitText: { fontSize: 15, fontWeight: '700', color: C.card },
 });
 
 export default ChatScreen;

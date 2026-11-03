@@ -37,12 +37,11 @@ import ChatScreen from '../../screens/ChatScreen';
 // ─── Mensajes que rota el globito ─────────────────────────────────────────────
 // Pensados para encaminar al usuario: que sepa que hay un asistente y qué
 // puede preguntarle. Se muestran en orden, uno por aparición.
+// Sirven todo el año: lo que sabe el chat cambia desde el panel, estos textos no.
 const BUBBLE_MESSAGES = [
   '¿Tenés dudas? Preguntame 👋',
-  '¿Buscás un expositor? Te digo en qué stand está 📍',
-  '¿Querés ver el cronograma de charlas? 🎤',
-  'Consultá horarios, entradas y cómo llegar 🎟️',
-  '¿Necesitás algo del evento? Estoy para ayudarte 🌾',
+  '¿Querés exponer en Agronea? Consultame 🤝',
+  '¿Necesitás algo de Agronea? Estoy para ayudarte 🌾',
 ];
 
 // ─── Tiempos del ciclo del globito (en ms) ───────────────────────────────────
