@@ -37,3 +37,6 @@ yarn-error.*
 
 # Firebase service account key (sensible — no commitear)
 *firebase-adminsdk*.json
+
+# Video promocional de la app (proyecto HyperFrames aparte, no va en el build)
+promo-app/
