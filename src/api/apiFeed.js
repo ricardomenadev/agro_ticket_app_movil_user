@@ -32,6 +32,14 @@ export const fetchAppSettings = async () => {
   return (await res.json()).data;
 };
 
+// Video emergente del panel: /api/app/promo (null si está apagado)
+export const API_ROOT = API_URL.replace(/\/api(\/mobile)?$/, "");
+export const fetchPromo = async () => {
+  const res = await fetch(`${API_URL.replace(/\/mobile$/, "")}/app/promo`);
+  if (!res.ok) throw new Error(`video: ${res.status}`);
+  return (await res.json()).data;
+};
+
 export const useAppSettings = () => useCachedFeed("agroFeed.appSettings", fetchAppSettings).data || {};
 
 // Clima de Charata (Open-Meteo, sin clave): ahora, máxima, mínima y probabilidad de lluvia del día

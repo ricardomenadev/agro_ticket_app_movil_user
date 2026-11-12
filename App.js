@@ -9,6 +9,7 @@ import { View, ActivityIndicator } from 'react-native';
 import MainTabNavigator from './src/navigation/MainTabNavigator';
 import { StoreProvider } from './src/context/StoreContext';
 import UpdateModal from './src/components/common/UpdateModal';
+import PromoVideoModal from './src/components/common/PromoVideoModal';
 import { registerForPushNotifications } from './src/utils/pushNotifications';
 import AnimatedSplash from './src/components/common/AnimatedSplash';
 import { ShopCartProvider } from './src/context/ShopCartContext';
@@ -53,6 +54,8 @@ export default function App() {
           </NavigationContainer>
         </ShopCartProvider>
         <UpdateModal onDismiss={() => setVersionChecked(true)} />
+        {/* Después del aviso de versión y de la animación de entrada, para no taparlos */}
+        {versionChecked && splashDone && <PromoVideoModal />}
         {!splashDone && <AnimatedSplash onDone={() => setSplashDone(true)} />}
       </StoreProvider>
     </SafeAreaProvider>
