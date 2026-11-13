@@ -116,3 +116,5 @@ Lo que se sabe hasta ahora:
 | 1.3.6 | 39 | 14 | jul 2026 | Última antes del rediseño |
 | 1.4.0 | 40 | — | 28 oct 2026 | Entradas con QR sin señal, pasar entradas, invitaciones. Primera subida con `eas submit` |
 | 1.4.1 | 41 | — | 2 nov 2026 | Inicio con portada de noticias, "Agro hoy", "Continuar compra", menú Más nuevo, footer |
+| 1.4.2 | 42 | — | 3 nov 2026 | Chat desde el panel, todos los dólares, aviso de actualización nuevo |
+| 1.4.3 | 43 | — | 12 nov 2026 | Video emergente desde el panel (WhatsApp y "Ahora no"), prensa en el menú Más, ícono de notificaciones. Mandada a revisión el 12/11 |
