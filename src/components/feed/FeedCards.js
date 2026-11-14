@@ -1,9 +1,10 @@
 // Piezas del rediseño: encabezados de sección, tarjetas de precio y de noticia.
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image, Linking } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useShare, ShareButton } from "../share/ShareProvider";
+import { useNewsReader } from "./NewsReader";
 
 // Fondo negro: el verde y el dorado quedan solo como acentos, para que resalten
 export const C = {
@@ -76,6 +77,7 @@ const ago = (date) => {
 /** Noticia del feed (o de ejemplo con tag/ago). Al tocarla abre la nota en el navegador. */
 export const NewsCard = ({ item, big }) => {
   const share = useShare();
+  const read = useNewsReader();
   const tag = item.tag || [CATEGORY[item.category] || "CAMPO", item.region === "nea" ? "NEA" : null].filter(Boolean).join(" · ");
   const when = item.ago || (item.publishedAt ? ago(item.publishedAt) : "");
   const photo = item.imageUrl ? (
@@ -86,7 +88,7 @@ export const NewsCard = ({ item, big }) => {
     </View>
   );
   return (
-    <TouchableOpacity style={[s.newsCard, big && s.newsCardBig]} onPress={() => openNews(item)} disabled={!item.url} activeOpacity={0.85} accessibilityRole="link">
+    <TouchableOpacity style={[s.newsCard, big && s.newsCardBig]} onPress={() => read(item, tag)} activeOpacity={0.85} accessibilityRole="link">
       {photo}
       <View style={big ? s.newsBodyBig : s.newsBody}>
         <View style={s.tagRow}>
@@ -110,10 +112,9 @@ export const NEWS_SECTIONS = [
 /** La principal de una sección: la más nueva que tenga foto (si ninguna tiene, la más nueva). */
 export const leadOf = (list) => (list || []).find((n) => n.imageUrl) || list?.[0] || null;
 
-const openNews = (item) => item.url && Linking.openURL(item.url).catch(() => {});
 
 /** Lo que va en la imagen al compartir una noticia (con el sello de Agronea). */
-const newsShare = (item, label) => ({
+export const newsShare = (item, label) => ({
   eyebrow: ["NOTICIA DEL AGRO", label].filter(Boolean).join(" · ").toUpperCase(),
   photo: item.imageUrl,
   title: item.title,
@@ -124,8 +125,9 @@ const newsShare = (item, label) => ({
 /** Portada: foto de fondo con el título encima. `half` es la versión chica que va de a dos. */
 export const NewsCover = ({ item, label, half }) => {
   const share = useShare();
+  const read = useNewsReader();
   return (
-  <TouchableOpacity style={[s.cover, half && s.coverHalf]} onPress={() => openNews(item)} disabled={!item.url} activeOpacity={0.9} accessibilityRole="link">
+  <TouchableOpacity style={[s.cover, half && s.coverHalf]} onPress={() => read(item, label)} activeOpacity={0.9} accessibilityRole="link">
     {item.imageUrl ? (
       <Image source={{ uri: item.imageUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" accessibilityIgnoresInvertColors />
     ) : (
@@ -146,8 +148,9 @@ export const NewsCover = ({ item, label, half }) => {
 /** Noticia en la grilla de dos columnas de Mercados y noticias. */
 export const NewsTile = ({ item, label }) => {
   const share = useShare();
+  const read = useNewsReader();
   return (
-  <TouchableOpacity style={s.tile} onPress={() => openNews(item)} disabled={!item.url} activeOpacity={0.85} accessibilityRole="link">
+  <TouchableOpacity style={s.tile} onPress={() => read(item, label)} activeOpacity={0.85} accessibilityRole="link">
     {item.imageUrl ? (
       <Image source={{ uri: item.imageUrl }} style={s.tilePhoto} resizeMode="cover" accessibilityIgnoresInvertColors />
     ) : (
