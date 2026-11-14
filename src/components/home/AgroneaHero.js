@@ -1,4 +1,4 @@
-// Carrusel de Agronea arriba del inicio: la marca (mensaje de la vitrina del panel), la tienda oficial,
+// Carrusel de Agronea arriba del inicio: siempre primero la preventa de stands 2027, después la marca (mensaje de la vitrina del panel), la tienda oficial,
 // la última novedad de Agronea si hay y Agronea TV. Pasa solo cada 5 segundos.
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image, ImageBackground, Dimensions, Linking, Animated, Easing } from "react-native";
@@ -16,6 +16,9 @@ const SOCIAL = [
   { id: "fb", icon: "logo-facebook", eyebrow: "FACEBOOK", title: "Sumate a Agronea Chaco", text: "Enterate primero de fechas, entradas y sorteos.", cta: "Ir a la página", url: "https://www.facebook.com/agroneachaco", colors: ["#1877f2", "#0b3a7a"] },
   { id: "x", icon: "logo-x", eyebrow: "X", title: "Seguinos en @AgroneaChaco", text: "Las novedades del evento al instante.", cta: "Seguir", url: "https://x.com/AgroneaChaco", colors: ["#2a2a2a", "#000000"] },
 ];
+
+// Preventa de stands (la misma campaña que el video emergente): abre el WhatsApp de ventas con el mensaje escrito
+const STANDS_WHATSAPP = `https://wa.me/5493794222011?text=${encodeURIComponent("Hola, quiero información para tener un stand en Agronea 2027.")}`;
 
 const W = Dimensions.get("window").width - 36 - 4; // menos el borde dorado
 const H = 220;
@@ -44,6 +47,18 @@ const AgroneaHero = ({ agroneaNews }) => {
   const showcasePhoto = showcase?.images?.[0]?.url || showcase?.images?.[0];
 
   const slides = [
+    <ImageBackground key="stands" source={require("../../../assets/images/stands2027.jpg")} style={styles.slide} imageStyle={styles.radius}>
+      <LinearGradient colors={["rgba(0,0,0,0.15)", "rgba(0,0,0,0.88)"]} style={[styles.slideInner, styles.radius, styles.standsInner]}>
+        <Text style={styles.eyebrow}>EXPO AGRONEA 2027</Text>
+        <Text style={styles.standsTitle} numberOfLines={2}>Preventa de espacios</Text>
+        <Text style={styles.text} numberOfLines={2}>Llegó el momento de asegurar tu lugar. Más oportunidades, más negocios.</Text>
+        <TouchableOpacity onPress={() => Linking.openURL(STANDS_WHATSAPP).catch(() => {})} style={styles.standsCta} activeOpacity={0.85} accessibilityRole="button">
+          <Ionicons name="logo-whatsapp" size={18} color="#fff" />
+          <Text style={styles.standsCtaText}>Quiero mi stand</Text>
+        </TouchableOpacity>
+      </LinearGradient>
+    </ImageBackground>,
+
     <ImageBackground key="brand" source={showcasePhoto ? { uri: typeof showcasePhoto === "string" ? showcasePhoto : showcasePhoto.url } : null} style={styles.slide} imageStyle={styles.radius}>
       <LinearGradient colors={showcasePhoto ? ["rgba(0,0,0,0.2)", "rgba(0,0,0,0.85)"] : ["#0f6e3f", "#0a0a0a"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[styles.slideInner, styles.radius, styles.centered]}>
         <View style={[styles.logoCard, styles.selfCenter]}>
@@ -161,6 +176,10 @@ const styles = StyleSheet.create({
   centered: { alignItems: "center" },
   selfCenter: { alignSelf: "center" },
   textCenter: { textAlign: "center" },
+  standsInner: { justifyContent: "flex-end" },
+  standsTitle: { color: C.gold, fontSize: 24, fontWeight: "900" },
+  standsCta: { flexDirection: "row", alignItems: "center", gap: 8, alignSelf: "flex-start", backgroundColor: "#25D366", borderRadius: 10, paddingHorizontal: 14, minHeight: 40, marginTop: 4 },
+  standsCtaText: { color: "#fff", fontWeight: "800", fontSize: 14 },
   socialRow: { flexDirection: "row", alignItems: "center", gap: 14 },
   socialIcon: { width: 64, height: 64, borderRadius: 32, backgroundColor: "rgba(255,255,255,0.18)", alignItems: "center", justifyContent: "center" },
   socialEyebrow: { color: "#fff", opacity: 0.85, fontSize: 10, letterSpacing: 2, fontWeight: "700" },
