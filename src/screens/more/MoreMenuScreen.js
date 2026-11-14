@@ -56,6 +56,10 @@ const MoreMenuScreen = ({ navigation }) => {
 
         <Group title="La edición" items={edition} />
         <Group
+          title="Herramientas"
+          items={[{ title: "Calculadora del campo", subtitle: "Cosecha, quintales y cuánto vender", icon: "calculator-outline", onPress: go("FieldCalculator") }]}
+        />
+        <Group
           title="Para tu visita"
           items={[
             { title: "Guía del visitante", icon: "compass-outline", onPress: go("VisitorGuide") },

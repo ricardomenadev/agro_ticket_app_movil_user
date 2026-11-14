@@ -3,6 +3,7 @@ import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image, Linking } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import { useShare, ShareButton } from "../share/ShareProvider";
 
 // Fondo negro: el verde y el dorado quedan solo como acentos, para que resalten
 export const C = {
@@ -74,6 +75,7 @@ const ago = (date) => {
 
 /** Noticia del feed (o de ejemplo con tag/ago). Al tocarla abre la nota en el navegador. */
 export const NewsCard = ({ item, big }) => {
+  const share = useShare();
   const tag = item.tag || [CATEGORY[item.category] || "CAMPO", item.region === "nea" ? "NEA" : null].filter(Boolean).join(" · ");
   const when = item.ago || (item.publishedAt ? ago(item.publishedAt) : "");
   const photo = item.imageUrl ? (
@@ -94,6 +96,7 @@ export const NewsCard = ({ item, big }) => {
         <Text style={big ? s.newsTitleBig : s.newsTitle} numberOfLines={big ? 4 : 3}>{item.title}</Text>
         <Text style={s.muted11}>{item.source}{when ? ` · ${when}` : ""}</Text>
       </View>
+      <ShareButton style={s.shareTopRight} onPress={() => share(newsShare(item, tag))} />
     </TouchableOpacity>
   );
 };
@@ -109,8 +112,19 @@ export const leadOf = (list) => (list || []).find((n) => n.imageUrl) || list?.[0
 
 const openNews = (item) => item.url && Linking.openURL(item.url).catch(() => {});
 
+/** Lo que va en la imagen al compartir una noticia (con el sello de Agronea). */
+const newsShare = (item, label) => ({
+  eyebrow: ["NOTICIA DEL AGRO", label].filter(Boolean).join(" · ").toUpperCase(),
+  photo: item.imageUrl,
+  title: item.title,
+  note: "Leé esta y todas las noticias del campo en la app Agronea.",
+  source: [item.source, item.publishedAt && new Date(item.publishedAt).toLocaleDateString("es-AR", { day: "numeric", month: "long" })].filter(Boolean).join(" · "),
+});
+
 /** Portada: foto de fondo con el título encima. `half` es la versión chica que va de a dos. */
-export const NewsCover = ({ item, label, half }) => (
+export const NewsCover = ({ item, label, half }) => {
+  const share = useShare();
+  return (
   <TouchableOpacity style={[s.cover, half && s.coverHalf]} onPress={() => openNews(item)} disabled={!item.url} activeOpacity={0.9} accessibilityRole="link">
     {item.imageUrl ? (
       <Image source={{ uri: item.imageUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" accessibilityIgnoresInvertColors />
@@ -124,11 +138,15 @@ export const NewsCover = ({ item, label, half }) => (
       <Text style={half ? s.coverTitleHalf : s.coverTitle} numberOfLines={half ? 4 : 3}>{item.title}</Text>
       {half ? null : <Text style={s.muted11}>{item.source}{item.publishedAt ? ` · ${ago(item.publishedAt)}` : ""}</Text>}
     </LinearGradient>
+    <ShareButton style={s.shareTopRight} onPress={() => share(newsShare(item, label))} />
   </TouchableOpacity>
-);
+  );
+};
 
 /** Noticia en la grilla de dos columnas de Mercados y noticias. */
-export const NewsTile = ({ item, label }) => (
+export const NewsTile = ({ item, label }) => {
+  const share = useShare();
+  return (
   <TouchableOpacity style={s.tile} onPress={() => openNews(item)} disabled={!item.url} activeOpacity={0.85} accessibilityRole="link">
     {item.imageUrl ? (
       <Image source={{ uri: item.imageUrl }} style={s.tilePhoto} resizeMode="cover" accessibilityIgnoresInvertColors />
@@ -139,8 +157,10 @@ export const NewsTile = ({ item, label }) => (
     )}
     <Text style={s.tag} numberOfLines={1}>{label} · {item.source}</Text>
     <Text style={s.tileTitle} numberOfLines={4}>{item.title}</Text>
+    <ShareButton style={s.shareTopRight} onPress={() => share(newsShare(item, label))} />
   </TouchableOpacity>
-);
+  );
+};
 
 /** Fila de pastillas para elegir sección (NEA, País, Economía…). */
 export const Chips = ({ options, value, onChange }) => (
@@ -179,7 +199,7 @@ const s = StyleSheet.create({
   newsCardBig: { flexDirection: "column", padding: 0, overflow: "hidden", borderRadius: 18 },
   newsPhoto: { width: 72, height: 72, borderRadius: 12, backgroundColor: C.photo, alignItems: "center", justifyContent: "center" },
   newsPhotoBig: { height: 150, backgroundColor: C.photo, alignItems: "center", justifyContent: "center" },
-  newsBody: { flex: 1, gap: 4 },
+  newsBody: { flex: 1, gap: 4, paddingRight: 30 },
   newsBodyBig: { padding: 14, gap: 6 },
   tagRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   featured: { fontSize: 10, letterSpacing: 1.5, fontWeight: "700", color: C.bg, backgroundColor: C.gold, borderRadius: 6, paddingHorizontal: 7, paddingVertical: 3, overflow: "hidden" },
@@ -195,6 +215,7 @@ const s = StyleSheet.create({
   coverTitle: { color: C.text, fontSize: 17, fontWeight: "800", lineHeight: 22 },
   coverTitleHalf: { color: C.text, fontSize: 13, fontWeight: "700", lineHeight: 17 },
   tile: { flex: 1, gap: 5 },
+  shareTopRight: { position: "absolute", top: 8, right: 8 },
   tilePhoto: { width: "100%", aspectRatio: 1, borderRadius: 12, backgroundColor: C.photo },
   tileTitle: { color: C.text, fontSize: 13, fontWeight: "600", lineHeight: 17 },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },

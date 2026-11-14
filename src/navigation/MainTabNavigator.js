@@ -22,6 +22,7 @@ import MoreMenuScreen from "../screens/more/MoreMenuScreen";
 import MercadoPagoWebView from "../screens/shop/MercadoPagoWebView";
 import ContactScreen from "../screens/more/ContactScreen";
 import PressAccreditationScreen from "../screens/more/PressAccreditationScreen";
+import FieldCalculatorScreen from "../screens/more/FieldCalculatorScreen";
 import AppVersionScreen from "../screens/more/AppVersionScreen";
 import TermsConditionsScreen from "../screens/more/TermsConditionsScreen";
 import AccommodationScreen from "../screens/more/AccommodationScreen";
@@ -175,6 +176,11 @@ const MoreStackNavigator = () => {
         name="PressAccreditation"
         component={PressAccreditationScreen}
         options={{ title: "Acreditación de prensa" }}
+      />
+      <MoreStack.Screen
+        name="FieldCalculator"
+        component={FieldCalculatorScreen}
+        options={{ title: "Calculadora del campo" }}
       />
       <MoreStack.Screen
         name="AppVersion"

@@ -13,6 +13,7 @@ import PromoVideoModal from './src/components/common/PromoVideoModal';
 import { registerForPushNotifications } from './src/utils/pushNotifications';
 import AnimatedSplash from './src/components/common/AnimatedSplash';
 import { ShopCartProvider } from './src/context/ShopCartContext';
+import { ShareProvider } from './src/components/share/ShareProvider';
 
 // Links que abren la app: el de "Mis entradas" del mail (agronea.store/mis-entradas/<token>) carga esa compra en Entradas;
 // el del cupo de invitaciones (agronea.store/i/<token>) abre ese cupo.
@@ -48,10 +49,12 @@ export default function App() {
     <SafeAreaProvider>
       <StoreProvider>
         <ShopCartProvider>
-          <NavigationContainer linking={linking}>
-            <StatusBar style="light" backgroundColor="transparent" translucent={true} />
-            <MainTabNavigator versionChecked={versionChecked} />
-          </NavigationContainer>
+          <ShareProvider>
+            <NavigationContainer linking={linking}>
+              <StatusBar style="light" backgroundColor="transparent" translucent={true} />
+              <MainTabNavigator versionChecked={versionChecked} />
+            </NavigationContainer>
+          </ShareProvider>
         </ShopCartProvider>
         <UpdateModal onDismiss={() => setVersionChecked(true)} />
         {/* Después del aviso de versión y de la animación de entrada, para no taparlos */}
