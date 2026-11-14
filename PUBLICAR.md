@@ -118,3 +118,4 @@ Lo que se sabe hasta ahora:
 | 1.4.1 | 41 | — | 2 nov 2026 | Inicio con portada de noticias, "Agro hoy", "Continuar compra", menú Más nuevo, footer |
 | 1.4.2 | 42 | — | 3 nov 2026 | Chat desde el panel, todos los dólares, aviso de actualización nuevo |
 | 1.4.3 | 43 | — | 12 nov 2026 | Video emergente desde el panel (WhatsApp y "Ahora no"), prensa en el menú Más, ícono de notificaciones. Mandada a revisión el 12/11 |
+| 1.4.4 | 44 | — | 14 nov 2026 | Preventa de stands 2027 primera en el carrusel, calculadora del campo, compartir con el sello de Agronea, noticias dentro de la app. Mandada a revisión el 14/11 |
